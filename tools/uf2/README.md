@@ -2,7 +2,12 @@
 
 ## Introduction
 This tool helps you to program eve-connected flash with user specified file through the USB interface of Pico.
-It downloads a customized bootloader(`eve_flash_pico.uf2`) to the RAM of Pico and a new USB drive(`BTEVE-FLASH`) will appear. 
+Before you do anything, please download a customized bootloader(`eve_flash_pico.uf2`) to the RAM of Pico and a new USB drive(`BTEVE-FLASH`) will appear. 
+
+BTW, the customized bootloader assumes the following SPI connection between Eve and Pico: 
+
+#### CS - GP5,  CLK - GP2,  MOSI - GP3, MISO - GP4
+
 Then you need convert your flash image into UF2 format file by running this tool.  Drag and drop the converted 
 UF2 file to the new USB drive and wait for the end of programming!
 
