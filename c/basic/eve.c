@@ -418,11 +418,10 @@ bool eve_wait_flush() {
  * @param cmd Command to send
  */
 void eve_host_command(uint8_t cmd) {
-	uint8_t hcmd[4] = { 0 };
+	uint8_t hcmd[3] = { 0 };
 	hcmd[0] = cmd;
 	hcmd[1] = 0;
 	hcmd[2] = 0;
-	hcmd[3] = 0;
 
 	cs_select();
 	spi_write_blocking(SPI_PORT, hcmd, 3);
@@ -435,11 +434,10 @@ void eve_host_command(uint8_t cmd) {
  * @param cmd Command to send
  */
 void eve_host_command_ext3(uint32_t cmd) {
-	uint8_t hcmd[4] = { 0 };
+	uint8_t hcmd[3] = { 0 };
 	hcmd[0] = cmd & 0xff;
 	hcmd[1] = (cmd >> 8) & 0xff;
 	hcmd[2] = (cmd >> 16) & 0xff;
-	hcmd[3] = 0;
 
 	cs_select();
 	spi_write_blocking(SPI_PORT, hcmd, 3);
