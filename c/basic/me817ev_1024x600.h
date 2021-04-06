@@ -1,6 +1,8 @@
 #ifndef ME817EV_1024x600__H
 #define ME817EV_1024x600__H
 
+#define HOST_PLATFORM_ME817EV
+
 #define WIDTH       1024
 #define HEIGHT      600
 #define HCYCLE      1344

@@ -123,12 +123,20 @@ int main() {
 	bootup.ExternalOsc = 1;
 	bootup.SystemClock = EVE_SYSCLK_72M;
 
+#ifdef HOST_PLATFORM_GAMEDUINO_3X_DAZZLER_1280X720
+	bootup.Skip_ROM_CHIPID_Check = 1;
+#else
+	bootup.Skip_ROM_CHIPID_Check = 0;
+#endif
+
 	while (!eve_init(&bootup, &config)) {
 		sleep_ms(1000);
 	}
 
 	/// Blocking call, return when calibrate finish
-	eve_calibrate(WIDTH, HEIGHT);
+#ifndef HOST_PLATFORM_GAMEDUINO_3X_DAZZLER_1280X720 // GAMEDUINO_3X_DAZZLER has no touch
+	eve_calibrate(WIDTH, HEIGHT); 
+#endif
 
 	while (true) {
 		widgets_demo();

@@ -191,6 +191,7 @@ typedef struct eve_bootup
 
 	/* External oscillator (default: false) */
 	bool ExternalOsc;
+	bool Skip_ROM_CHIPID_Check; 
 } eve_bootup;
 
 

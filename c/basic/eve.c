@@ -1102,11 +1102,13 @@ bool eve_init(eve_bootup *bootup, eve_config *config) {
 		sleep_ms(300);
 
 		/* Wait for valid chip ID */
-		chip_id = eve_rd32(ROM_CHIPID);
-		while (EXTRACT_CHIPID(chip_id) < EVE_FT800
-				|| EXTRACT_CHIPID(chip_id) > EVE_BT818) {
-			sleep_ms(20);
+		if (!bootup->Skip_ROM_CHIPID_Check){
 			chip_id = eve_rd32(ROM_CHIPID);
+			while (EXTRACT_CHIPID(chip_id) < EVE_FT800
+					|| EXTRACT_CHIPID(chip_id) > EVE_BT818) {
+				sleep_ms(20);
+				chip_id = eve_rd32(ROM_CHIPID);
+			}
 		}
 	} while (!chip_id);
 
