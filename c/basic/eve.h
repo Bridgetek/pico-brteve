@@ -36,6 +36,8 @@
 #define REG_CMDB_SPACE       (0x302574)
 #define REG_CMDB_WRITE       (REG_CMDB_SPACE + 4UL)
 #define REG_PCLK_FREQ        (REG_CMDB_SPACE + 160UL)
+#define REG_GPIO             (REG_CPURESET + 116UL)
+#define REG_GPIOX_DIR        (REG_CPURESET + 120UL)
 
 #define CMD_DLSTART          0xFFFFFF00
 #define CMD_SWAP             0xFFFFFF01
