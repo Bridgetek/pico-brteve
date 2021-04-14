@@ -17,3 +17,17 @@ https://brtchip.com/bt81x/
 ![image](https://user-images.githubusercontent.com/13127756/110600563-06ef1300-81bf-11eb-87c9-c75d55c7d02a.png)
 
 
+### Eve Modules for Pico 
+
+#### MM2040EV 
+#### ID2040
+
+Both modules defines the same connections with EVE:  
+
+PICO GP2 <--> Eve SCK   
+PICO GP3 <--> Eve MOSI   
+PICO GP4 <--> Eve MISO   
+PICO GP5 <--> Eve CS#   
+  
+PICO Power <--> Eve Board power   
+PICO GND <--> Eve Board GND   
