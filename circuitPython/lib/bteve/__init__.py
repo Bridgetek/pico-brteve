@@ -1,5 +1,6 @@
-__version__ = '0.1.0'
+__version__ = '0.1.2'
 
-from .BRT_ME815A_WH70C import ME815A_WH70C_Pico
+from .gameduino_circuitpython import GameduinoCircuitPython
+Gameduino = GameduinoCircuitPython
 from .registers import *
 from .eve import align4
