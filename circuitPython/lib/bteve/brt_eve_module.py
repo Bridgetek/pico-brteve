@@ -55,7 +55,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-class Gameduino(_EVE, EVE):
+class Brt_Eve_Module(_EVE, EVE):
     def init(self):
         self.register(self)
 
@@ -79,8 +79,8 @@ class Gameduino(_EVE, EVE):
         self.standard_startup()
 
     def coldstart(self):
-        # self.host_cmd(0x61, 0x46)   # 72 MHz
-        # self.host_cmd(0x44)         # int clock
+        self.host_cmd(0x61, 0x46)   # 72 MHz
+        self.host_cmd(0x44)         # int clock
         self.host_cmd(0x00)         # Wake up
         self.host_cmd(0x68)         # Core reset
 
@@ -202,118 +202,145 @@ class Gameduino(_EVE, EVE):
             self.cmd_regwrite(0x302614, 0x8c1)
 
         self.cmd_regwrite(REG_PCLK, 1)
+        self.cmd_regwrite(REG_PCLK_FREQ, 0x8B1)
+                                            
+
+    #Good for LVDS interface 1280x720
+    #This panel shall work with BT817/8 board only
     def setup_1280x720(self):
-        if 1:
+        self.Clear()
+        self.swap()
+        setup = [
+            (REG_OUTBITS, 0),
+            (REG_DITHER, 0),
+            (REG_GPIO, 0x83),
+            (REG_CSPREAD, 0),
+            (REG_PCLK_POL, 0),
+            (REG_ADAPTIVE_FRAMERATE, 0),
+        ]
+        for (a, v) in setup:
+            self.cmd_regwrite(a, v)
 
-            self.Clear()
-            self.swap()
-            setup = [
-                (REG_OUTBITS, 0),
-                (REG_DITHER, 0),
-                (REG_GPIO, 0x83),
-                (REG_CSPREAD, 0),
-                (REG_PCLK_POL, 0),
-                (REG_ADAPTIVE_FRAMERATE, 0),
-            ]
-            for (a, v) in setup:
-                self.cmd_regwrite(a, v)
+        self.video_signal(
+            h_Active = 1280,
+            h_Front = 110,
+            h_Sync = 40,
+            h_Back = 220,
+            h_Total = 1650,
+            v_Active = 800,
+            v_Front = 5,
+            v_Sync = 5,
+            v_Back = 20,
+            v_Total = 830)
+        self.w = 1280
+        self.h = 800
+        return
 
-            self.video_signal(
-                h_Active = 1280,
-                h_Front = 110,
-                h_Sync = 40,
-                h_Back = 220,
-                h_Total = 1650,
-                v_Active = 720,
-                v_Front = 5,
-                v_Sync = 5,
-                v_Back = 20,
-                v_Total = 750)
-            self.w = 1280
-            self.h = 720
-            return
-
-    def setup_640_480(self):
-        if 1:
-
-            self.Clear()
-            self.swap()
-            setup = [
-                # (REG_OUTBITS, 0),
-                (REG_DITHER, 0),
-                (REG_GPIO, 0x83),
-                (REG_CSPREAD, 0),
-                (REG_PCLK_POL, 0),
-                (REG_ADAPTIVE_FRAMERATE, 0),
-
-                (REG_HCYCLE, 800),
-                (REG_HOFFSET, 16 + 96),
-                (REG_HSIZE, 640),
-
-                (REG_HSYNC1, 0),
-                (REG_HSYNC0, 96),
-
-                (REG_VCYCLE, 525),
-                (REG_VOFFSET, 12),
-                (REG_VSIZE, 480),
-
-                (REG_VSYNC1, 0),
-                (REG_VSYNC0, 10),
-            ]
-            for (a, v) in setup:
-                self.cmd_regwrite(a, v)
-
-        if 0:
-            self.cmd_regwrite(REG_TRIM, 23)
-            self.cmd_regwrite(0x302614, 0x8c1)
+    def setup_640x480(self):
+        self.Clear()
+        self.swap()
+        setup = [
+            # (REG_OUTBITS, 0),
+            (REG_DITHER, 0),
+            (REG_GPIO, 0x83),
+            (REG_CSPREAD, 0),
+            (REG_PCLK_POL, 0),
+            (REG_ADAPTIVE_FRAMERATE, 0),
+        
+            (REG_HCYCLE, 800),
+            (REG_HOFFSET, 16 + 96),
+            (REG_HSIZE, 640),
+        
+            (REG_HSYNC1, 0),
+            (REG_HSYNC0, 96),
+        
+            (REG_VCYCLE, 525),
+            (REG_VOFFSET, 12),
+            (REG_VSIZE, 480),
+        
+            (REG_VSYNC1, 0),
+            (REG_VSYNC0, 10),
+        ]
+        for (a, v) in setup:
+            self.cmd_regwrite(a, v)
+        
 
         self.cmd_regwrite(REG_PCLK, 3)
         self.w = 640
-        self.h = 480		
-		
-		
+        self.h = 480
 
-    def setup_800_480(self):
-        if 1:
 
-            self.Clear()
-            self.swap()
-            setup = [
-                # (REG_OUTBITS, 0),
-                (REG_DITHER, 1),
-				(REG_GPIO_DIR, 0xFF),
-                (REG_GPIO, 0xFF),
-                (REG_CSPREAD, 0),
-                (REG_PCLK_POL, 1),
-                (REG_ADAPTIVE_FRAMERATE, 0),
+    #Good for Riverdi 800x480 panel
+    def setup_800x480(self):
+        self.Clear()
+        self.swap()
+        setup = [
+            # (REG_OUTBITS, 0),
+            (REG_DITHER, 1),
+            (REG_GPIO_DIR, 0xFF),
+            (REG_GPIO, 0xFF),
+            (REG_CSPREAD, 0),
+            (REG_PCLK_POL, 1),
+            (REG_ADAPTIVE_FRAMERATE, 0),
 
-                (REG_HCYCLE, 928),
-                (REG_HOFFSET, 88),
-                (REG_HSIZE, 800),
+            (REG_HCYCLE, 928),
+            (REG_HOFFSET, 88),
+            (REG_HSIZE, 800),
 
-                (REG_HSYNC1, 48),
-                (REG_HSYNC0, 0),
+            (REG_HSYNC1, 48),
+            (REG_HSYNC0, 0),
 
-                (REG_VCYCLE, 525),
-                (REG_VOFFSET, 32),
-                (REG_VSIZE, 480),
+            (REG_VCYCLE, 525),
+            (REG_VOFFSET, 32),
+            (REG_VSIZE, 480),
 
-                (REG_VSYNC1, 3),
-                (REG_VSYNC0, 0),
-            ]
-            for (a, v) in setup:
-                self.cmd_regwrite(a, v)
+            (REG_VSYNC1, 3),
+            (REG_VSYNC0, 0),
+        ]
+        for (a, v) in setup:
+            self.cmd_regwrite(a, v)
 
 
         self.cmd_regwrite(REG_PCLK, 2)
         self.finish()
-		
-        self.w = 800
-        self.h = 480		
 
-        print("ID %x  %x %x %x %x" % (
-            self.rd32(REG_ID),
-            self.rd32(0xc0000),
-            self.rd32(REG_HSIZE),
-            self.rd32(REG_VSIZE),
-            self.rd32(REG_CMDB_SPACE)))		
+        self.w = 800
+        self.h = 480
+
+    #Good for Riverdi 1024x600 panel (RGB40pin)
+    def setup_1024x600(self):
+        self.Clear()
+        self.swap()
+        setup = [
+            # (REG_OUTBITS, 0),
+            (REG_DITHER, 1),
+            (REG_GPIO_DIR, 0xFF),
+            (REG_GPIO, 0xFF),
+            (REG_CSPREAD, 0),
+            (REG_PCLK_POL, 1),
+            (REG_ADAPTIVE_FRAMERATE, 0),
+
+            (REG_HCYCLE, 1344),
+            (REG_HOFFSET, 160),
+            (REG_HSIZE, 1024),
+
+            (REG_HSYNC1, 100),
+            (REG_HSYNC0, 0),
+
+            (REG_VCYCLE, 635),
+            (REG_VOFFSET, 23),
+            (REG_VSIZE, 600),
+
+            (REG_VSYNC1, 10),
+            (REG_VSYNC0, 0),
+        ]
+        for (a, v) in setup:
+            self.cmd_regwrite(a, v)
+
+
+        self.cmd_regwrite(REG_PCLK, 1)
+        self.cmd_regwrite(REG_PCLK_FREQ, 0xD12)
+        self.finish()
+
+        self.w = 1024
+        self.h = 600

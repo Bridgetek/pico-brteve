@@ -1,7 +1,3 @@
-import sys
-if sys.implementation.name != "circuitpython":
-    def const(x): return x
-
 NEVER                  = const(0)
 LESS                   = const(1)
 LEQUAL                 = const(2)
@@ -234,3 +230,7 @@ REG_GPIOX_DIR          = const(0x302098)
 REG_FLASH_SIZE         = const(0x00309024) 
 REG_FLASH_STATUS       = const(0x003025f0) 
 REG_ADAPTIVE_FRAMERATE = const(0x0030257c) 
+
+
+# 817 registers
+REG_PCLK_FREQ          = const(0x00302614)
