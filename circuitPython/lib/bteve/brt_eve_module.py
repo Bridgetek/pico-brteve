@@ -13,16 +13,6 @@ from .registers import *
 if sys.implementation.name != "circuitpython":
     def const(x): return x
 
-REG_ID = const(0x302000)
-REG_HSIZE = const(0x302034)
-REG_VSIZE = const(0x302048)
-REG_CMDB_SPACE = const(0x302574)
-REG_CMDB_WRITE = const(0x302578)
-REG_GPIO = const(0x302094)
-REG_PCLK = 0x302070
-REG_PWM_DUTY = 0x3020d4
-REG_PWM_HZ = 0x3020d0
-
 FIFO_MAX = const(0xffc)    # Maximum reported free space in the EVE command FIFO
 
 class CoprocessorException(Exception):
