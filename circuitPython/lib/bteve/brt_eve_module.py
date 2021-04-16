@@ -226,6 +226,77 @@ class Brt_Eve_Module(_EVE, EVE):
         self.h = 800
         return
 
+    #For XXXX board QVGA LCD panel
+    def setup_320x240(self):
+        self.Clear()
+        self.swap()
+        setup = [
+            # (REG_OUTBITS, 0),
+            (REG_DITHER, 1),
+            (REG_GPIO, 0x83),
+            (REG_CSPREAD, 1),
+            (REG_PCLK_POL, 0),
+            (REG_SWIZZLE, 2),
+            #(REG_ADAPTIVE_FRAMERATE, 0),
+        
+            (REG_HCYCLE, 408),
+            (REG_HOFFSET, 70),
+            (REG_HSIZE, 320),
+        
+            (REG_HSYNC1, 10),
+            (REG_HSYNC0, 0),
+        
+            (REG_VCYCLE, 263),
+            (REG_VOFFSET, 13),
+            (REG_VSIZE, 240),
+        
+            (REG_VSYNC1, 2),
+            (REG_VSYNC0, 0),
+        ]
+        for (a, v) in setup:
+            self.cmd_regwrite(a, v)
+        
+
+        self.cmd_regwrite(REG_PCLK, 8)
+        self.w = 320
+        self.h = 240
+
+
+    #For ME810A-HV35R board ILI9488 LCD panel
+    def setup_320x480(self):
+        self.Clear()
+        self.swap()
+        setup = [
+            # (REG_OUTBITS, 0),
+            (REG_DITHER, 1),
+            (REG_GPIO, 0x83),
+            (REG_CSPREAD, 1),
+            (REG_PCLK_POL, 1),
+            (REG_SWIZZLE, 2),
+            #(REG_ADAPTIVE_FRAMERATE, 0),
+        
+            (REG_HCYCLE, 400),
+            (REG_HOFFSET, 40),
+            (REG_HSIZE, 320),
+        
+            (REG_HSYNC1, 10),
+            (REG_HSYNC0, 0),
+        
+            (REG_VCYCLE, 500),
+            (REG_VOFFSET, 10),
+            (REG_VSIZE, 480),
+        
+            (REG_VSYNC1, 5),
+            (REG_VSYNC0, 0),
+        ]
+        for (a, v) in setup:
+            self.cmd_regwrite(a, v)
+        
+
+        self.cmd_regwrite(REG_PCLK, 5)
+        self.w = 320
+        self.h = 480
+
     def setup_640x480(self):
         self.Clear()
         self.swap()
