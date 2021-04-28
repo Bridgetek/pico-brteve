@@ -30,16 +30,21 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
     def __init__(self):
         mach = os.uname().machine
         if mach == 'Raspberry Pi Pico with rp2040':
-            self.sp = busio.SPI(board.GP2, MOSI=board.GP3, MISO=board.GP4)
-            self.sd_spi = busio.SPI(board.GP10, MOSI=board.GP11, MISO=board.GP12)
-        self.cs = self.pin(board.GP5)
-        self.pdn = self.pin(board.GP7)
-        self.cs_ili9488 = self.pin(board.GP9)
-        self.dcx_ili9488 = self.pin(board.GP8)      
+            self.sp = busio.SPI(board.GP2, MOSI=board.GP3, MISO=board.GP4)  #SPI for Eve
+            self.sd_spi = busio.SPI(board.GP10, MOSI=board.GP11, MISO=board.GP12) #SPI for SD card
+
+        self.cs = self.pin(board.GP5) #cs of SPI for Eve
+        self.pdn = self.pin(board.GP7) #power down pin of Eve
+		
+        self.cs_ili9488 = self.pin(board.GP9) #CSX pin of ILI9488
+        self.dcx_ili9488 = self.pin(board.GP8) #D/CX pin of ILI9488      
         
-        self.sdcs = board.GP13
+        self.sdcs = board.GP13 #cs of SPI for SD card
+		
         if not self.setup_sd(self.sdcs):
             self.pin(self.sdcs)
+		
+		#configure SPI for Eve
         self.setup_spi()
 
     def pin(self,p):
@@ -48,14 +53,24 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
         r.value = True
         return r
         
-    def init(self):
-        print("BRT Eve Module init\n")
+    def init(self, resolution = "800x480"):
+        print("BRT Eve Module init\n")                      
         Brt_Eve_Module.init(self)
-        # self.setup_1280x720()
-        self.setup_800x480()
-        # self.setup_1024x600()
-        # self.init_ili9488()
-        # self.setup_320x480()
+        
+        if resolution == "800x480":
+            self.setup_800x480()
+        if resolution == "1280x720":
+            self.setup_1280x720()
+        if resolution == "1280x800":
+            self.setup_1280x800()           
+        if resolution == "1024x600":
+            self.setup_1024x600()
+        if resolution == "640x480":         
+            self.setup_640x480()
+        if resolution == "320x480":         
+            self.init_ili9488()
+            self.setup_320x480()
+
 
     def setup_sd(self, sdcs):
         try:
@@ -68,7 +83,7 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
 
     @spilock
     def setup_spi(self):
-        self.sp.configure(baudrate=1000000, phase=0, polarity=0)
+        self.sp.configure(baudrate=30000000, phase=0, polarity=0)
 
 
     @spilock
@@ -81,7 +96,7 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
             self.sp.readinto(r)
         self.cs.value = True
         return r
-        
+      
     def write_ili9488(self,cmd,data):
         self.write_ili9488_cmd(cmd)
         self.write_ili9488_data(data)
@@ -103,6 +118,9 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
         self.cs_ili9488.value = True
         
     def init_ili9488(self):
+        #Toggle RESX pin of ILI9488 to complete power-on reset process
+        self.wr32(REG_GPIO, 0x0)   
+        time.sleep(0.002)
         self.wr32(REG_GPIO, 0x83)   
 
         ILI9488_CMD_SOFTWARE_RESET = b'\x01'
@@ -150,10 +168,7 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
         time.sleep(0.02)
         
         self.write_ili9488_cmd(ILI9488_CMD_DISPLAYON)
-        write_ili9488(b'\x2C',b'\xB0')
-        
-        pin(cs_ili9488)
-        pin(dcx_ili9488)
+
         
         
         
