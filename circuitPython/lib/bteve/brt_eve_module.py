@@ -70,7 +70,7 @@ class Brt_Eve_Module(_EVE, EVE):
 
     def coldstart(self):
         self.host_cmd(0x61, 0x46)   # 72 MHz
-        self.host_cmd(0x44)         # int clock
+        self.host_cmd(0x44)         # Select PLL input from external clock source
         self.host_cmd(0x00)         # Wake up
         self.host_cmd(0x68)         # Core reset
 
@@ -92,6 +92,7 @@ class Brt_Eve_Module(_EVE, EVE):
     def standard_startup(self):
         self.Clear(1,1,1)
         self.swap()
+        '''
         self.cmd_flashread(0, 0x1000, 0x1000)
         self.finish()
         # print('*** Done flash ***')
@@ -100,6 +101,7 @@ class Brt_Eve_Module(_EVE, EVE):
             self.cc(self.rd(0, 512))
         else:
             print('*** Did not find flash config ***')
+        '''
         self.finish()
         self.w = self.rd32(REG_HSIZE)
         self.h = self.rd32(REG_VSIZE)
@@ -164,7 +166,46 @@ class Brt_Eve_Module(_EVE, EVE):
         self.finish()
         wp = self.rd32(REG_CMD_READ)
         return self.rd32(RAM_CMD + (4095 & (wp - 4 * n)))
+        
+    # For BT817/8 based module with 1280x800 LCD
+    def setup_1280x800(self):
+        self.Clear()
+        self.swap()
+        setup = [
+            (REG_OUTBITS, 0),
+            (REG_PCLK, 0),
+            (REG_DITHER, 0),
+            (REG_GPIO_DIR, 0xffff),
+            (REG_GPIO, 0xffff),
+            (REG_CSPREAD, 0),
+            (REG_PCLK_POL, 0),
+            (REG_PCLK_2X, 1),
+            #(REG_ADAPTIVE_FRAMERATE, 0),
+
+            (REG_HCYCLE, 1411),
+            (REG_HOFFSET, 120),
+            (REG_HSIZE, 1280),
+
+            (REG_HSYNC1, 100),
+            (REG_HSYNC0, 0),
+
+            (REG_VCYCLE, 815),
+            (REG_VOFFSET, 14),
+            (REG_VSIZE, 800),
+
+            (REG_VSYNC1, 10),
+            (REG_VSYNC0, 0),
+            (REG_PCLK_FREQ, 0x8B1),
+        ]
+        for (a, v) in setup:
+            self.cmd_regwrite(a, v)
+
+        self.cmd_regwrite(REG_PCLK, 1)
+        self.finish()
 		
+        self.w = 1280
+        self.h = 800		
+
 
     def video_signal(self, h_Active, h_Front, h_Sync, h_Back, h_Total, v_Active, v_Front, v_Sync, v_Back, v_Total):
         assert((h_Active + h_Front + h_Sync + h_Back) == h_Total)
@@ -192,39 +233,39 @@ class Brt_Eve_Module(_EVE, EVE):
             self.cmd_regwrite(0x302614, 0x8c1)
 
         self.cmd_regwrite(REG_PCLK, 1)
-        self.cmd_regwrite(REG_PCLK_FREQ, 0x8B1)
-                                            
-
-    #Good for LVDS interface 1280x720
-    #This panel shall work with BT817/8 board only
+		
+		
+    #For Gameduino 3x dazzler (HDMI output) , Eve Type = BT815/6
     def setup_1280x720(self):
-        self.Clear()
-        self.swap()
-        setup = [
-            (REG_OUTBITS, 0),
-            (REG_DITHER, 0),
-            (REG_GPIO, 0x83),
-            (REG_CSPREAD, 0),
-            (REG_PCLK_POL, 0),
-            (REG_ADAPTIVE_FRAMERATE, 0),
-        ]
-        for (a, v) in setup:
-            self.cmd_regwrite(a, v)
+        if 1:
 
-        self.video_signal(
-            h_Active = 1280,
-            h_Front = 110,
-            h_Sync = 40,
-            h_Back = 220,
-            h_Total = 1650,
-            v_Active = 800,
-            v_Front = 5,
-            v_Sync = 5,
-            v_Back = 20,
-            v_Total = 830)
-        self.w = 1280
-        self.h = 800
-        return
+            self.Clear()
+            self.swap()
+            setup = [
+                (REG_OUTBITS, 0),
+                (REG_DITHER, 0),
+                (REG_GPIO, 0x83),
+                (REG_CSPREAD, 0),
+                (REG_PCLK_POL, 0),
+                (REG_ADAPTIVE_FRAMERATE, 0),
+            ]
+            for (a, v) in setup:
+                self.cmd_regwrite(a, v)
+
+            self.video_signal(
+                h_Active = 1280,
+                h_Front = 110,
+                h_Sync = 40,
+                h_Back = 220,
+                h_Total = 1650,
+                v_Active = 720,
+                v_Front = 5,
+                v_Sync = 5,
+                v_Back = 20,
+                v_Total = 750)
+            self.w = 1280
+            self.h = 720
+            return
 
     #For XXXX board QVGA LCD panel
     def setup_320x240(self):
@@ -237,7 +278,6 @@ class Brt_Eve_Module(_EVE, EVE):
             (REG_CSPREAD, 1),
             (REG_PCLK_POL, 0),
             (REG_SWIZZLE, 2),
-            #(REG_ADAPTIVE_FRAMERATE, 0),
         
             (REG_HCYCLE, 408),
             (REG_HOFFSET, 70),
@@ -262,7 +302,7 @@ class Brt_Eve_Module(_EVE, EVE):
         self.h = 240
 
 
-    #For ME810A-HV35R board ILI9488 LCD panel
+    #For ME810A-HV35R board, Eve Type >= FT180. 
     def setup_320x480(self):
         self.Clear()
         self.swap()
@@ -273,7 +313,6 @@ class Brt_Eve_Module(_EVE, EVE):
             (REG_CSPREAD, 1),
             (REG_PCLK_POL, 1),
             (REG_SWIZZLE, 2),
-            #(REG_ADAPTIVE_FRAMERATE, 0),
         
             (REG_HCYCLE, 400),
             (REG_HOFFSET, 40),
@@ -331,7 +370,7 @@ class Brt_Eve_Module(_EVE, EVE):
         self.h = 480
 
 
-    #Good for Riverdi 800x480 panel
+    #Good for Riverdi 800x480 panel, Eve Type >= FT810
     def setup_800x480(self):
         self.Clear()
         self.swap()
@@ -368,7 +407,7 @@ class Brt_Eve_Module(_EVE, EVE):
         self.w = 800
         self.h = 480
 
-    #Good for Riverdi 1024x600 panel (RGB40pin)
+    #Good for Riverdi 1024x600 panel (RGB40pin) , Eve Type = BT817/8
     def setup_1024x600(self):
         self.Clear()
         self.swap()

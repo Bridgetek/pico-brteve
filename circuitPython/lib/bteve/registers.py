@@ -234,3 +234,4 @@ REG_ADAPTIVE_FRAMERATE = const(0x0030257c)
 
 # 817 registers
 REG_PCLK_FREQ          = const(0x00302614)
+REG_PCLK_2X            = const(0x00302618)
