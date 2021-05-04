@@ -135,6 +135,7 @@ CHACK                  = const(0x58)
 MUTE                   = const(0x60)     # Management
 UNMUTE                 = const(0x61)
 
+RAM_G                  = const(0x000000)
 RAM_CMD                = const(0x308000)
 RAM_DL                 = const(0x300000)
 REG_CLOCK              = const(0x302008)
@@ -144,6 +145,7 @@ REG_CMD_DL             = const(0x302100)
 REG_CMD_READ           = const(0x3020f8)
 REG_CMD_WRITE          = const(0x3020fc)
 REG_CPURESET           = const(0x302020)
+REG_TOUCH_CONFIG       = const(0x302168)
 REG_CSPREAD            = const(0x302068)
 REG_DITHER             = const(0x302060)
 REG_DLSWAP             = const(0x302054)
@@ -217,7 +219,6 @@ BLUE                   = const(4)
 ALPHA                  = const(5)
 
 # 810 registers
-
 REG_MEDIAFIFO_BASE     = const(0x30901c) 
 REG_MEDIAFIFO_READ     = const(0x309014) 
 REG_MEDIAFIFO_SIZE     = const(0x309020) 
@@ -225,13 +226,12 @@ REG_MEDIAFIFO_WRITE    = const(0x309018)
 REG_GPIOX              = const(0x30209c)
 REG_GPIOX_DIR          = const(0x302098)
 
-
 # 815 registers
 REG_FLASH_SIZE         = const(0x00309024) 
 REG_FLASH_STATUS       = const(0x003025f0) 
 REG_ADAPTIVE_FRAMERATE = const(0x0030257c) 
 
-
 # 817 registers
 REG_PCLK_FREQ          = const(0x00302614)
 REG_PCLK_2X            = const(0x00302618)
+

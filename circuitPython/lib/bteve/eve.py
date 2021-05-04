@@ -147,7 +147,8 @@ class EVE:
         self.cmd(0x1c, "II", args)
 
     def cmd_number(self, *args):
-        self.cmd(0x2e, "hhhHi", args)
+        args_int = tuple(int(el) for el in args)
+        self.cmd(0x2e, "hhhHi", args_int)
 
     def cmd_progress(self, *args):
         self.cmd(0x0f, "hhhhHHI", args)
@@ -195,7 +196,8 @@ class EVE:
         self.cmd0(0x01)
 
     def cmd_text(self, *args):
-        self.cmd(0x0c, "hhhH", args[0:4])
+        args_int = tuple(int(el) for el in args[0:4])
+        self.cmd(0x0c, "hhhH", args_int[0:4])
         self.fstring(args[4:])
 
     def cmd_toggle(self, *args):
