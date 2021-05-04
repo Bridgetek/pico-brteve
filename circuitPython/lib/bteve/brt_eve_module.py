@@ -119,8 +119,20 @@ class Brt_Eve_Module(_EVE, EVE):
     def wr(self, a, v):
         self.transfer(self._addr(0x800000 | a) + v)
 
+    def rd8(self, a):
+        return struct.unpack("<B", self.rd(a, 1))[0]
+
+    def rd16(self, a):
+        return struct.unpack("<H", self.rd(a, 2))[0]
+
     def rd32(self, a):
         return struct.unpack("<I", self.rd(a, 4))[0]
+
+    def wr8(self, a, v):
+        self.wr(a, struct.pack("B", v))
+
+    def wr16(self, a, v):
+        self.wr(a, struct.pack("H", v))
 
     def wr32(self, a, v):
         self.wr(a, struct.pack("I", v))
