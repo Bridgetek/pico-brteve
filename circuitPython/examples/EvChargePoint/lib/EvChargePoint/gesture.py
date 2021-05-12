@@ -1,15 +1,7 @@
 from bteve.eve import EVE
-
-
-
 import sys
-
-
-
-
 import bteve as eve
 from .eve_helper import eve_helper
-
 
 class Gesture_Touch():
 	tagTrackTouched =0
@@ -50,12 +42,12 @@ class gesture():
         return tagRet
         
     def renew(gd: Brt_PicoEve_Module, eve: eve):
-        gesture.sTag = gd.rd32(eve.REG_TOUCH_TAG) & 0xFF
-        gesture.sIsTouch = gd.rd32(eve.REG_TOUCH_RAW_XY) != 0xFFFFFFFF
-        gesture.sTouchX = gd.rd16(eve.REG_TOUCH_SCREEN_XY + 2)
-        gesture.sTouchY = gd.rd16(eve.REG_TOUCH_SCREEN_XY + 4)
+        gesture.sTag = gd.rd32(gd.REG_TOUCH_TAG) & 0xFF
+        gesture.sIsTouch = gd.rd32(gd.REG_TOUCH_RAW_XY) != 0xFFFFFFFF
+        gesture.sTouchX = gd.rd16(gd.REG_TOUCH_SCREEN_XY + 2)
+        gesture.sTouchY = gd.rd16(gd.REG_TOUCH_SCREEN_XY + 4)
 
-        gesture.sGesture.tagTrackTouched = gd.rd32(eve.REG_TRACKER)
+        gesture.sGesture.tagTrackTouched = gd.rd32(gd.REG_TRACKER)
         gesture.sGesture.isTouch = gesture.sIsTouch
         gesture.sGesture.tagPressed = gesture.sTag
         gesture.sGesture.isSwipe = gesture.sIsSwipe

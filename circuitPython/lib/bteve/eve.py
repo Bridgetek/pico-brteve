@@ -2,8 +2,6 @@ import struct
 import array
 from collections import namedtuple
 
-from .registers import *
-
 _B0 = b'\x00'
 def align4(s):
     """
@@ -48,8 +46,7 @@ _Inputs = namedtuple(
     "state",
     ))
 
-class EVE:
-
+class EVE():
     def cstring(self, s):
         if type(s) == str:
             s = bytes(s, "utf-8")

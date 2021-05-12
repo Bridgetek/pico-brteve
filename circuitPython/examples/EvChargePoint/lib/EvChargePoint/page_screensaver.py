@@ -49,15 +49,15 @@ class page_screensaver():
             self.gd.cmd_setfont2(common.HF_BOTTOM, lan.FontBottom["xf_addr"] - lan.FontBegin["xf_addr"], 0)
 
         self.gd.BitmapHandle(0)
-        self.gd.cmd_setbitmap(self.helper.RAM_G_SIZE - common.SS_FRAME_SIZE, common.SS_ASTC_FORMAT, common.SCREEN_WIDTH, common.SCREEN_HEIGHT)
+        self.gd.cmd_setbitmap(self.helper.RAM_G_SIZE - common.SS_FRAME_SIZE, self.gd.ASTC_10x10, common.SCREEN_WIDTH, common.SCREEN_HEIGHT)
         self.gd.Tag(common.SS_TAG)
-        self.gd.Begin(self.eve.BITMAPS)
+        self.gd.Begin(self.gd.BITMAPS)
         self.gd.Vertex2f(0, 0)
         self.gd.End()
     
         self.gd.ColorRGB(0, 0, 0)
         self.gd.ColorA((int)(self.ani_color))
-        self.gd.cmd_text((int)(common.SCREEN_WIDTH / 2), common.Y_FOOTER, common.HF_BOTTOM, self.eve.OPT_CENTERX, lan.lan_active.s_pleaseTouch)
+        self.gd.cmd_text((int)(common.SCREEN_WIDTH / 2), common.Y_FOOTER, common.HF_BOTTOM, self.gd.OPT_CENTERX, lan.lan_active.s_pleaseTouch)
         self.gd.ColorRGB(255, 255, 255)
         
         self.ani_color += self.ani_color_step

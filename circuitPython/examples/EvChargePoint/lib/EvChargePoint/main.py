@@ -58,16 +58,16 @@ class demo_evchargepoint:
         self.page_active['page'].init(self.eve, self.gd, self.helper, self.lan)
 
     def Get_SystemClock(self) :
-        self.gd.rd32(self.eve.REG_CLOCK); # warm up
+        self.gd.rd32(self.gd.REG_CLOCK); # warm up
 
-        c0 = self.gd.rd32(self.eve.REG_CLOCK)
-        c1 = self.gd.rd32(self.eve.REG_CLOCK)
+        c0 = self.gd.rd32(self.gd.REG_CLOCK)
+        c1 = self.gd.rd32(self.gd.REG_CLOCK)
 
         overhead = c1 - c0
 
-        c0 = self.gd.rd32(self.eve.REG_CLOCK)
+        c0 = self.gd.rd32(self.gd.REG_CLOCK)
         time.sleep(1)
-        c1 = self.gd.rd32(self.eve.REG_CLOCK)
+        c1 = self.gd.rd32(self.gd.REG_CLOCK)
 
         freq = (c1 - c0) - overhead
         return freq
@@ -79,21 +79,21 @@ class demo_evchargepoint:
         lan=self.lan
         lan.switch(lan.LANGUAGE_EN)
 
-        gd.wr32(eve.REG_TOUCH_TRANSFORM_A, 0xfffefefc)
-        gd.wr32(eve.REG_TOUCH_TRANSFORM_B, 0xfffffcbf)
-        gd.wr32(eve.REG_TOUCH_TRANSFORM_C, 0x506adb4)
-        gd.wr32(eve.REG_TOUCH_TRANSFORM_D, 0xfffffed1)
-        gd.wr32(eve.REG_TOUCH_TRANSFORM_E, 0xfffefc79)
-        gd.wr32(eve.REG_TOUCH_TRANSFORM_F, 0x32c3211)
+        gd.wr32(gd.REG_TOUCH_TRANSFORM_A, 0xfffefefc)
+        gd.wr32(gd.REG_TOUCH_TRANSFORM_B, 0xfffffcbf)
+        gd.wr32(gd.REG_TOUCH_TRANSFORM_C, 0x506adb4)
+        gd.wr32(gd.REG_TOUCH_TRANSFORM_D, 0xfffffed1)
+        gd.wr32(gd.REG_TOUCH_TRANSFORM_E, 0xfffefc79)
+        gd.wr32(gd.REG_TOUCH_TRANSFORM_F, 0x32c3211)
 
         print("Setup touch for Goodix\n")
-        gd.wr8(eve.REG_CPURESET, 2)
-        gd.wr16(eve.REG_TOUCH_CONFIG, 0x05d0)
-        gd.wr8(eve.REG_CPURESET, 0)
+        gd.wr8(gd.REG_CPURESET, 2)
+        gd.wr16(gd.REG_TOUCH_CONFIG, 0x05d0)
+        gd.wr8(gd.REG_CPURESET, 0)
 
         helper.set_precision(3) # for 1280x800 big screen
         helper.flash_switch_fullmode()
-        gd.cmd_flashread(eve.RAM_G, 4096, helper.RAM_G_SIZE)
+        gd.cmd_flashread(0, 4096, helper.RAM_G_SIZE)
         
         gd.calibrate()
 

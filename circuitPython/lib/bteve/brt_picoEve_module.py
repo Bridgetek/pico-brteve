@@ -11,7 +11,6 @@ if sys.implementation.name == 'circuitpython':
 else:
     from ._eve import _EVE
 from .eve import EVE
-from .registers import *
 
 from .brt_eve_module import Brt_Eve_Module
 
@@ -28,6 +27,7 @@ def spilock(f):
 
 class Brt_PicoEve_Module(Brt_Eve_Module):
     def __init__(self):
+        Brt_Eve_Module.__init__(self)
         mach = os.uname().machine
         if mach == 'Raspberry Pi Pico with rp2040':
             self.sp = busio.SPI(board.GP2, MOSI=board.GP3, MISO=board.GP4)  #SPI for Eve
@@ -53,7 +53,7 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
         r.value = True
         return r
         
-    def init(self, resolution = "800x480"):
+    def init(self, resolution = ""):
         print("BRT Eve Module init\n")                      
         Brt_Eve_Module.init(self)
         
@@ -65,6 +65,8 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
             self.setup_1280x800()           
         if resolution == "1024x600":
             self.setup_1024x600()
+        if resolution == "480x272":         
+            self.setup_480x272()
         if resolution == "640x480":         
             self.setup_640x480()
         if resolution == "320x480":         

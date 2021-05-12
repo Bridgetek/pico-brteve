@@ -17,16 +17,16 @@ class page_transition():
         self.lan = lan
 
         self.TR_BEGIN            = {'addr':4096}
-        self.TR_CHARGE_BUTTON ={'addr':456768, 'size':63552, 'x':0, 'y':0, 'width':252, 'height':252, 'format':eve.ASTC_4x4}
-        self.TR_CHARGE_TEXT   ={'addr':520320, 'size':896  , 'x':0, 'y':0, 'width':24 , 'height':36 , 'format':eve.ASTC_4x4}
-        self.TR_ROUND_ENERGY  ={'addr':521216, 'size':7104 , 'x':0, 'y':0, 'width':84 , 'height':84 , 'format':eve.ASTC_4x4}
-        self.TR_EXIT_BUTTON   ={'addr':528320, 'size':25344, 'x':0, 'y':0, 'width':352, 'height':72 , 'format':eve.ASTC_4x4}
-        self.TR_QR_CODE       ={'addr':553664, 'size':23104, 'x':0, 'y':0, 'width':150, 'height':150, 'format':eve.ASTC_4x4}
+        self.TR_CHARGE_BUTTON ={'addr':456768, 'size':63552, 'x':0, 'y':0, 'width':252, 'height':252, 'format':gd.ASTC_4x4}
+        self.TR_CHARGE_TEXT   ={'addr':520320, 'size':896  , 'x':0, 'y':0, 'width':24 , 'height':36 , 'format':gd.ASTC_4x4}
+        self.TR_ROUND_ENERGY  ={'addr':521216, 'size':7104 , 'x':0, 'y':0, 'width':84 , 'height':84 , 'format':gd.ASTC_4x4}
+        self.TR_EXIT_BUTTON   ={'addr':528320, 'size':25344, 'x':0, 'y':0, 'width':352, 'height':72 , 'format':gd.ASTC_4x4}
+        self.TR_QR_CODE       ={'addr':553664, 'size':23104, 'x':0, 'y':0, 'width':150, 'height':150, 'format':gd.ASTC_4x4}
        
-        self.TR_CAR              = {'addr':320192, 'size':81600, 'x':0, 'y':0, 'width':600, 'height':306, 'format':eve.ASTC_6x6}
-        self.TR_BATTERY          = {'addr':401792, 'size':45632, 'x':0, 'y':0, 'width':300, 'height':152, 'format':eve.ASTC_4x4}
-        self.TR_BAT_GREEN        = {'addr':447424, 'size':4672 , 'x':0, 'y':0, 'width':40 , 'height':116, 'format':eve.ASTC_4x4}
-        self.TR_BAT_RED          = {'addr':452096, 'size':4672 , 'x':0, 'y':0, 'width':40 , 'height':116, 'format':eve.ASTC_4x4}
+        self.TR_CAR              = {'addr':320192, 'size':81600, 'x':0, 'y':0, 'width':600, 'height':306, 'format':gd.ASTC_6x6}
+        self.TR_BATTERY          = {'addr':401792, 'size':45632, 'x':0, 'y':0, 'width':300, 'height':152, 'format':gd.ASTC_4x4}
+        self.TR_BAT_GREEN        = {'addr':447424, 'size':4672 , 'x':0, 'y':0, 'width':40 , 'height':116, 'format':gd.ASTC_4x4}
+        self.TR_BAT_RED          = {'addr':452096, 'size':4672 , 'x':0, 'y':0, 'width':40 , 'height':116, 'format':gd.ASTC_4x4}
 
         self.BATTERY_CELL_X =[39, 90, 139, 191, 240]
         self.BATTERY_CELL_Y = 19
@@ -98,12 +98,12 @@ class page_transition():
 
         w = self.TR_CHARGE_TEXT["width"] * 2
         h = self.TR_CHARGE_TEXT["height"] * 2; 
-        self.gd.cmd_setbitmap(common.ADDR(self.TR_CHARGE_TEXT, self.TR_BEGIN), eve.ASTC_4x4,
+        self.gd.cmd_setbitmap(common.ADDR(self.TR_CHARGE_TEXT, self.TR_BEGIN), gd.ASTC_4x4,
                 self.TR_CHARGE_TEXT["width"], self.TR_CHARGE_TEXT["height"])
-        self.gd.BitmapSize(eve.BILINEAR, eve.BORDER, eve.BORDER, w, h)
+        self.gd.BitmapSize(gd.BILINEAR, gd.BORDER, gd.BORDER, w, h)
         self.gd.BitmapSizeH(w >> 9, h >> 9)
 
-        self.gd.Begin(eve.BITMAPS)
+        self.gd.Begin(gd.BITMAPS)
         self.gd.SaveContext()
 
         self.gd.cmd_loadidentity()
@@ -162,7 +162,7 @@ class page_transition():
             self.gd.cmd_text(
                         self.x_ani + common.SCREEN_WIDTH - self.TR_CHARGE_BUTTON["width"] * 0.5 - common.TR_RIGHT_BUTTON_MARGIN,
                         y_start_charging,
-                        HF_START_CHARGING, eve.OPT_CENTER, lan.lan_active.s_startCharging)
+                        HF_START_CHARGING, gd.OPT_CENTER, lan.lan_active.s_startCharging)
             self.gd.ColorRGB(255, 255, 255)
 
             self.x_car -= 5
@@ -191,14 +191,14 @@ class page_transition():
             self.gd.cmd_text(
                         self.x_ani + common.SCREEN_WIDTH - self.TR_CHARGE_BUTTON["width"] * 0.5 - common.TR_RIGHT_BUTTON_MARGIN,
                         y_start_charging,
-                        HF_START_CHARGING, eve.OPT_CENTER, lan.lan_active.s_startCharging)
+                        HF_START_CHARGING, gd.OPT_CENTER, lan.lan_active.s_startCharging)
             self.gd.ColorRGB(255, 255, 255)
 
 
             # Draw Slider
             self.gd.ColorRGB(219, 219, 219)
             self.gd.LineWidth(common.SLIDER_HEIGHT)
-            self.gd.Begin(eve.LINES)
+            self.gd.Begin(gd.LINES)
 
             for i in range(3):
                 y_slider = (common.SLIDER_Y + i * common.SLIDER_GAP)
@@ -226,12 +226,12 @@ class page_transition():
         # Draw Charging Button Outter
         self.gd.SaveContext()
         self.gd.Tag(common.TR_TAG_CHARGE_BUTTON)
-        self.gd.cmd_setbitmap(common.ADDR(self.TR_CHARGE_BUTTON, self.TR_BEGIN), eve.ASTC_4x4,
+        self.gd.cmd_setbitmap(common.ADDR(self.TR_CHARGE_BUTTON, self.TR_BEGIN), gd.ASTC_4x4,
                             self.TR_CHARGE_BUTTON["width"], self.TR_CHARGE_BUTTON["height"])
-        self.gd.BitmapSize(eve.BILINEAR, eve.BORDER, eve.BORDER, self.TR_CHARGE_BUTTON["width"], self.TR_CHARGE_BUTTON["height"])
+        self.gd.BitmapSize(gd.BILINEAR, gd.BORDER, gd.BORDER, self.TR_CHARGE_BUTTON["width"], self.TR_CHARGE_BUTTON["height"])
         self.gd.BitmapSizeH(self.TR_CHARGE_BUTTON["width"] >> 9, self.TR_CHARGE_BUTTON["height"] >> 9)
         
-        self.gd.Begin(eve.BITMAPS)
+        self.gd.Begin(gd.BITMAPS)
         self.gd.cmd_loadidentity()
         self.gd.cmd_translate((self.TR_CHARGE_BUTTON["width"] - 1) / 2, (self.TR_CHARGE_BUTTON["height"] - 1) / 2)
         self.gd.cmd_rotate(self.angle * 1 / 360)
@@ -254,14 +254,14 @@ class page_transition():
         self.gd.cmd_text(
                     self.x_ani + common.SCREEN_WIDTH - self.TR_CHARGE_BUTTON["width"] * 0.5 - common.TR_RIGHT_BUTTON_MARGIN,
                     y_start_charging,
-                    HF_START_CHARGING, eve.OPT_CENTER, lan.lan_active.s_startCharging)
+                    HF_START_CHARGING, gd.OPT_CENTER, lan.lan_active.s_startCharging)
         self.gd.Tag(0)
         self.gd.ColorRGB(255, 255, 255)
 
         # Draw Slider
         self.gd.ColorRGB(219, 219, 219)
         self.gd.LineWidth(common.SLIDER_HEIGHT)
-        self.gd.Begin(eve.LINES)
+        self.gd.Begin(gd.LINES)
 
         for i in range(3):
             self.gd.Vertex2f((self.x_ani + self.SLIDER_X), (common.SLIDER_Y + i*common.SLIDER_GAP))
@@ -278,15 +278,15 @@ class page_transition():
         self.gd.cmd_setfont2(common.HF_TITLE, lan.FontTitle["xf_addr"] - lan.FontBegin["xf_addr"], 0)
         # Energy
         self.gd.cmd_number(self.x_ani + self.SLIDER_X, common.SLIDER_Y - 55, common.HF_VALUE, 0, 25)
-        self.gd.cmd_number(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y - 55, 31, eve.OPT_RIGHTX, 250)
+        self.gd.cmd_number(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y - 55, 31, gd.OPT_RIGHTX, 250)
 
         # Time
         self.gd.cmd_number(self.x_ani + self.SLIDER_X, common.SLIDER_Y + common.SLIDER_GAP - 55, common.HF_VALUE, 0, 0)
-        self.gd.cmd_number(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + common.SLIDER_GAP - 55, 31, eve.OPT_RIGHTX, 120)
+        self.gd.cmd_number(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + common.SLIDER_GAP - 55, 31, gd.OPT_RIGHTX, 120)
 
         # Cost
         self.gd.cmd_number(self.x_ani + self.SLIDER_X, common.SLIDER_Y + 2 * common.SLIDER_GAP - 55, common.HF_VALUE, 0, 0)
-        self.gd.cmd_number(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + 2 * common.SLIDER_GAP - 55, 31, eve.OPT_RIGHTX, 32)
+        self.gd.cmd_number(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + 2 * common.SLIDER_GAP - 55, 31, gd.OPT_RIGHTX, 32)
 
         # Draw Unit
         font_size = common.HF_SMALL
@@ -297,13 +297,13 @@ class page_transition():
         
         self.gd.ColorRGB(150, 150, 150)
         self.gd.cmd_text(self.x_ani + self.SLIDER_X, common.SLIDER_Y + unit_gap, font_size, 0, lan.lan_active.s_energy)
-        self.gd.cmd_text(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + unit_gap, font_size, eve.OPT_RIGHTX, lan.lan_active.s_kWh)
+        self.gd.cmd_text(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + unit_gap, font_size, gd.OPT_RIGHTX, lan.lan_active.s_kWh)
 
         self.gd.cmd_text(self.x_ani + self.SLIDER_X, common.SLIDER_Y + common.SLIDER_GAP + unit_gap, font_size, 0, lan.lan_active.s_time)
-        self.gd.cmd_text(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + common.SLIDER_GAP + unit_gap, font_size, eve.OPT_RIGHTX, lan.lan_active.s_minutes)
+        self.gd.cmd_text(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + common.SLIDER_GAP + unit_gap, font_size, gd.OPT_RIGHTX, lan.lan_active.s_minutes)
 
         self.gd.cmd_text(self.x_ani + self.SLIDER_X, common.SLIDER_Y + 2 * common.SLIDER_GAP + unit_gap, font_size, 0, lan.lan_active.s_cost)
-        self.gd.cmd_text(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + 2 * common.SLIDER_GAP + unit_gap, font_size, eve.OPT_RIGHTX, lan.lan_active.s_currency)
+        self.gd.cmd_text(self.x_ani + self.SLIDER_X + common.SLIDER_WIDTH, common.SLIDER_Y + 2 * common.SLIDER_GAP + unit_gap, font_size, gd.OPT_RIGHTX, lan.lan_active.s_currency)
         
         return 1
 

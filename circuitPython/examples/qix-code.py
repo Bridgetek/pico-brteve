@@ -2,7 +2,7 @@ import math
 import random
 import bteve as eve
 
-gd = eve.Gameduino()
+gd = eve.Brt_PicoEve_Module()  # Default is MM2040 with LCD 1280x800 capacity touch
 gd.init()
 
 def tri(t):
@@ -22,7 +22,7 @@ t = 0
 while True:
     gd.Clear()
     gd.VertexFormat(3)
-    gd.Begin(eve.LINE_STRIP)
+    gd.Begin(gd.LINE_STRIP)
     for dt in range(10):
         tn = (t - dt) / 75
         gd.ColorRGB(

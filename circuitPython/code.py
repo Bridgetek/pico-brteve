@@ -2,9 +2,12 @@ import random
 import math
 import bteve as eve
 
-gd = eve.Brt_PicoEve_Module()
-gd.init()
+gd = eve.Brt_PicoEve_Module()  # Default is MM2040 with LCD 1280x800 capacity touch
 
+# User can change module like this:
+#gd.set_module(gd.MODULE_VM800B50A_BK()) 
+
+gd.init()
 
 random.seed(6)
 rr = random.randrange
@@ -36,11 +39,15 @@ class Bubble:
 
 bubbles = [Bubble() for i in range(90)]
 
-for t in range(999):
-    gd.Clear()                              # black background
-    gd.VertexFormat(2)                      # full-screen
-    gd.ColorA(192)                          # 75% opacity
-    gd.Begin(eve.POINTS)                    # large POINTS are circles
-    for b in bubbles:
-        b.draw(t)
-    gd.swap()
+while 1:
+    for t in range(999):
+        gd.Clear()                              # black background
+        if gd.w > 1024:
+            gd.VertexFormat(2)                      # full-screen
+        else:
+            gd.VertexFormat(4)                      # full-screen
+        gd.ColorA(192)                          # 75% opacity
+        gd.Begin(gd.POINTS)                    # large POINTS are circles
+        for b in bubbles:
+            b.draw(t)
+        gd.swap()

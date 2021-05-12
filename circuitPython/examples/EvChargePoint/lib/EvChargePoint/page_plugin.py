@@ -19,10 +19,10 @@ class page_plugin():
         self.STEP_X = 10
 
         self.PL_BEGIN ={'addr':4096}
-        self.PL_MALE         ={'addr':223744, 'size':45760, 'x':0, 'y':0, 'width':325, 'height':220, 'format':eve.ASTC_5x5}
-        self.PL_FEMALE       ={'addr':269504, 'size':25344, 'x':0, 'y':0, 'width':180, 'height':220, 'format':eve.ASTC_5x5}
-        self.PL_FEMALE_GREEN ={'addr':294848, 'size':25344, 'x':0, 'y':0, 'width':180, 'height':220, 'format':eve.ASTC_5x5}
-        self.TR_CAR ={'addr':320192, 'size':81600, 'x':0, 'y':0, 'width':600, 'height':306, 'format':eve.ASTC_6x6}
+        self.PL_MALE         ={'addr':223744, 'size':45760, 'x':0, 'y':0, 'width':325, 'height':220, 'format':gd.ASTC_5x5}
+        self.PL_FEMALE       ={'addr':269504, 'size':25344, 'x':0, 'y':0, 'width':180, 'height':220, 'format':gd.ASTC_5x5}
+        self.PL_FEMALE_GREEN ={'addr':294848, 'size':25344, 'x':0, 'y':0, 'width':180, 'height':220, 'format':gd.ASTC_5x5}
+        self.TR_CAR ={'addr':320192, 'size':81600, 'x':0, 'y':0, 'width':600, 'height':306, 'format':gd.ASTC_6x6}
         self.TR_BEGIN ={"addr":4096}
 
         self.PLUG_PREPARE = 0,
@@ -81,7 +81,7 @@ class page_plugin():
         # Draw Text: footer
         if (self.page_state != self.PLUG_PREPARE  and  self.page_state != self.PLUG_END):
             self.gd.ColorRGB(0, 0, 0)
-            self.gd.cmd_text((int)(common.SCREEN_WIDTH * 0.5), common.Y_FOOTER, common.HF_BOTTOM, eve.OPT_CENTERX, lan.lan_active.s_pleaseTouch)
+            self.gd.cmd_text((int)(common.SCREEN_WIDTH * 0.5), common.Y_FOOTER, common.HF_BOTTOM, gd.OPT_CENTERX, lan.lan_active.s_pleaseTouch)
             self.gd.ColorRGB(255, 255, 255)
             
         # Draw Plug Male and Female

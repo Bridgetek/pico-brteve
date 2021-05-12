@@ -25,9 +25,9 @@ class page_language():
 
         self.CL_BEGIN = {'addr':4096}
         self.CL_CIRCLE = [
-            {'addr':117568, 'size':35392, 'x':0, 'y':0, 'width':280, 'height':280, 'format':eve.ASTC_6x6},
-            {'addr':152960, 'size':35392, 'x':0, 'y':0, 'width':280, 'height':280, 'format':eve.ASTC_6x6},
-            {'addr':188352, 'size':35392, 'x':0, 'y':0, 'width':280, 'height':280, 'format':eve.ASTC_6x6},
+            {'addr':117568, 'size':35392, 'x':0, 'y':0, 'width':280, 'height':280, 'format':gd.ASTC_6x6},
+            {'addr':152960, 'size':35392, 'x':0, 'y':0, 'width':280, 'height':280, 'format':gd.ASTC_6x6},
+            {'addr':188352, 'size':35392, 'x':0, 'y':0, 'width':280, 'height':280, 'format':gd.ASTC_6x6},
         ]
 
         self.CL_TAGS = [common.CL_TAG_CIRCLE_EN, common.CL_TAG_CIRCLE_DE, common.CL_TAG_CIRCLE_CN]
@@ -76,8 +76,8 @@ class page_language():
 
         self.gd.ColorA(85)
         self.gd.BitmapHandle(1)
-        self.gd.cmd_setbitmap(helper.RAM_G_SIZE - common.SS_FRAME_SIZE, common.SS_ASTC_FORMAT, common.SCREEN_WIDTH, common.SCREEN_HEIGHT)
-        self.gd.Begin(eve.BITMAPS)
+        self.gd.cmd_setbitmap(helper.RAM_G_SIZE - common.SS_FRAME_SIZE, self.gd.ASTC_10x10, common.SCREEN_WIDTH, common.SCREEN_HEIGHT)
+        self.gd.Begin(gd.BITMAPS)
         self.gd.Vertex2f(0, 0)
         self.gd.End()
         self.gd.ColorA(255)
@@ -113,7 +113,7 @@ class page_language():
                         handler=common.HF_LANG_CN
                     self.gd.cmd_text((int)(common.H_CENTER(x) + i * (self.CL_CIRCLE[i]["width"] + GAP) + self.CL_CIRCLE[i]["width"] * 0.5),
                                 common.V_CENTER(self.CL_CIRCLE[i]["height"]) + self.CL_CIRCLE[i]["height"],
-                                handler, eve.OPT_CENTERX, self.LANG[i])
+                                handler, gd.OPT_CENTERX, self.LANG[i])
                 
                 self.gd.ColorRGB(255, 255, 255)
         

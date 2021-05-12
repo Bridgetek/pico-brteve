@@ -24,18 +24,16 @@ SLIDER_HEIGHT          = (10)# * 16)
 SLIDER_Y               = (350)                            
 SLIDER_GAP             = (145)                            
 
-# Screen saver        =                                  
+# Screen saver                                        
 #SS_FRAME_COUNT       = (377) # 64Mb Flash              
 SS_FRAME_COUNT         = (97) # 16Mb Flash               
 SS_FRAME_SIZE          = (163840)                         
-SS_ASTC_FORMAT         = eve.ASTC_10x10   
 SS_FLASH_ADDR_FRAME_0  = (814208)                         
 
-# Choose language     =                                  
+# Choose language                                      
 CIRCLE_NUM             = (3)                              
 
-# Authenticate        =                                  
-ATH_ASTC_FORMAT        = eve.ASTC_4x4     
+# Authenticate                                         
 PAY_NUM                = (5)                              
 
 ATH_PAYWITH_X          = (X_HEADER)                       
@@ -43,11 +41,7 @@ ATH_PAYWITH_Y          = (670)
 ATH_PAY_VERTICAL_CENTER= (750)                            
 ATH_PAY_ROOM           = (SCREEN_WIDTH / PAY_NUM)         
 
-# Plugin              =                                  
-PL_ASTC_FORMAT         = eve.ASTC_4x4     
-
 # Transaction         =                                  
-TR_ASTC_FORMAT         = eve.ASTC_4x4     
 TR_RIGHT_MARGIN        = (150)                            
 TR_RIGHT_BUTTON_MARGIN = (50)                             
 

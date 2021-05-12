@@ -27,24 +27,24 @@ def draw_circular(gd):
     w = max(gd.w, gd.h)
     gd.SaveContext()
     gd.BitmapHandle(15)
-    gd.Begin(eve.BITMAPS)
+    gd.Begin(gd.BITMAPS)
 
     # Draw in X, in replace mode. Only care about the Alpha channel
     gd.BlendFunc(1, 0)
-    gd.cmd_setbitmap(0, eve.L8, w, 1)
-    gd.BitmapSize(eve.NEAREST, eve.BORDER, eve.REPEAT, w, w)
+    gd.cmd_setbitmap(0, gd.L8, w, 1)
+    gd.BitmapSize(gd.NEAREST, gd.BORDER, gd.REPEAT, w, w)
     gd.BitmapSizeH(w >> 9, w >> 9)
     gd.Vertex2f(0, (gd.h - w) / 2)
 
     # Multiply by gaussian in Y, again only care about the alpha channel
-    gd.BlendFunc(eve.DST_ALPHA, 0)
-    gd.cmd_setbitmap(0, eve.L8, 1, w)
-    gd.BitmapSize(eve.NEAREST, eve.REPEAT, eve.BORDER, w, w)
+    gd.BlendFunc(gd.DST_ALPHA, 0)
+    gd.cmd_setbitmap(0, gd.L8, 1, w)
+    gd.BitmapSize(gd.NEAREST, gd.REPEAT, gd.BORDER, w, w)
     gd.BitmapSizeH(w >> 9, w >> 9)
     gd.Vertex2f(0, (gd.h - w) / 2)
 
     # Now paint the whole screen, scaled by the alpha channel value
-    gd.Begin(eve.RECTS)
+    gd.Begin(gd.RECTS)
     gd.Vertex2f(0, 0)
     gd.Vertex2f(gd.w, gd.h)
     gd.RestoreContext()
@@ -55,7 +55,7 @@ def run(assetdir, gd):
     gd.BitmapHandle(0)
     gd.cmd_loadimage(2000, 0)
     gd.load(open(assetdir + "blinka540.png", "rb"))
-    # gd.BitmapSize(eve.BILINEAR, eve.BORDER, eve.BORDER, 540, 540)
+    # gd.BitmapSize(gd.BILINEAR, gd.BORDER, gd.BORDER, 540, 540)
 
     gd.BitmapHandle(1)
     gd.cmd_loadimage(-1, 0)
@@ -76,7 +76,7 @@ def run(assetdir, gd):
 
     def dlptr():
         gd.finish()
-        return eve.RAM_DL + gd.rd32(eve.REG_CMD_DL)
+        return gd.RAM_DL + gd.rd32(gd.REG_CMD_DL)
     drawlists = []
 
     t = 0
@@ -87,7 +87,7 @@ def run(assetdir, gd):
         gd.ColorRGB(0x40, 0x50, 0x70)
         draw_circular(gd)
 
-        gd.Begin(eve.BITMAPS)
+        gd.Begin(gd.BITMAPS)
 
         gd.SaveContext()        # {
         gd.BitmapHandle(0)      # blinka540.png
@@ -114,11 +114,12 @@ def run(assetdir, gd):
         t += 0.5
 
 if sys.implementation.name == "circuitpython":
-    gd = eve.Brt_PicoEve_Module()
+    gd = eve.Brt_PicoEve_Module()  # Default is MM2040 with LCD 1280x800 capacity touch
     assetdir = ""
 else:
     from spidriver import SPIDriver
     gd = eve.Gameduino(SPIDriver(sys.argv[1]))
     assetdir = "assets/"
+
 gd.init()
 run(assetdir, gd)

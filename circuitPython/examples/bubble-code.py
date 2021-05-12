@@ -2,9 +2,8 @@ import random
 import math
 import bteve as eve
 
-gd = eve.ME815A_WH70C_Pico()
+gd = eve.Brt_PicoEve_Module()  # Default is MM2040 with LCD 1280x800 capacity touch
 gd.init()
-gd.setup_800_480()
 
 random.seed(6)
 rr = random.randrange
@@ -40,7 +39,7 @@ for t in range(999999):
     gd.Clear()                              # black background
     gd.VertexFormat(2)                      # full-screen
     gd.ColorA(192)                          # 75% opacity
-    gd.Begin(eve.POINTS)                    # large POINTS are circles
+    gd.Begin(gd.POINTS)                    # large POINTS are circles
     for b in bubbles:
         b.draw(t)
     gd.swap()

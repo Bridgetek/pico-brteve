@@ -16,15 +16,15 @@ class page_authenticate():
         self.lan = lan
 
         self.ATH_BEGIN = {'addr':4096}
-        self.ATH_TAP_POINT = {'addr':4096, 'size':47872, 'x':0, 'y':0, 'width':520, 'height':368, 'format':bteve.ASTC_8x8}
-        self.ATH_CARD      = {'addr':51968, 'size':32832, 'x':0, 'y':0, 'width':456, 'height':288, 'format':bteve.ASTC_8x8}
+        self.ATH_TAP_POINT = {'addr':4096, 'size':47872, 'x':0, 'y':0, 'width':520, 'height':368, 'format':gd.ASTC_8x8}
+        self.ATH_CARD      = {'addr':51968, 'size':32832, 'x':0, 'y':0, 'width':456, 'height':288, 'format':gd.ASTC_8x8}
 
         self.ATH_PAY = [
-            {'addr':84800 ,  'size':7104, 'x':0, 'y':0, 'width':148, 'height':48, 'format':eve.ASTC_4x4},
-            {'addr':91904 ,  'size':4608, 'x':0, 'y':0, 'width':76 , 'height':60, 'format':eve.ASTC_4x4},
-            {'addr':96512 ,  'size':5568, 'x':0, 'y':0, 'width':116, 'height':48, 'format':eve.ASTC_4x4},
-            {'addr':102080,  'size':8128, 'x':0, 'y':0, 'width':184, 'height':44, 'format':eve.ASTC_4x4},
-            {'addr':110208,  'size':7360, 'x':0, 'y':0, 'width':108, 'height':68, 'format':eve.ASTC_4x4},
+            {'addr':84800 ,  'size':7104, 'x':0, 'y':0, 'width':148, 'height':48, 'format':gd.ASTC_4x4},
+            {'addr':91904 ,  'size':4608, 'x':0, 'y':0, 'width':76 , 'height':60, 'format':gd.ASTC_4x4},
+            {'addr':96512 ,  'size':5568, 'x':0, 'y':0, 'width':116, 'height':48, 'format':gd.ASTC_4x4},
+            {'addr':102080,  'size':8128, 'x':0, 'y':0, 'width':184, 'height':44, 'format':gd.ASTC_4x4},
+            {'addr':110208,  'size':7360, 'x':0, 'y':0, 'width':108, 'height':68, 'format':gd.ASTC_4x4},
         ]
 
         self.TAP_POINT = 0

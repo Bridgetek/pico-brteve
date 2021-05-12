@@ -1,7 +1,5 @@
 import time
 
-
-from bteve import registers  as reg
 import bteve as eve
 
 EVE_CMD_FIFO_SIZE = ((4) * 1024)
@@ -28,10 +26,10 @@ class eve_helper():
         pass
     
     def cmd_rp(self):
-        return self.gd.rd32 (reg.REG_CMD_READ) & EVE_CMD_FIFO_MASK
+        return self.gd.rd32 (self.gd.REG_CMD_READ) & EVE_CMD_FIFO_MASK
         
     def cmd_wp(self):
-        return self.gd.rd32 (reg.REG_CMD_WRITE) & EVE_CMD_FIFO_MASK
+        return self.gd.rd32 (self.gd.REG_CMD_WRITE) & EVE_CMD_FIFO_MASK
 
     def wait_flush(self):
         rp = self.cmd_rp()
@@ -66,7 +64,7 @@ class eve_helper():
     def draw_image(self, img, addr, x, y):
         self.gd.BitmapHandle(1)
         self.gd.cmd_setbitmap(addr, img["format"], img["width"], img["height"]);    
-        self.gd.Begin(eve.BITMAPS)
+        self.gd.Begin(self.gd.BITMAPS)
         self.gd.Vertex2f((x), (y))
         self.gd.End()
     
@@ -74,7 +72,7 @@ class eve_helper():
         self.gd.BitmapHandle(1)
         self.gd.cmd_setbitmap(addr, img["format"], img["width"], img["height"])
         self.gd.Tag(tag); 
-        self.gd.Begin(eve.BITMAPS)
+        self.gd.Begin(self.gd.BITMAPS)
         self.gd.Vertex2f((x),(y))
         self.gd.End()
         self.gd.Tag(0)

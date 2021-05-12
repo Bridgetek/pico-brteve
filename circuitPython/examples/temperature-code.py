@@ -23,7 +23,7 @@ def temperature(gd, sense):
 
         gd.cmd_gradient(0, 0, 0x000010, gd.w, gd.h, 0x206060)
         gd.VertexFormat(3)
-        gd.cmd_text(gd.w // 2, gd.h // 9, 31, eve.OPT_CENTER, "CPU junction temperature")
+        gd.cmd_text(gd.w // 2, gd.h // 9, 31, gd.OPT_CENTER, "CPU junction temperature")
 
         # Update sparkline every few frames
         if (frames % 6) == 0:
@@ -35,13 +35,13 @@ def temperature(gd, sense):
 
         # Draw dot and measurement
         (x, y) = sparkline[-1]
-        gd.cmd_text(int(x), int(y), 30, eve.OPT_CENTERY, " %.1f C" % temp)
+        gd.cmd_text(int(x), int(y), 30, gd.OPT_CENTERY, " %.1f C" % temp)
         gd.PointSize(20)
-        gd.Begin(eve.POINTS)
+        gd.Begin(gd.POINTS)
         gd.Vertex2f(x, y)
 
         gd.LineWidth(gd.w / 200)
-        gd.Begin(eve.LINE_STRIP)
+        gd.Begin(gd.LINE_STRIP)
         for (x, y) in sparkline:
             gd.Vertex2f(x, y)
         gd.swap()
@@ -49,7 +49,6 @@ def temperature(gd, sense):
 def celsius():
     return microcontroller.cpu.temperature
 
-gd = eve.ME815A_WH70C_Pico()
+gd = eve.Brt_PicoEve_Module()  # Default is MM2040 with LCD 1280x800 capacity touch
 gd.init()
-gd.setup_800_480()
 temperature(gd, celsius)
