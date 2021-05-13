@@ -4,13 +4,46 @@ import struct
 from collections import namedtuple
 from .mcu_bt817_8 import *
 from .mcu_ft80x import *
-from .mcu_bridgetek_general import *
 
 if sys.implementation.name == 'circuitpython':
     from _eve import _EVE
 else:
     from ._eve import _EVE
 from .eve import EVE
+
+# Order matches the register layout, so can fill with a single block read
+_Touch = namedtuple(
+    "TouchInputs",
+    (
+    "rawy",
+    "rawx",
+    "rz",
+    "y",
+    "x",
+    "tag_y",
+    "tag_x",
+    "tag",
+    ))
+_State = namedtuple(
+    "State",
+    (
+    "touching",
+    "press",
+    "release"
+    ))
+_Tracker = namedtuple(
+    "Tracker",
+    (
+    "tag",
+    "val"
+    ))
+_Inputs = namedtuple(
+    "Inputs",
+    (
+    "touch",
+    "tracker",
+    "state",
+    ))
 
 EVE_DL_SIZE  =(8 * 1024) # 8kB Display List buffer size 
 EVE_DL_COUNT = (2 * 1024)
@@ -51,9 +84,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-class Brt_Eve_Module(_EVE, EVE, Mcu_BridgeTek_General):
+class Brt_Eve_Module(_EVE, EVE):
     def __init__(self):
-        Mcu_BridgeTek_General.__init__(self)
+        EVE.__init__(self)
 
         self.FIFO_MAX = (0xffc)    # Maximum reported free space in the EVE command FIFO
         self.Mcu_FT80X  = Mcu_FT80X()
@@ -934,3 +967,85 @@ class Brt_Eve_Module(_EVE, EVE, Mcu_BridgeTek_General):
 		
         self.w = 1280
         self.h = 800		
+
+    # Some higher-level functions
+
+    def get_inputs(self):
+        self.finish()
+        t = _Touch(*struct.unpack("HHIhhhhB", self.rd(REG_TOUCH_RAW_XY, 17)))
+
+        r = _Tracker(*struct.unpack("HH", self.rd(self.mcu.REG_TRACKER, 4)))
+
+        if not hasattr(self, "prev_touching"):
+            self.prev_touching = False
+        touching = (t.x != -32768)
+        press = touching and not self.prev_touching
+        release = (not touching) and self.prev_touching
+        s = _State(touching, press, release)
+        self.prev_touching = touching
+
+        self.inputs = _Inputs(t, r, s)
+        return self.inputs
+
+    def swap(self):
+        self.Display()
+        self.cmd_swap()
+        self.flush()
+        self.cmd_dlstart()
+        self.cmd_loadidentity()
+
+    def calibrate(self):
+        self.Clear()
+        self.cmd_text(self.w // 2, self.h // 2, 29, 0x0600, "Tap the dot")
+        self.cmd_calibrate(0)
+        self.cmd_dlstart()
+
+    def screenshot(self, dest):
+        import time
+        REG_SCREENSHOT_EN    = 0x302010 # Set to enable screenshot mode
+        REG_SCREENSHOT_Y     = 0x302014 # Y line register
+        REG_SCREENSHOT_START = 0x302018 # Screenshot start trigger
+        REG_SCREENSHOT_BUSY  = 0x3020e8 # Screenshot ready flags
+        REG_SCREENSHOT_READ  = 0x302174 # Set to enable readout
+        RAM_SCREENSHOT       = 0x3c2000 # Screenshot readout buffer
+
+        self.finish()
+
+        pclk = self.rd32(self.mcu.REG_PCLK)
+        self.wr32(self.mcu.REG_PCLK, 0)
+        time.sleep(0.001)
+        self.wr32(self.mcu.REG_SCREENSHOT_EN, 1)
+        self.wr32(0x0030201c, 32)
+        
+        for ly in range(self.h):
+            print(ly, "/", self.h)
+            self.wr32(self.mcu.REG_SCREENSHOT_Y, ly)
+            self.wr32(self.mcu.REG_SCREENSHOT_START, 1)
+            time.sleep(.002)
+            # while (self.raw_read(self.mcu.REG_SCREENSHOT_BUSY) | self.raw_read(self.mcu.REG_SCREENSHOT_BUSY + 4)): pass
+            while self.rd(self.mcu.REG_SCREENSHOT_BUSY, 8) != bytes(8):
+                pass
+            self.wr32(self.mcu.REG_SCREENSHOT_READ, 1)
+            bgra = self.rd(RAM_SCREENSHOT, 4 * self.w)
+            (b,g,r,a) = [bgra[i::4] for i in range(4)]
+            line = bytes(sum(zip(r,g,b), ()))
+            dest(line)
+            self.wr32(self.mcu.REG_SCREENSHOT_READ, 0)
+        self.wr32(self.mcu.REG_SCREENSHOT_EN, 0)
+        self.wr32(self.mcu.REG_PCLK, pclk)
+
+    def screenshot_im(self):
+        self.ssbytes = b""
+        def appender(s):
+            self.ssbytes += s
+        self.screenshot(appender)
+        from PIL import Image
+        return Image.frombytes("RGB", (self.w, self.h), self.ssbytes)
+
+    def load(self, f):
+        while True:
+            s = f.read(512)
+            if not s:
+                return
+            self.cc(align4(s))
+
