@@ -8,14 +8,19 @@ import math
 gd = eve.Brt_PicoEve_Module()  # Default is MM2040 with LCD 1280x800 capacity touch
 gd.init()
 
+color_yellow=[0xF5, 0x90, 0x1F]
+color_white=[255, 255, 255]
+
+c1=color_white
+c2=color_yellow
+
 degree=1
 while 1:
     gd.VertexFormat(4)
     gd.ClearColorRGB(255, 255, 255)
     gd.Clear()
-    gd.ColorRGB(255, 255, 255)
-    
-    gd.cmd_gradient (0, 0, 0x00FF0000,800, 800, 0x000000FF)
+    gd.ColorRGB(c1[0], c1[1], c1[2])    
+    gd.cmd_gradient (0, (int)(gd.h/2), 0x00FC0003, gd.w, (int)(gd.h/2), 0x00860078)
 
     gd.StencilFunc(gd.NEVER, 0x00, 0x00)
     gd.StencilOp(gd.INCR, gd.INCR)
@@ -61,19 +66,27 @@ while 1:
     #   that is, the template is not changed. The following code is as follows, 
     #   draw POINT on the ring:
     
-    gd.ColorRGB(246, 0, 0)
+    gd.ColorRGB(c2[0], c2[1], c2[2])
     gd.PointSize(10 * 2)
     
     r=85
-    for num in range(0, degree, 1):
-        posX = (gd.w / 2) + (r) * math.cos((int)(num) * 65535 / 360)
-        posY = (gd.h / 2) + (r) * math.sin((int)(num) * 65535 / 360)
+    for num in range(0, degree, 2):
+        num=math.radians(num)
+        posX = (gd.w / 2) + (r) * math.cos(num)
+        posY = (gd.h / 2) + (r) * math.sin(num)
         gd.Vertex2f(posX, posY)
-    degree+=1
-    if degree > 360: degree=1
+    degree+=2
+    if degree > 360: 
+        degree=1
+        if c1==color_white:
+            c1=color_yellow
+            c2=color_white
+        else:
+            c1=color_white
+            c2=color_yellow
     
     gd.swap()
-    time.sleep(.08)
+    time.sleep(.001)
     
 
 
