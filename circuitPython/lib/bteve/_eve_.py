@@ -88,13 +88,13 @@ class _EVE:
     def Jump(self, dest):
         self.c4((30 << 24) | ((dest & 65535)))
     def LineWidth(self, width): # "width" is width of lines in diameter
-        self.c4((14 << 24) | ((int(width) & 4095)))
+        self.c4((14 << 24) | ((int(width * 8) & 4095)))
     def Line_Width(self, width):  # "width" is width of lines in radius
         self.LineWidth(2 * width)
     def Macro(self, m):
         self.c4((37 << 24) | ((m & 1)))
     def PointSize(self, size): # "size" is diameter of rasterized points
-        self.c4((13 << 24) | ((int(size) & 8191)))
+        self.c4((13 << 24) | ((int(size * 8) & 8191)))
     def Point_Size(self, size): # "size" is radius of points
         self.PointSize(2 * size)
     def RestoreContext(self):
