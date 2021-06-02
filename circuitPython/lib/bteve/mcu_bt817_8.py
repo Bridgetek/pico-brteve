@@ -22,6 +22,7 @@ class Mcu_BT817_8():
         self.ASTC_12x12             = (0x93BD)   # BT815
 
         # Widget command macros
+        self.OPT_NOTEAR             = (4)
         self.OPT_FULLSCREEN         = (8)
         self.OPT_MEDIAFIFO          = (16)
         self.OPT_FORMAT             = (4096)     # For 815
