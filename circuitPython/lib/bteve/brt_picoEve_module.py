@@ -73,6 +73,8 @@ class Brt_PicoEve_Module(Brt_Eve_Module):
             self.init_ili9488()
             self.setup_320x480()
 
+    def sd_spis(self):
+        return self.sd_spi
 
     def setup_sd(self, sdcs):
         try:

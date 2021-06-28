@@ -2,8 +2,10 @@ import sys
 import time
 import struct
 from collections import namedtuple
+from .mcu_bt815_6 import *
 from .mcu_bt817_8 import *
 from .mcu_ft80x import *
+from .eve import align4
 
 if sys.implementation.name == 'circuitpython':
     from _eve import _EVE
@@ -90,6 +92,7 @@ class Brt_Eve_Module(_EVE, EVE):
 
         self.FIFO_MAX = (0xffc)    # Maximum reported free space in the EVE command FIFO
         self.Mcu_FT80X  = Mcu_FT80X()
+        self.Mcu_BT815_6=Mcu_BT815_6()
         self.Mcu_BT817_8=Mcu_BT817_8()
 
         # Default attributes
@@ -112,7 +115,15 @@ class Brt_Eve_Module(_EVE, EVE):
         print("Initialing for MCU " + self.ic)
         funcdict = {
             self.IC_EVE_FT800():self.Mcu_FT80X,
+            self.IC_EVE_FT801():self.Mcu_FT80X,
+            # self.IC_EVE_FT810():self.Mcu_FT81X,
+            # self.IC_EVE_FT811():self.Mcu_FT81X,
+            # self.IC_EVE_FT812():self.Mcu_FT81X,
+            # self.IC_EVE_FT813():self.Mcu_FT81X,
+            self.IC_EVE_BT815():self.Mcu_BT815_6,
+            self.IC_EVE_BT816():self.Mcu_BT815_6,
             self.IC_EVE_BT817():self.Mcu_BT817_8,
+            self.IC_EVE_BT818():self.Mcu_BT817_8,
         }
         if self.ic in self._all_settings:
             self.mcu=funcdict[self.ic]
@@ -245,6 +256,9 @@ class Brt_Eve_Module(_EVE, EVE):
     def wr32(self, a, v):
         self.CmdWp += 4
         self.CmdWp &= EVE_CMD_FIFO_MASK;
+        self.wr(a, struct.pack("I", v))
+
+    def wrMem(self, a, v):
         self.wr(a, struct.pack("I", v))
 
     def EVE_Cmd_wp(self):
@@ -827,7 +841,7 @@ class Brt_Eve_Module(_EVE, EVE):
             (self.mcu.REG_GPIO, 0xFF),
             (self.mcu.REG_CSPREAD, 0),
             (self.mcu.REG_PCLK_POL, 1),
-            (self.mcu.REG_ADAPTIVE_FRAMERATE, 0),
+#            (self.mcu.REG_ADAPTIVE_FRAMERATE, 0),
 
             (self.mcu.REG_HCYCLE, 928),
             (self.mcu.REG_HOFFSET, 88),
@@ -972,7 +986,7 @@ class Brt_Eve_Module(_EVE, EVE):
 
     def get_inputs(self):
         self.finish()
-        t = _Touch(*struct.unpack("HHIhhhhB", self.rd(REG_TOUCH_RAW_XY, 17)))
+        t = _Touch(*struct.unpack("HHIhhhhB", self.rd(self.mcu.REG_TOUCH_RAW_XY, 17)))
 
         r = _Tracker(*struct.unpack("HH", self.rd(self.mcu.REG_TRACKER, 4)))
 
@@ -1001,7 +1015,6 @@ class Brt_Eve_Module(_EVE, EVE):
         self.cmd_dlstart()
 
     def screenshot(self, dest):
-        import time
         REG_SCREENSHOT_EN    = 0x302010 # Set to enable screenshot mode
         REG_SCREENSHOT_Y     = 0x302014 # Y line register
         REG_SCREENSHOT_START = 0x302018 # Screenshot start trigger
@@ -1048,4 +1061,46 @@ class Brt_Eve_Module(_EVE, EVE):
             if not s:
                 return
             self.cc(align4(s))
+    # display list commands
+    def VERTEX2F(self, x,y)                                : return  self.Vertex2f         (x,y)                                     #((1<<30)|(((x)&32767)<<15)|(((y)&32767)<<0))
+    def VERTEX2II(self, x,y,handle,cell)                   : return  self.Vertex2ii        (x,y,handle,cell)                         #((2<<30)|(((x)&511)<<21)|(((y)&511)<<12)|(((handle)&31)<<7)|(((cell)&127)<<0))
+    def BITMAP_SOURCE(self, addr)                          : return  self.BitmapSource     (addr)                                    #((1<<24)|(((addr)&1048575)<<0))
+    def CLEAR_COLOR_RGB(self, red,green,blue)              : return  self.ClearColorRgb    (red,green,blue)                          #((2<<24)|(((red)&255)<<16)|(((green)&255)<<8)|(((blue)&255)<<0))
+    def TAG(self, s)                                       : return  self.Tag              (s)                                       #((3<<24)|(((s)&255)<<0))
+    def COLOR_RGB(self, red,green,blue)                    : return  self.ColorRgb         (red,green,blue)                          #((4<<24)|(((red)&255)<<16)|(((green)&255)<<8)|(((blue)&255)<<0))
+    def BITMAP_HANDLE(self, handle)                        : return  self.BitmapHandle     (handle)                                  #((5<<24)|(((handle)&31)<<0))
+    def CELL(self, cell)                                   : return  self.Cell             (cell)                                    #((6<<24)|(((cell)&127)<<0))
+    def BITMAP_LAYOUT(self, format,linestride,height)      : return  self.BitmapLayout     (format,linestride,height)                #((7<<24)|(((format)&31)<<19)|(((linestride)&1023)<<9)|(((height)&511)<<0))
+    def BITMAP_SIZE(self, filter,wrapx,wrapy,width,height) : return  self.BitmapSize       (filter,wrapx,wrapy,width,height)         #((8<<24)|(((filter)&1)<<20)|(((wrapx)&1)<<19)|(((wrapy)&1)<<18)|(((width)&511)<<9)|(((height)&511)<<0))
+    def ALPHA_FUNC(self, func,ref)                         : return  self.AlphaFunc        (func,ref)                                #((9<<24)|(((func)&7)<<8)|(((ref)&255)<<0))
+    def STENCIL_FUNC(self, func,ref,mask)                  : return  self.StencilFunc      (func,ref,mask)                           #((10<<24)|(((func)&7)<<16)|(((ref)&255)<<8)|(((mask)&255)<<0))
+    def BLEND_FUNC(self, src,dst)                          : return  self.BlendFunc        (src,dst)                                 #((11<<24)|(((src)&7)<<3)|(((dst)&7)<<0))
+    def STENCIL_OP(self, sfail,spass)                      : return  self.StencilOp        (sfail,spass)                             #((12<<24)|(((sfail)&7)<<3)|(((spass)&7)<<0))
+    def POINT_SIZE(self, size)                             : return  self.PointSize        (size)                                    #((13<<24)|(((size)&8191)<<0))
+    def LINE_WIDTH(self, width)                            : return  self.LineWidth        (width)                                   #((14<<24)|(((width)&4095)<<0))
+    def CLEAR_COLOR_A(self, alpha)                         : return  self.ClearColorA      (alpha)                                   #((15<<24)|(((alpha)&255)<<0))
+    def COLOR_A(self, alpha)                               : return  self.ColorA           (alpha)                                   #((16<<24)|(((alpha)&255)<<0))
+    def CLEAR_STENCIL(self, s)                             : return  self.ClearStencil     (s)                                       #((17<<24)|(((s)&255)<<0))
+    def CLEAR_TAG(self, s)                                 : return  self.ClearTag         (s)                                       #((18<<24)|(((s)&255)<<0))
+    def STENCIL_MASK(self, mask)                           : return  self.StencilMask      (mask)                                    #((19<<24)|(((mask)&255)<<0))
+    def TAG_MASK(self, mask)                               : return  self.TagMask          (mask)                                    #((20<<24)|(((mask)&1)<<0))
+    def BITMAP_TRANSFORM_A(self, a)                        : return  self.BitmapTransformA (a)                                       #((21<<24)|(((a)&131071)<<0))
+    def BITMAP_TRANSFORM_B(self, b)                        : return  self.BitmapTransformB (b)                                       #((22<<24)|(((b)&131071)<<0))
+    def BITMAP_TRANSFORM_C(self, c)                        : return  self.BitmapTransformC (c)                                       #((23<<24)|(((c)&16777215)<<0))
+    def BITMAP_TRANSFORM_D(self, d)                        : return  self.BitmapTransformD (d)                                       #((24<<24)|(((d)&131071)<<0))
+    def BITMAP_TRANSFORM_E(self, e)                        : return  self.BitmapTransformE (e)                                       #((25<<24)|(((e)&131071)<<0))
+    def BITMAP_TRANSFORM_F(self, f)                        : return  self.BitmapTransformF (f)                                       #((26<<24)|(((f)&16777215)<<0))
+    def SCISSOR_XY(self, x,y)                              : return  self.ScissorXy        (x,y)                                     #((27<<24)|(((x)&511)<<9)|(((y)&511)<<0))
+    def SCISSOR_SIZE(self, width,height)                   : return  self.ScissorSize      (width,height)                            #((28<<24)|(((width)&1023)<<10)|(((height)&1023)<<0))
+    def CALL(self, dest)                                   : return  self.Call             (dest)                                    #((29<<24)|(((dest)&65535)<<0))
+    def JUMP(self, dest)                                   : return  self.Jump             (dest)                                    #((30<<24)|(((dest)&65535)<<0))
+    def BEGIN(self, prim)                                  : return  self.Begin            (prim)                                    #((31<<24)|(((prim)&15)<<0))
+    def COLOR_MASK(self, r,g,b,a)                          : return  self.ColorMask        (r,g,b,a)                                 #((32<<24)|(((r)&1)<<3)|(((g)&1)<<2)|(((b)&1)<<1)|(((a)&1)<<0))
+    def CLEAR(self, c,s,t)                                 : return  self.Clear            (c,s,t)                                   #((38<<24)|(((c)&1)<<2)|(((s)&1)<<1)|(((t)&1)<<0))
+    def END(self, )                                        : return  self.End              ()                                        #((33<<24))
+    def SAVE_CONTEXT(self, )                               : return  self.SaveContext      ()                                        #((34<<24))
+    def RESTORE_CONTEXT(self, )                            : return  self.RestoreContext   ()                                        #((35<<24))
+    def RETURN(self, )                                     : return  self.Return           ()                                        #((36<<24))
+    def MACRO(self, m)                                     : return  self.Macro            (m)                                       #((37<<24)|(((m)&1)<<0))
+    def DISPLAY(self, )                                    : return  self.Display          ()                                        #((0<<24))
 
