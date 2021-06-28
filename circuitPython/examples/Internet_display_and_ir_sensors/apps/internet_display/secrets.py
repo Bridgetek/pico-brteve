@@ -4,6 +4,6 @@ wifi_secrets=[
 ]
 
 aio_secrets={
-    'aio_username':'tuan_nguyen_brtchip',
-    'aio_key':'aio_mggR95ttAiOpWCVzZUyYumj4l70T'
+    'aio_username':'___',
+    'aio_key':'___' # key will get disable automatically if push into by github
 }
