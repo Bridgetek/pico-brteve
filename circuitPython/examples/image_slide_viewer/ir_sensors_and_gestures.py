@@ -26,8 +26,7 @@ class ir_sensors_and_gestures:
     def __init__(self, eve):
         self.eve=eve
 
-        #self.show_astc('/sd/Test/DemoImageSlideShow/8x8')
-        self.show_jpeg('/sd/Test/DemoImageSlideShow/jpg/compressed')
+        self.show_jpeg('/sd/Test/image_slide_viewer')
     
     def get_w_x_h(self, imagename):
         """ Imagename should have format: ..._wxh_COMPRESSED...raw
@@ -72,7 +71,7 @@ class ir_sensors_and_gestures:
         images=[]
         names=[]
         for f in arr:
-            if '.jpg' in f:
+            if '.jpg' in f or '.png' in f:
                 images.append(path + '/' +f)
                 names.append(f)
 
