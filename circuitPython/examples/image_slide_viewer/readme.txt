@@ -1,8 +1,10 @@
 ********************************************************************************
-*    Demo Image SlideShow                                                      *
+*    Demo Image Slide Viewer                                                   *
 *                                                                              *
 *                                                                              *
 ********************************************************************************
+    This demo load an image from SDcard and show on the screen.
+    User can swipe image via gesture sensor (APDS-9660), or IR receiver, or swipe on LCD.
 
 1. Hardware Requirement
     Below is the list of hardware used in this demo
@@ -43,11 +45,12 @@
         -> Copy and rename code_ir_sensors_and_gestures.py to code.py
     - Demo should start after that
     
-5. Demo Functional:
+5. Demo Functionality:
     - Wave hand left/right to swipe image left/right
       *Gesture detection range is only up to a few centimeters
       
-    - Push button left/right on IR controller to swipe image left/right
+    - Push button left/right on IR controller to swipe image
+    - Swipe on LCD left/right to swipe image
     
     
     

@@ -3,6 +3,8 @@
 *                                                                              *
 *                                                                              *
 ********************************************************************************
+    This demo display data from sensor into LCD and sync with cloud in realtime.
+    It also download data (an image) from internet and show on LCD.
 
 1. Hardware Requirement
     Below is the list of hardware used in this demo
@@ -58,7 +60,7 @@
     * If stuck in "Connecting to wifi" screen, try enable TKIP Security Mode in the Wifi Router,
         and restart demo
         
-5. Demo Functional:
+5. Demo Functionality:
     - At startup, air quality and biametric data is show on screen
       Data also synchonize in realtime into Adafruit IO
       https://io.adafruit.com/tuan_nguyen_brtchip/dashboards/test1?kiosk=true
