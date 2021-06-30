@@ -4,15 +4,6 @@ sys.path.append("../lib/adafruit")
 sys.path.append("../lib/adafruit/adafruit_io")
 sys.path.append("../lib/adafruit/adafruit_minimqtt")
 
-import random
-import math
-import busio
-import board
-import sdcardio
-import storage
-import os
-import time
-
 # adafruit IO
 import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
@@ -60,7 +51,6 @@ class aio():
     def aio_url_hh_mm(self, timezone='US'):
         username=self.secrets["aio_username"]
         password=self.secrets["aio_key"]
-
         TIME_URL = "http://io.adafruit.com/api/v2/%s/integrations/time/strftime?x-aio-key=%s" % (
             username, password)
 

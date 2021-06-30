@@ -33,6 +33,9 @@ import math
 import struct
 import time
 
+import sys
+sys.path.append("../lib/adafruit")
+
 from micropython import const
 from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_register import i2c_bit

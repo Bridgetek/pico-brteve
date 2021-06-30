@@ -1,15 +1,6 @@
 # Manage sensor SparkFun https://www.sparkfun.com/products/14348
 
-import random
-import math
-import busio
-import sdcardio
-import storage
-import os
-import time
-import board
 import sys
-
 sys.path.append("../lib/adafruit")
 
 import adafruit_ccs811

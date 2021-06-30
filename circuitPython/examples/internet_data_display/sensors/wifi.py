@@ -1,14 +1,8 @@
-import random
-import math
-import busio
-import board
-import sdcardio
-import storage
-import os
 import sys
-
 sys.path.append("../lib/adafruit")
 sys.path.append("../lib/adafruit/adafruit_esp32spi")
+
+import board
 
 # ESP 32 air lift
 from digitalio import DigitalInOut
@@ -91,15 +85,5 @@ class wifi():
         print(r.json())
         print('-'*40)
         r.close()
-
-
-        print("Raspberry Pi RP2040 - ESP32 SPI webclient test")
-
-        TEXT_URL = "http://wifitest.adafruit.com/testwifi/index.html"
-        JSON_URL = "http://api.coindesk.com/v1/bpi/currentprice/USD.json"
-
-        wf = wifi()
-        wf.connect()
-        wf.get_raw(TEXT_URL)
 
     

@@ -42,13 +42,11 @@
     | GP01 - CN11 pin 4             | RST          |
     | GP01 - CN11 pin 5             | BUSY         |
     |----------------------------------------------|
-    
-    See board_mapping_2.jpg for Pin mapping on MM2040EV
-        
+            
 4. Startup
     - Add wifi SSID and wifi password into apps\internet_display\secrets.py
     - Copy folder "test" into sdcard
-    - Start MM2040EV with CircuitPython 6.3.0
+    - Start MM2040EV with adafruit-circuitpython-raspberry_pi_pico-en_US-7.0.0-alpha.3.uf2
     - In the code.py, disable this line: app=ir_sensors_and_gestures(eve)
     - Copy source code in Python into CircuitPython drive:
         -> lib (which inclide "bteve" folder )

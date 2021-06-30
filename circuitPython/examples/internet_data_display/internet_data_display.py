@@ -1,25 +1,17 @@
-import sys
-sys.path.append("../../lib")
-
-import random
-import math
 import bteve as eve_module
 import busio
 import board
-import sdcardio
-import storage
-import os
 import time
 
-from ..sensors.wifi import wifi 
-from ..sensors.air_quality import CCS811_and_BME280_SparkFun
-from ..sensors.aio import aio
-from ..sensors.sparkfun_max30101_max32664 import SparkFun_MAX30101_And_MAX32664
+from sensors.wifi import wifi 
+from sensors.air_quality import CCS811_and_BME280_SparkFun
+from sensors.aio import aio
+from sensors.sparkfun_max30101_max32664 import SparkFun_MAX30101_And_MAX32664
 
-# Get wifi details and more from a secrets.py file
-from .secrets import wifi_secrets, aio_secrets
-from .page1_ui import Page1_UI
-from .page2_ui import Page2_UI
+# Getwifi details and more from a secrets.py file
+from secrets import wifi_secrets, aio_secrets
+from page1_ui import Page1_UI
+from page2_ui import Page2_UI
 
 _BUFFER_DOWNLOADED_IMG = 0
 class internet_display:
@@ -98,12 +90,15 @@ class internet_display:
         step += 1
         soc=self.wifi.socket
         esp=self.wifi.esp
+        print(aio_secrets)
         self.aio=aio(soc, esp, aio_secrets, "temp")
 
+        print("Fetching realtime clock...")
         self.init_screen("Fetching realtime clock...", step, TOTAL_STEPS)
         step += 1  
         self.get_time()
 
+        print("Starting page 1...")
         self.init_screen("Starting page 1...", step, TOTAL_STEPS)
         step += 1
         self.page1.start()
@@ -244,25 +239,27 @@ class internet_display:
 
     def get_time(self):
         for i in range(10):
-            try:
+            # try:
                 # url = self.aio.aio_url_hh_mm('SG')
-                url = self.aio.aio_url_hh_mm('TH')
-                
-                r = self.wifi.get(url)
-                hh_mm = r.text
-                print("time = ", hh_mm)
+            url = self.aio.aio_url_hh_mm('TH')
+            print("time url = ", url)
+            
+            r = self.wifi.get(url)
+            hh_mm = r.text
+            print("time = ", hh_mm)
 
-                self.hh = int(hh_mm[0:2])
-                self.mm = int(hh_mm[2:4])
-                self.page1.hh = int(hh_mm[0:2])
-                self.page1.mm = int(hh_mm[2:4])
-                self.start_time_ns = time.monotonic_ns()
-                self.page1.start_time_ns = self.start_time_ns
+            self.hh = int(hh_mm[0:2])
+            self.mm = int(hh_mm[2:4])
+            self.page1.hh = int(hh_mm[0:2])
+            self.page1.mm = int(hh_mm[2:4])
+            self.start_time_ns = time.monotonic_ns()
+            self.page1.start_time_ns = self.start_time_ns
 
-                break
-            except Exception as e:
-                print(e)
-                continue
+            break
+            # except Exception as e:
+            #     print("get_time Error...")
+            #     print(e)
+            #     continue
 
     def update_local(self, is_finger, temperature, co2, tvoc, press, hr, oxy, humidity):
         try:
@@ -279,8 +276,8 @@ class internet_display:
 
             self.page1.start()
         except Exception as e:
-            print(e)
             print("update_local failed")
+            print(e)
             pass
 
     last_push = 0
@@ -354,6 +351,7 @@ class internet_display:
                     self.page1.message = "Push air data..."
                     if self.isTouch(): return
         except Exception as e:
+            print("update_aio Error...")
             print(e)
             pass
     

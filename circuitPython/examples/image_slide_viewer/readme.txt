@@ -31,12 +31,11 @@
         | GP1     | V.out(pin 3) |
         |------------------------|
         
-        See board_mapping.jpg for Pin mapping on MM2040EV
         See IR receiver pin diagram at: https://learn.adafruit.com/ir-sensor/testing-an-ir-sensor
         
 4. Startup
     - Copy folder "test" into sdcard
-    - Start MM2040EV with CircuitPython 6.3.0
+    - Start MM2040EV with adafruit-circuitpython-raspberry_pi_pico-en_US-7.0.0-alpha.3.uf2
     - Copy source code in Python into CircuitPython drive:
         -> lib (which inclide "bteve" folder )
         -> lib (which include "adafruit"folder)
