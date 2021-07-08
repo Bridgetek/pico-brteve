@@ -117,10 +117,14 @@ class Page1_UI:
         e.PointSize(35)
         e.Vertex2f(_x + _midpoint, _y)
 
-        e.ColorRGB(self._COLOR_GREEN[0], self._COLOR_GREEN[1], self._COLOR_GREEN[2])
-        e.cmd_text(x + 3, y + 3, 21, 0, title)
+        # Center text
+        char_w_1 = 18
+        char_w_2 = char_w_1 + 25
         e.ColorRGB(255, 255, 255)
-        e.cmd_text((_x + _w) / 2 - 10, _y - 70, 25, 0, str(round(value, 2)))
+        e.cmd_text(x + 3, y + 3, 21, 0, title)
+        e.cmd_text(x + (w / 2), _y - 70, 31, e.OPT_RIGHTX, str(round(value, 1)))
+        e.cmd_text(x + (w / 2) + char_w_1, _y - 60, 18, e.OPT_RIGHTX, "o")
+        e.cmd_text(x + (w / 2) + char_w_2, _y - 70, 31, e.OPT_RIGHTX, "C")
 
     #circle_box
     def circle_box(self, x, y, w, h, border, title, unit, vmin, vmax, lwarning, hwarning, value):
@@ -212,9 +216,48 @@ class Page1_UI:
         e.StencilFunc(e.ALWAYS, 0x00, 0xFF)
         e.StencilOp(e.KEEP, e.KEEP)
 
+        e.ColorRGB(255, 255, 255)
         e.cmd_text(x + 3, y + 3, 21, 0, title)
-        e.cmd_text(_x - len(str(value)) * 5, _y - 15, 24, 0, str(round(value, 2)))
-        e.cmd_text(_x - len(unit) * 5, _y + 15, 18, 0, unit)
+        e.cmd_text(x + (w / 2), _y - 5, 31, e.OPT_CENTER, str(round(value, 1)))
+        e.cmd_text(x + (w / 2), _y + 25, 23, e.OPT_CENTER, unit)
+
+
+        e.cmd_text(x + (w / 2) - (r/3), _y + r, 21, e.OPT_RIGHTX, str(vmin))
+        e.cmd_text(x + (w / 2) + (r/3), _y + r, 21, 0           , str(vmax))
+
+        # Warning line
+        for i in lwarning, hwarning:
+            if i == 0 or i == vmax:
+                continue # no warning
+            percent = i / vmax * 100
+            degree = min(_max_degree * percent / 100, _max_degree)
+            num = degree + _ROTATE + _skip_low #rotate circle by 90 degree and center down
+            num %=360
+            num=math.radians(num)
+
+            posX = _x + (r) * math.cos(num)
+            posY = _y + (r) * math.sin(num)
+            posX2 = _x + (r - _size) * math.cos(num)
+            posY2 = _y + (r - _size) * math.sin(num)
+
+            margin = _size/2
+            if len(str(i)) > 3:
+                margin /=4
+            textX = _x + (r + margin) * math.cos(num)
+            textY = _y + (r + margin) * math.sin(num)
+            
+            opt = e.OPT_RIGHTX
+            if posX> (x + w/2):
+                opt = 0
+            
+            e.Begin(e.LINES)
+            e.ColorRGB(0, 0, 0)
+            e.LineWidth(3)
+            e.Vertex2f(posX, posY)
+            e.Vertex2f(posX2, posY2)
+            
+            e.ColorRGB(255, 255, 255)
+            e.cmd_text(textX, textY, 16, opt, str(round(i, 1)))
     
     def _time_str(self, hh, mm, isnext = 0) :
         """ isnext != 0: return hour:minute before hh:mm
@@ -309,7 +352,7 @@ class Page1_UI:
         # Rows 
         row_offsetx = x + PADDING_X 
         row_offsety = y + PADDING_Y 
-        ROW_HEIGHT= (h/2) / ROW_NUM
+        ROW_HEIGHT = (h/2) / ROW_NUM
         e.LineWidth(1)
         for i in range(ROW_NUM+1):
             e.Begin(e.LINES)
@@ -336,13 +379,13 @@ class Page1_UI:
             _x= x + w - i*col_w - _x_gaps
                 
             e.Vertex2f(_x, row_offsety)
-            e.Vertex2f(_x, row_offsety + ROW_LINE * ROW_HEIGHT)
+            e.Vertex2f(_x, row_offsety + ROW_LINE * ROW_HEIGHT - ROW_HEIGHT/2)
 
             # _time_str = "19:20 am"
             tm = self._time_str(hh, mm, 0)
             if i != 0:
                 hh, mm, tm = self._time_str(hh, mm, 1)
-            self.rotate_str_up(tm, angle, fontsize, 0, _x - 50, row_offsety + ROW_LINE * ROW_HEIGHT + 30)
+            self.rotate_str_up(tm, angle, fontsize, 0, _x - 50, row_offsety + ROW_LINE * ROW_HEIGHT + 25)
         
         # line strips
         MAX_TIME = num_mins * 60 #second
@@ -390,7 +433,7 @@ class Page1_UI:
         MG = 20
         NB = 4
         bw = (w - 2 * PD - 3 * MG) / NB
-        bh=190
+        bh=200
         y = 10
         self.Progress_box(x = PD + (bw + MG) * 0, y=y, w = bw, h = bh, border=1, title="Temperature", 
             unit=" C", vmin=20, vmax=50, warning=40, value=self.temp_value)
