@@ -28,8 +28,8 @@
        Sensor module can work with 5v as my testing but im not sure its safety
     
     After that:
-    - Connect biometric sensor to CN4 (I2C1)
-    - Connect Air quality sensor to CN5 (I2C0)
+    - Connect biometric sensor to CN5 (I2C0 - GP18, GP19)
+    - Connect Air quality sensor to CN4 (I2C1 - GP20, GP21)
     
    - MM2040EV and ESP32 WiFi module:
     |----------------------------------------------|
@@ -46,34 +46,32 @@
     |----------------------------------------------|
             
 4. Startup
-    - Add wifi SSID and wifi password into apps\internet_display\secrets.py
-    - Copy folder "test" into sdcard
+    - Add wifi SSID and wifi password into secrets.py
     - Start MM2040EV with adafruit-circuitpython-raspberry_pi_pico-en_US-7.0.0-alpha.3.uf2
-    - In the code.py, disable this line: app=ir_sensors_and_gestures(eve)
     - Copy source code in Python into CircuitPython drive:
         -> lib (which inclide "bteve" folder )
         -> lib (which include "adafruit"folder)
         -> apps
-        -> Copy and rename code_internet_display.py to code.py
+        -> code.py, internet_data_display.py, page1_ui.py, page2_ui.py, secrets.py
     - Demo should start after that
     
-    * If stuck in "Connecting to wifi" screen, try enable TKIP Security Mode in the Wifi Router,
+    * If stuck in "Connecting to wifi" screen, try to enable TKIP Security Mode in your Wifi Router,
         and restart demo
         
 5. Demo Functionality:
     - At startup, air quality and biametric data is show on screen
-      Data also synchonize in realtime into Adafruit IO
+      Data also synchonize in realtime into Adafruit IO:
       https://io.adafruit.com/tuan_nguyen_brtchip/dashboards/test1?kiosk=true
       
     - Touch on screen to show an image on internet
-      Images are download from this hosting: http://ancuviet.com:
+      Images are downloaded from this hosting: http://ancuviet.com:
          + http://ancuviet.com/image0006.jpg
          + http://ancuviet.com/image0005.jpg
          + http://ancuviet.com/image0004.jpg
          + http://ancuviet.com/image0003.jpg
          + http://ancuviet.com/image0002.jpg
          + http://ancuviet.com/image0001.jpg
-     - Touch on screen again to switch back to sensor data page
+     - Touch "Back" button to switch back to sensor data page
 
     
     
