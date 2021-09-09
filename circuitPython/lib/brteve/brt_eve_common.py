@@ -5,7 +5,7 @@ import array
 if sys.implementation.name == "circuitpython":
     from _eve import _EVE   # pylint: disable=import-error
 else:
-    from ._eve import _EVE
+    from ._eve_ import _EVE
 
 def const(num):
     """Constant wrapper
