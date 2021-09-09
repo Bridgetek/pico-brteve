@@ -5,6 +5,8 @@ from .brt_eve_common import args_to_integer, const
 class BrtEve(BrtEve_BT815_BT816): # pylint: disable=too-many-public-methods
     """BT817 and BT818 specific commands, options and registers"""
 
+    OPT_DITHER = (256)
+    
     # Registers
     REG_ADAPTIVE_FRAMERATE = const(0x30257C)
     REG_AH_HCYCLE_MAX      = const(0x302610)
