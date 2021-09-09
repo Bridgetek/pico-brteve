@@ -209,9 +209,21 @@ class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes
         self.command_write_pointer &= self.EVE_CMD_FIFO_MASK
         self.transfer_write(address, struct.pack("I", value))
 
-    def write_mem(self, address, value):
+    def write_mem(self, address, buff):
         """Write a buffer to EVE"""
-        self.transfer_write(address, struct.pack("I", value))
+        self.transfer_write(address, buff)
+
+    def write_file(self, address, file):
+        """Write a buffer to EVE"""
+        chunksize = 1000
+        with open(file, 'rb') as f:
+            while True:
+                buff = f.read(chunksize)
+                if not buff:
+                    break # done
+                self.transfer_write(address, buff)
+                address += len(buff)
+        return address
 
     def eve_write_pointer(self):
         """Get write pointer value"""
