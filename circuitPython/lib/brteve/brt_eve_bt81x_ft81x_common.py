@@ -117,4 +117,3 @@ class BrtEveBT81xFT81xCommon(BrtEveModule):
         :return: none
         """
         self.cmd0(0x40)
-    
