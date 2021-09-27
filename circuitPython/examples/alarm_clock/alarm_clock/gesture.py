@@ -37,7 +37,7 @@ class gesture():
         return tag_released
 
     def is_swipe(self, new_x, new_y):
-        time = milis() 
+        time = milis()
         if (self.prev_time != 0):
             self._delay += (time - self.prev_time)
         self.prev_time = time
@@ -90,4 +90,3 @@ class gesture():
 
     def get(self):
         return self._gesture
-    

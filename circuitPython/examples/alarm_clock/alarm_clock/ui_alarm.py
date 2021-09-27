@@ -2,17 +2,19 @@ import time
 
 from .helper import helper
 from .gesture import gesture
-from .datetime import hh_mm, milis, print_weekday, random
+from .datetime import hh_mm, milis, now_hh_mm, now_hh_mm_ss, print_weekday, random
 from .layout import layout
 from .tags import *
 from . import datetime
 from .scroller import scroller
+from .widgets import widgets_point
+from .dimension2d import clock_hand
 
 import sys
 if sys.implementation.name == "circuitpython":
     from brteve.brt_eve_bt817_8 import BrtEve
 else:
-    from ..lib.brteve.brt_eve_bt817_8 import BrtEve
+    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
 
 PADDING_TOP = 70
 ALARM_MARGIN = 30
@@ -42,23 +44,23 @@ class ui_alarm():
         self._last_veloc = 0
         self.offset_y = 0
         self.alarms = [
-            #'name',         'alarm-second', 'repeat: 2, 3, 4, 5, 6, 7, 8', 'on_off',  color, tag, onoff_tag 
-            ['Wake up'      , [6, 00] , [1, 1, 1, 1, 1, 1, 1], 'on' , -1, -1, -1],
-            ['Meeting'      , [9, 00] , [0, 0, 1, 0, 0, 0, 0], 'on' , -1, -1, -1],
-            ['Go to school' , [8, 00] , [1, 0, 1, 0, 0, 1, 1], 'off', -1, -1, -1],
-            [''             , [14, 30], [1, 1, 0, 0, 0, 0, 0], 'on' , -1, -1, -1],
+            #'name',         'alarm-second', 'repeat: 2, 3, 4, 5, 6, 7, 8', 'on_off',  color, tag, onoff_tag , status = 0
+            ['Wake up'      , [6, 00] , [1, 1, 1, 1, 1, 1, 1], 'on' , -1, -1, -1, 0], # status: 0=inactive, 1 = active, 2 = dimissed
+            ['Meeting'      , [9, 00] , [0, 0, 1, 0, 0, 0, 0], 'on' , -1, -1, -1, 0],
+            ['Go to school' , [8, 00] , [1, 0, 1, 0, 0, 1, 1], 'off', -1, -1, -1, 0],
+            [''             , [8, 19], [1, 1, 0, 0, 0, 0, 0], 'on' , -1, -1, -1, 0],
         ]
-        self.alarm_new = ['', [6, 00], [0, 0, 0, 0, 0, 0, 0], 'on' , -1, -1, -1]
-        self.alarm_clone = ['', [6, 00], [0, 0, 0, 0, 0, 0, 0], 'on' , -1, -1, -1]
+        self.alarm_new = ['', [6, 00], [0, 0, 0, 0, 0, 0, 0], 'on' , -1, -1, -1, 0]
+        self.alarm_clone = ['', [6, 00], [0, 0, 0, 0, 0, 0, 0], 'on' , -1, -1, -1, 0]
 
         self.tag_min = 0
         self.tag_max = 0
 
         self.popup = 0
-        
+
         self.tag_alarm_pressing = 0
         self.tag_alarm_released = 0
-        
+
         self.tag_pressing = 0
         self.tag_released = 0
 
@@ -66,6 +68,7 @@ class ui_alarm():
 
         self.tag_hh_selected = 0
         self.tag_mm_selected = 0
+        self.alarm_animation_nth=0
 
         self.alarm_expanding = {
             #, , x, y, w, h, expan_or_collapse, is_done_animate
@@ -78,7 +81,7 @@ class ui_alarm():
             [0x100994, 0x6e3642],
             [0x6e0eeb, 0xfa6182],
             [0xcc06c9, 0xcfde5f],
-            [0x3b8201, 0x27751b],            
+            [0x3b8201, 0x27751b],
         ]
 
         self.default_value()
@@ -104,7 +107,7 @@ class ui_alarm():
             tag+=1
             tag_onoff+=1
         self.tag_max = tag - 1
-        
+
     def get_repeat_text(self, alarm):
         _mon=0
         _tue=1
@@ -127,7 +130,7 @@ class ui_alarm():
         if len(alldaycounter) == 7:
             daystr = "Everyday"
         return daystr
-    
+
     def event(self):
         self.tag_alarm_pressing = 0
         self.tag_alarm_released = 0
@@ -152,9 +155,9 @@ class ui_alarm():
         if self.tag_min <= release and self.tag_max >= release:
             if self._last_veloc > 0:
                 self._last_veloc = 0
-            else: 
+            else:
                 self.tag_alarm_released = release
-        
+
         if release == tag_ui_alarm_hh:
             self.tag_hh_selected = 1
             self.tag_mm_selected = 0
@@ -173,12 +176,13 @@ class ui_alarm():
         self.alarm_new[4] = self.gradients[(self.tag_max + 1 - tag_ui_alarm_rects) % (len(self.gradients) - 1)]
         self.alarm_new[5] = self.tag_max
         self.alarm_new[6] = self.tag_max - tag_ui_alarm_rects + tag_ui_alarm_onoff
+        self.alarm_new[7] = 0 # inactive
 
         self.alarms.append(self.alarm_new)
         self.alarm_expanding['expan_or_collapse'] == EXPAND
         self.tag_new_alarm = self.tag_max
         self.tag_alarm_released = self.tag_max
-    
+
     def confirm_delete(self):
         eve = self.eve
         layout = self.layout
@@ -189,18 +193,18 @@ class ui_alarm():
         h = round(w * 2 / 3)
         x = round(layout.APP_X + layout.APP_W / 2 - w / 2)
         y = round(layout.APP_Y + layout.APP_H / 2 - h / 2)
-        rounded = 40     
+        rounded = 40
 
         if self.tag_released >= tag_ui_alarm_delete and \
             self.tag_released <= tag_ui_alarm_delete + self.tag_max - tag_ui_alarm_rects:
             self.popup = self.tag_released
-        
+
         if self.popup:
             border = 2
             eve.ColorRGB(0xf0, 0xf0, 0xf0)
             eve.Begin(eve.RECTS)
-            eve.LineWidth(rounded) 
-            eve.Vertex2f(x + rounded / 2 - border - border/2, y + rounded / 2 - border) 
+            eve.LineWidth(rounded)
+            eve.Vertex2f(x + rounded / 2 - border - border/2, y + rounded / 2 - border)
             eve.Vertex2f(x + w - rounded / 2 + border, h + y - rounded / 2 + border)
 
             eve.ColorRGB(0xeb, 0x2a, 0x94)
@@ -209,7 +213,7 @@ class ui_alarm():
             hb = wb / 2
             yb = y + h / 2 - hb / 2
             ct = x + w / 2
-            
+
             eve.ColorRGB(0xff, 0xff, 0xff)
             eve.Tag(tag_ui_alarm_yes)
             eve.cmd_button(ct - wb - 10, yb, wb, hb, 29, 0, 'Yes')
@@ -228,18 +232,18 @@ class ui_alarm():
     def _draw1alarm(self, alarm, count, expanded = 0, ox = 0, oy = 0, ow = 0, oh = 0):
         enable_gradient = 1
         tag_index = 5
-        rounded = 40        
+        rounded = 40
 
         eve = self.eve
         layout = self.layout
         helper = self.helper
-        
+
         panel_w=layout.APP_W - layout.MENU_W
         x=ox
         y=oy
         w=ow
         h=oh
-        
+
         if not expanded:
             w = round(panel_w * 8 / 10)
             h = round(w / 2.1)
@@ -254,8 +258,8 @@ class ui_alarm():
             border = 2
             eve.ColorRGB(0xf0, 0xf0, 0xf0)
             eve.Begin(eve.RECTS)
-            eve.LineWidth(rounded) 
-            eve.Vertex2f(x + rounded / 2 - border - border/2, y + rounded / 2 - border) 
+            eve.LineWidth(rounded)
+            eve.Vertex2f(x + rounded / 2 - border - border/2, y + rounded / 2 - border)
             eve.Vertex2f(x + w - rounded / 2 + border, h + y - rounded / 2 + border)
 
         #boundary
@@ -266,10 +270,10 @@ class ui_alarm():
         eve.ColorRGB(0x80, 0xFF, 0x40)
         eve.Begin(eve.RECTS)
         eve.Tag(alarm[tag_index])
-        eve.LineWidth(rounded) 
-        eve.Vertex2f(x + rounded / 2, y + rounded / 2) 
+        eve.LineWidth(rounded)
+        eve.Vertex2f(x + rounded / 2, y + rounded / 2)
         eve.Vertex2f(x + w - rounded / 2,h + y - rounded / 2)
-        
+
         # gradient
         alarm_color = alarm[4]
         if enable_gradient:
@@ -326,10 +330,10 @@ class ui_alarm():
             eve.ColorRGB(0x77, 0x77, 0x77)
             eve.Begin(eve.POINTS)
             eve.PointSize(radius * 2)
-            eve.Vertex2f(xc, yc) 
+            eve.Vertex2f(xc, yc)
             eve.ColorRGB(0, 0, 0)
             eve.cmd_text(xc, yc, 28, eve.OPT_CENTER, 'X')
-            
+
     def _draw_alarm_editing(self, alarm_e, count, ax, ay, aw, ah):
         eve = self.eve
         layout = self.layout
@@ -343,6 +347,7 @@ class ui_alarm():
 
         # clock face
         clocksize = round(aw * 8 / 10 / 2)
+
         x = layout.screen_w / 2
         y = clocksize * 2 + 30
         eve.cmd_bgcolor(alarm[4][0] / 2)
@@ -366,37 +371,35 @@ class ui_alarm():
         eve.LineWidth(1)
         eve.ColorRGB(int('0x'+color_hh[2:4], 16), int('0x'+color_hh[4:6], 16), int('0x'+color_hh[6:8], 16))
         eve.ColorRGB(0, 0, 0)
-        eve.Vertex2f(x, y) 
+        eve.Vertex2f(x, y)
         eve.Vertex2f(x + w, h + y)
-        eve.cmd_track(x, y, w, h, tag_ui_alarm_hh)
 
         # mm background
         x += w
         eve.Tag(tag_ui_alarm_mm)
         eve.Begin(eve.RECTS)
         eve.ColorRGB(int('0x'+color_hh[2:4], 16), int('0x'+color_hh[4:6], 16), int('0x'+color_hh[6:8], 16))
-        eve.Vertex2f(x, y) 
+        eve.Vertex2f(x, y)
         eve.Vertex2f(x + w, h + y)
-        eve.cmd_track(x, y, w, h, tag_ui_alarm_mm)
 
         eve.BlendFunc(eve.SRC_ALPHA, eve.ONE_MINUS_SRC_ALPHA) # remove gradient
-        
+
         # hh:mm
         eve.ColorRGB(int('0x'+color_text[2:4], 16), int('0x'+color_text[4:6], 16), int('0x'+color_text[6:8], 16))
         eve.cmd_text(x, y + h/2, 30, eve.OPT_CENTER, ' : ')
-        
+
         if self.tag_hh_selected == 1:
             eve.ColorRGB(0xFF, 0, 0)
         eve.Tag(tag_ui_alarm_hh)
-        eve.cmd_text(x - w/2, y + h/2, 30, eve.OPT_CENTER, str(alarm[1][0]))
-        
+        eve.cmd_text(x - w/2, y + h/2, 30, eve.OPT_CENTER, self.helper.zfill(str(alarm[1][0]), 2))
+
         if self.tag_mm_selected == 1:
             eve.ColorRGB(0xFF, 0, 0)
         else:
             eve.ColorRGB(int('0x'+color_text[2:4], 16), int('0x'+color_text[4:6], 16), int('0x'+color_text[6:8], 16))
         eve.Tag(tag_ui_alarm_mm)
-        eve.cmd_text(x + w/2, y + h/2, 30, eve.OPT_CENTER, str(alarm[1][1]))
-        
+        eve.cmd_text(x + w/2, y + h/2, 30, eve.OPT_CENTER, self.helper.zfill(str(alarm[1][1]), 2))
+
         eve.ColorRGB(0xFF, 0xFF, 0xFF) #reset color
 
         # track the circle
@@ -408,19 +411,27 @@ class ui_alarm():
             eve.ColorA(0)
             eve.Begin(eve.POINTS)
             eve.PointSize(clocksize * 2)
-            eve.Vertex2f(xc, yc) 
+            eve.Vertex2f(xc, yc)
             eve.ColorA(255)
 
             # get new clock
-            track = gesture.get().tagTrackTouched 
+            track = gesture.get().tagTrackTouched
             tag = track & 0xFF
             angel = track >> 16
             if tag == tag_ui_alarm_rotate:
-                hh = round(angel * 24 / 65535 + 12) % 24
+                hh = round(angel * 12 / 65535 + 6) % 12
                 mm = round(angel * 60 / 65535 + 30) % 60
                 print(track & 0xff, track >> 16, hh , mm)
+
                 if self.tag_hh_selected == 1:
-                    self.alarm_clone[1][0] = hh
+                    pm_time = 0
+                    if self.alarm_clone[1][0] == 11 and hh == 0:
+                        pm_time = 12
+                    elif self.alarm_clone[1][0] == 23 and hh == 0:
+                        pm_time = 0
+                    elif self.alarm_clone[1][0] >= 12:
+                        pm_time = 12
+                    self.alarm_clone[1][0] = pm_time + hh
                 else:
                     self.alarm_clone[1][1] = mm
 
@@ -456,7 +467,7 @@ class ui_alarm():
             tag+=1
             x += w + margin
 
-        eve.cmd_fgcolor(0)    
+        eve.cmd_fgcolor(0)
 
         # reflect the change
         if self.tag_released > 0:
@@ -478,10 +489,10 @@ class ui_alarm():
         eve.Tag(tag_ui_alarm_save)
         eve.cmd_button(x, y, btn_w, btn_h, 22, 0, "Save")
         if self.tag_released == tag_ui_alarm_save:
-            self.alarms[count] = deepcopy_nested_list(self.alarm_clone)    
+            self.alarms[count] = deepcopy_nested_list(self.alarm_clone)
             self.alarm_expanding['expan_or_collapse'] = COLLAPSE
             self.tag_new_alarm = 0
-            
+
         # Cancel
         x = ax + aw - btn_w - 10
         eve.Tag(tag_ui_alarm_cancel)
@@ -489,7 +500,7 @@ class ui_alarm():
         if self.tag_released == tag_ui_alarm_cancel:
             self.alarm_expanding['expan_or_collapse'] = COLLAPSE
             self.tag_new_alarm = 0
-        
+
     def collapse_alarm(self):
         layout = self.layout
         count = self.alarm_expanding['tag'] - tag_ui_alarm_rects
@@ -499,12 +510,12 @@ class ui_alarm():
         th = round(tw / 2.1)
         tx = layout.APP_X + layout.MENU_W + round(panel_w / 2 - tw / 2)
         ty = self.offset_y + layout.APP_Y + PADDING_TOP + (ALARM_MARGIN + th) * count
-        
+
         x = self.alarm_expanding['x']
-        y = self.alarm_expanding['y'] 
+        y = self.alarm_expanding['y']
         w = self.alarm_expanding['w']
         h = self.alarm_expanding['h']
-        
+
         devider = 5
         x += round((tx - x) / (devider - self.alarm_expanding['step']))
         y += round((ty - y) / (devider - self.alarm_expanding['step']))
@@ -524,12 +535,12 @@ class ui_alarm():
         th = tw * 2
         tx =  round(layout.APP_X + layout.APP_W / 2 - tw / 2)
         ty =  round(layout.APP_Y + layout.APP_H / 2 - th / 2)
-        
+
         x = self.alarm_expanding['x']
-        y = self.alarm_expanding['y'] 
+        y = self.alarm_expanding['y']
         w = self.alarm_expanding['w']
         h = self.alarm_expanding['h']
-        
+
         devider = 8
 
         x += round((tx - x) / devider * self.alarm_expanding['step'])
@@ -549,7 +560,7 @@ class ui_alarm():
         layout = self.layout
         helper = self.helper
         is_start_expand = (self.tag_alarm_released != 0 and self.alarm_expanding['tag'] == 0)
-            
+
         is_alarm_choosing = self.alarm_expanding['tag'] != 0
         count = self.alarm_expanding['tag'] - tag_ui_alarm_rects
 
@@ -567,13 +578,13 @@ class ui_alarm():
 
             self.alarm_expanding['tag'] = self.tag_alarm_released
             self.alarm_expanding['step'] = 1
-            self.alarm_expanding['x'] = x 
+            self.alarm_expanding['x'] = x
             self.alarm_expanding['y'] = y
             self.alarm_expanding['w'] = w
             self.alarm_expanding['h'] = h
             self.alarm_expanding['expan_or_collapse'] = EXPAND
             self.alarm_expanding['is_done_animate'] = 0
-            
+
             # clone the alarm if save or cancel button is press
             self.alarm_clone = deepcopy_nested_list(self.alarms[count])
             return 0
@@ -605,7 +616,7 @@ class ui_alarm():
             eve.ScissorXY(0, 0)
             eve.ScissorSize(2048, 2048)
             return
-            
+
         # Yes no popup
         if self.confirm_delete():
             # reset scissor
@@ -623,7 +634,7 @@ class ui_alarm():
 
         scroller_len = len(self.alarms) * (h + ALARM_MARGIN + 10) + PADDING_TOP
         self.scroller.set_limit(0, min(0, self.layout.screen_h - scroller_len))
-        
+
         eve.ScissorXY((int)(x), (int)(y))
         eve.ScissorSize(w, layout.APP_H - PADDING_TOP - PADDING_BOTTOM)
         count = 0
@@ -638,6 +649,105 @@ class ui_alarm():
         eve.ScissorXY(0, 0)
         eve.ScissorSize(2048, 2048)
 
+    def _alarm_ringing(self, alarm):
+        layout = self.layout
+        eve= self.eve
+        self.alarm_animation_nth = (int)(self.alarm_animation_nth+1)
+
+        # overwride boundary
+        rounded = 60
+        eve.ColorRGB(0xc3, 0xc3, 0xc3)
+        eve.Begin(eve.RECTS)
+        eve.LineWidth(rounded)
+        eve.Vertex2f(self.layout.APP_X + rounded / 2, self.layout.APP_Y + rounded / 2)
+        eve.Vertex2f(self.layout.APP_X + self.layout.APP_W - rounded / 2, self.layout.APP_H + self.layout.APP_Y - rounded / 2)
+
+        ani_nth = self.alarm_animation_nth % 4
+        alarm_center= ['ring_alarm', 0, 0]
+        alarm_left  = ['ring_left' , -60, -60]
+        alarm_right = ['ring_right',  70, -60]
+        ani_c = [[2, 2], [3, -3], [1, 3], [-2, -2], [1, 1]]
+        ani_l_ = [8, 4, 6, 1, 7]
+        ani_r_ = [-7, -1, -6, -4, -8]
+        ani_l = []
+        ani_r = []
+        for (c, l, r) in zip(ani_c, ani_l_, ani_r_):
+            ani_l.append([c[0] + l, c[1] + l])
+            ani_r.append([c[0] + r, c[1] - r])
+
+        x = layout.APP_X + layout.APP_W / 2
+        y = layout.APP_Y + layout.APP_H / 2
+        alarm_ani = [ani_c, ani_l, ani_r]
+        alarm_img=[alarm_center, alarm_left, alarm_right]
+        for (i, j) in zip(alarm_img, alarm_ani):
+            img = i[0]
+            offset_x = i[1]
+            offset_y = i[2]
+            w = layout.images[img][2]
+            h = layout.images[img][2]
+            self.layout.draw_asset(0, img,
+                x - w/2 + offset_x + j[ani_nth][0],
+                y - h/2 + offset_y + j[ani_nth][1])
+
+        #hand
+        center_x = layout.APP_X + layout.APP_W / 2 + ani_c[ani_nth][0] - 2
+        center_y = layout.APP_Y + layout.APP_H / 2 + ani_c[ani_nth][1] + 15
+        point_size = 6
+        widgets_point(eve, center_x - 0, center_y - 0, point_size, [0x00, 0x00, 0x00])
+
+        hh = alarm[1][0]
+        clock_hand(eve, center_x, center_y, 15, 40, hh, 12, [0xff, 0x00, 0x00], 8)
+        clock_hand(eve, center_x, center_y, 15, 40, hh, 12, [0xff, 0xFF, 0xFF], 4)
+
+        mm = alarm[1][1]
+        clock_hand(eve, center_x, center_y, 15, 60, mm, 60, [0x00, 0xff, 0x00], 2)
+
+        center_x = layout.APP_X + layout.APP_W / 2
+        center_y = layout.APP_Y + layout.APP_H / 2
+
+        # hour string
+        text = self.helper.zfill(str(hh), 2) + ' : ' + self.helper.zfill(str(mm), 2)
+        eve.ColorRGB(0xff, 0, 0)
+        eve.cmd_text(center_x, center_y - 150, 30, eve.OPT_CENTER, text)
+
+        # dismiss
+        x = center_x
+        y = layout.APP_Y + layout.APP_H - 20
+        eve.ColorRGB(0x77, 0x77, 0x77)
+        eve.cmd_text(x, y, 28, eve.OPT_CENTER, "Tap to dismiss")
+        eve.ColorRGB(0xff, 0xff, 0xff)
+
+        dismissed = 2
+        if self.gesture.get().isTouch: # dimiss
+            alarm[7] = dismissed
+
+        # time.sleep(1)
+
+    def interrupt(self):
+        # self.alarms = [
+        #     #'name',         'alarm-second', 'repeat: 2, 3, 4, 5, 6, 7, 8', 'on_off',  color, tag, onoff_tag , status = 0
+        #     ['Wake up'      , [6, 00] , [1, 1, 1, 1, 1, 1, 1], 'on' , -1, -1, -1, 0],
+        #     ['Meeting'      , [9, 00] , [0, 0, 1, 0, 0, 0, 0], 'on' , -1, -1, -1, 0],
+        #     ['Go to school' , [8, 00] , [1, 0, 1, 0, 0, 1, 1], 'off', -1, -1, -1, 0],
+        #     [''             , [14, 30], [1, 1, 0, 0, 0, 0, 0], 'on' , -1, -1, -1, 0],
+        # ]
+        inactive = 0
+        active = 1
+        dismissed = 2
+
+        hh, mm, ss = now_hh_mm_ss()
+        for i in self.alarms:
+            if i[1][0] != hh and i[7] == dismissed :
+                i[7] = inactive
+                i[7] = inactive
+
+            if i[1][0] == hh and i[1][1] == mm and i[7] == inactive:
+                i[7] = active
+            if i[7] == active:
+                self._alarm_ringing(i)
+                return 1
+        return 0
+
     def draw(self):
         eve = self.eve
 
@@ -647,7 +757,7 @@ class ui_alarm():
 
         eve.ColorRGB(255, 255, 255)
         title="Alarm"
-        x = (self.layout.APP_X + self.layout.MENU_W) / 2 + (self.layout.APP_X + self.layout.APP_W) / 2 
+        x = (self.layout.APP_X + self.layout.MENU_W) / 2 + (self.layout.APP_X + self.layout.APP_W) / 2
         eve.cmd_text(x, 20, 29, eve.OPT_CENTERX, title)
 
         btn_size = 56
@@ -655,5 +765,5 @@ class ui_alarm():
         y = self.layout.APP_Y + self.layout.APP_H - 10 - btn_size
         if self.gesture.get().tagPressed == tag_ui_alarm_new_alarm:
             self.layout.draw_asset(tag_ui_alarm_new_alarm, 'new_alarm', x, y)
-        else: 
+        else:
             self.layout.draw_asset(tag_ui_alarm_new_alarm, 'new_alarm_hover', x, y)

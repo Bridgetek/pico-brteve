@@ -1,4 +1,4 @@
-    
+
 from brteve.brt_eve_bt817_8 import BrtEve
 from .datetime import milis
 
@@ -34,6 +34,9 @@ class scroller():
     def set_friction(self, friction):
         self._friction = friction
 
+    def stop(self):
+        self._last_velocity = 0
+
     def _stop_and_run_back(self):
         padding = 100
         # back to top
@@ -60,21 +63,17 @@ class scroller():
             else:
                 self._last_offset += distance
 
-    def get_offset_velocity(self, new_position_xy):
-        time = milis() 
-        delay = time - self.last_milis_touch
-       
-        distance = new_position_xy - self.last_xy
-        
-        if new_position_xy == 32768: # no touch, friction is in affect
-            # print("no touch", self._last_velocity)
-            # print('_last_offset=', self._last_offset, 
-            # '_last_velocity=', self._last_velocity, 
-            # 'delay=', time - self.last_milis, 
-            # 'distance=', distance, 
-            # self._limit_t , '-', self._limit_b,
-            # self._back_to_bottom, '-', self._back_to_top)
+    def set_offset_vloc(self, offset, vloc):
+        self._last_offset = offset
+        self._last_velocity = vloc
 
+    def get_offset_velocity(self, new_position_xy):
+        time = milis()
+        delay = max(1, time - self.last_milis_touch)
+
+        distance = new_position_xy - self.last_xy
+
+        if new_position_xy == 32768: # no touch, friction is in affect
             self._last_velocity = round(self._friction * self._last_velocity, 3)
             if abs(self._speed * self._last_velocity) < 0.02:
                 self._last_velocity = 0
@@ -86,62 +85,16 @@ class scroller():
             velocity = distance / delay # v = pixel / milisecond
             self.last_milis_touch = time
 
-            if self._last_no_touch == 1 \
-                or delay > MAX_DELAY: # This is a single touch
-                # print("touch")
-                self.last_xy = new_position_xy                    
+            if self._last_no_touch == 1 or delay > MAX_DELAY: # This is a single touch
+                self.last_xy = new_position_xy
                 self._back_to_top = 0
                 self._back_to_bottom = 0
                 self._last_velocity = 0
             else: # this is a swipe
-                # print("swipe-------")
                 self._last_velocity = velocity
-                self.last_xy = new_position_xy 
+                self.last_xy = new_position_xy
                 self._last_offset += round(self._last_velocity * delay)
             self._last_no_touch = 0
 
-            # print('_last_offset=', self._last_offset, 
-            #     '_last_velocity=', self._last_velocity, 
-            #     'velocity=', velocity, 
-            #     'delay=', delay, 
-            #     'time', time, 
-            #     'self.last_milis=', self.last_milis, 
-            #     'distance=', distance, 
-            #     self._limit_t , '-', self._limit_b,
-            #     self._back_to_bottom, '-', self._back_to_top)
-        
         self.last_milis = time
         return self._last_offset, self._last_velocity
-        
-        # if new_position_xy != 32768:
-        #     if self.isSwipe == 0:
-        #         if (self.last_xy == 0):
-        #             self.last_xy = new_position_xy
-        #         else:
-        #             self._distance = new_position_xy - self.last_xy
-        #         if abs(self._distance) > MIN_MOVE:
-        #             self.isSwipe = 1
-        #     self._back_to_top = 0
-        #     self._back_to_bottom = 0
-        # else:
-        #     self._distance = 0
-        #     self.last_xy = 0
-        #     self.isSwipe = 0
-
-        # if ((new_position_xy != 32768) & (self._last_drag != 32768)) and self.isSwipe == 1: # this is a swipe
-        #     self._last_velocity = (self._last_drag - new_position_xy) << 4 
-        
-        # else: # no touch                
-        #     self._last_velocity -= self._speed * self._last_velocity
-        #     self._last_velocity = round(self._last_velocity)
-        #     if abs(self._speed * self._last_velocity) < MIN_TOUCH:
-        #         self._last_velocity = 0
-
-        # if abs(self._distance) < MIN_TOUCH and new_position_xy != 32768:
-        #     self._last_velocity = 0 # this is a single touch
-
-        # self._last_drag = new_position_xy
-        # self._last_offset += round(self._last_velocity / 10)
-        # self._stop_and_run_back()
-
-        # return self._last_offset, self._last_velocity

@@ -9,7 +9,7 @@ MAX_ANGLE           = 360
 CIRCLE_MAX          = 65536
 
 # Graphics unity
-def ANGLE(x): 
+def ANGLE(x):
     return (x * 100 * CIRCLE_MAX / (MAX_ANGLE * 100))
 
 FLASH_ADDRESS = (0x800000)
@@ -17,20 +17,20 @@ def ATFLASH(x):
     return (FLASH_ADDRESS | x / 32)
 
 class image:
-    def __init__(self, 
-        index = 0, 
-        addressFlash = 0, 
-        addressRamg = 0, 
+    def __init__(self,
+        index = 0,
+        addressFlash = 0,
+        addressRamg = 0,
         file_location = '',
-        size = 0, 
-        x = 0, 
-        y = 0, 
-        w = 0, 
-        h = 0, 
-        bitmap_layout = 0, 
-        ext_format = 0, 
-        tag = 0, 
-        opt = 0, 
+        size = 0,
+        x = 0,
+        y = 0,
+        w = 0,
+        h = 0,
+        bitmap_layout = 0,
+        ext_format = 0,
+        tag = 0,
+        opt = 0,
         isFlash = 0):
 
         self.index         = index
@@ -42,8 +42,8 @@ class image:
         self.y             = y
         self.w             = w
         self.h             = h
-        self.bitmap_layout = bitmap_layout # see Table 13 – BITMAP_LAYOUT Format List 
-        self.ext_format    = ext_format # See Table 12 – Bitmap formats and bits per pixel 
+        self.bitmap_layout = bitmap_layout # see Table 13 – BITMAP_LAYOUT Format List
+        self.ext_format    = ext_format # See Table 12 – Bitmap formats and bits per pixel
         self.tag           = tag
         self.opt           = opt
         self.isFlash       = isFlash
@@ -60,33 +60,33 @@ class helper():
         self.misScale = 0
 
     def getformatW(self, format):
-        if format == self.eve.ASTC_4x4  : 
-            return 4 
-        if format == self.eve.ASTC_5x4  : 
-            return 5 
-        if format == self.eve.ASTC_5x5  : 
-            return 5 
-        if format == self.eve.ASTC_6x5  : 
-            return 6 
-        if format == self.eve.ASTC_6x6  : 
-            return 6 
-        if format == self.eve.ASTC_8x5  : 
-            return 8 
-        if format == self.eve.ASTC_8x6  : 
-            return 8 
-        if format == self.eve.ASTC_8x8  : 
-            return 8 
-        if format == self.eve.ASTC_10x5 : 
+        if format == self.eve.ASTC_4x4  :
+            return 4
+        if format == self.eve.ASTC_5x4  :
+            return 5
+        if format == self.eve.ASTC_5x5  :
+            return 5
+        if format == self.eve.ASTC_6x5  :
+            return 6
+        if format == self.eve.ASTC_6x6  :
+            return 6
+        if format == self.eve.ASTC_8x5  :
+            return 8
+        if format == self.eve.ASTC_8x6  :
+            return 8
+        if format == self.eve.ASTC_8x8  :
+            return 8
+        if format == self.eve.ASTC_10x5 :
             return 10
-        if format == self.eve.ASTC_10x6 : 
+        if format == self.eve.ASTC_10x6 :
             return 10
-        if format == self.eve.ASTC_10x8 : 
+        if format == self.eve.ASTC_10x8 :
             return 10
-        if format == self.eve.ASTC_10x10: 
+        if format == self.eve.ASTC_10x10:
             return 10
-        if format == self.eve.ASTC_12x10: 
+        if format == self.eve.ASTC_12x10:
             return 12
-        if format == self.eve.ASTC_12x12: 
+        if format == self.eve.ASTC_12x12:
             return 12
 
         return 4
@@ -122,21 +122,21 @@ class helper():
             return 12
 
         return 4
-        
+
     def setup_bitmap(self, img: image) :
         address = img.addressRamg
 
         if (img.isFlash) :
             address = ATFLASH(img.addressFlash)
-        
-        self.eve.cmd_setbitmap(address, img.bitmap_layout, img.w, img.h)        
+
+        self.eve.cmd_setbitmap(address, img.bitmap_layout, img.w, img.h)
 
     def scale_bitmap(self, img: image) :
         self.eve.cmd_loadidentity()
         self.eve.cmd_scale(self.scale_ratio * 65536, self.scale_ratio * 65536)
         self.eve.cmd_setmatrix()
         self.eve.BitmapSize(self.eve.BILINEAR, self.eve.BORDER, self.eve.BORDER, img.w * 2, img.h * 2)
-        
+
     def rotate_bitmap(self, img: image) :
         translateX = 1
         translateY = img.h - img.w
@@ -144,7 +144,7 @@ class helper():
         if (img.w < img.h) :
             translateX = img.h - img.w
             translateY = 1
-        
+
         if ENABLE_ROTATEAROUND:
             self.eve.cmd_loadidentity()
             self.eve.cmd_rotatearound(self.mrootx, self.mrooty, ANGLE(self.mangle), CIRCLE_MAX)
@@ -164,21 +164,21 @@ class helper():
             self.eve.Tag(img.tag)
         else:
             self.eve.Tag(0)
-        
+
         self.eve.Begin(self.eve.BITMAPS)
         self.eve.Vertex2f(img.x, img.y)
-    
+
     def image_setup_scale(self, ratio) :
         self.misScale = 1
         self.scale_ratio = ratio
-        
+
     def image_setup_rotate(self, angle, rootx, rooty) :
         self.misRotate = 1
         self.mangle = angle
         self.mrootx = rootx
         self.mrooty = rooty
         return 1
-    
+
     def image_copy_to_ramg(self, img: image, isRestart) :
         ramgAddr = self.eve.RAM_G
 
@@ -196,7 +196,7 @@ class helper():
 
         if (isRestart == 1) :
             ramgAddr = 0
-        
+
         img.isFlash = 0
         img.addressRamg = ramgAddr
 
@@ -205,10 +205,10 @@ class helper():
 
         ramgAddr += img.size
         return 1
-    
+
     def image_draw(self, img: image) :
         self.eve.SaveContext()
-        
+
         if not img.file_location == '':
             print("Drawing file", img.file_location)
 
@@ -226,11 +226,11 @@ class helper():
         if (self.misScale) :
             self.scale_bitmap(img)
             self.misScale = 0
-        
+
         self.draw_bitmap(img)
         self.eve.RestoreContext()
         return 1
-    
+
     def image_load(self, img: image) :
         eve=self.eve
 
@@ -288,7 +288,7 @@ class helper():
         img.tag = tag
         img.opt = opt
         return self.image_draw(img)
-    
+
     def image_draw_from_flash(self, address, x, y, w, h, bitmap_layout, ext_format, tag, opt) :
         img = image()
         img.isFlash = 1
@@ -303,4 +303,10 @@ class helper():
         img.tag = tag
         img.opt = opt
         return self.image_draw(img)
-    
+
+    def zfill(self, s, num):
+        strlen = len(s)
+        for i in range(num - strlen):
+            s = '0' + s
+        return s
+
