@@ -2,7 +2,7 @@
 import time
 import struct
 from collections import namedtuple
-from .brt_eve_common import BrtEveCommon
+from .brt_eve_common import BrtEveCommon, align4
 
 # Order matches the register layout, so can fill with a single block read
 _Touch = namedtuple(
@@ -49,7 +49,7 @@ def get_transfer_addess(address):
     """Pack an address"""
     return struct.pack(">I", address)[1:]
 
-class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes
+class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes,too-many-public-methods
     """EVE management, including boot up and transfer data, via SPI port"""
 
     FIFO_MAX = (0xffc) # Maximum reported free space in the EVE command FIFO
@@ -216,9 +216,9 @@ class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes
     def write_file(self, address, file):
         """Write a buffer to EVE"""
         chunksize = 1000
-        with open(file, 'rb') as f:
+        with open(file, 'rb') as file_handle:
             while True:
-                buff = f.read(chunksize)
+                buff = file_handle.read(chunksize)
                 if not buff:
                     break # done
                 self.transfer_write(address, buff)
@@ -651,4 +651,4 @@ class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes
             chunk = file_handler.read(512)
             if not chunk:
                 return
-            self.cc(self.align4(chunk))
+            self.cc(align4(chunk))

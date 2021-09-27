@@ -16,6 +16,27 @@ def const(num):
 
 _B0 = b"\x00"
 
+def align4( num):
+    """ Align number to multiple of 4
+    :param num: input bytes object
+    :return: the bytes object extended so that its length is a multiple of 4
+    """
+    return num + _B0 * (-len(num) & 3)
+
+def f16(value):
+    """ Multiply with maximum value of a number 16bit (0xFFFF)
+    :param value: Input value
+    :return: value * 0xFFFF
+    """
+    return int(round(65536 * value))
+
+def furmans(deg):
+    """ Given an angle in degrees, return it in Furmans
+    :param deg: Input degree
+    :return: value * 0xFFFF
+    """
+    return 0xFFFF & f16(deg / 360.0)
+
 def args_to_integer(func):
     """ Delegate function, to convert every number of a function to type int
     :param func: Call-back method
@@ -207,28 +228,6 @@ class BrtEveCommon(_EVE): # pylint: disable=too-many-public-methods
     CLK36M                 = const(0x61)  # Select 36MHz PLL output
     CORERST                = const(0x68)  # Reset core - all registers default and processors reset
 
-
-    def align4(self, num):
-        """ Align number to multiple of 4
-        :param num: input bytes object
-        :return: the bytes object extended so that its length is a multiple of 4
-        """
-        return num + _B0 * (-len(num) & 3)
-
-    def f16(self, value):
-        """ Multiply with maximum value of a number 16bit (0xFFFF)
-        :param value: Input value
-        :return: value * 0xFFFF
-        """
-        return int(round(65536 * value))
-
-    def furmans(self, deg):
-        """ Given an angle in degrees, return it in Furmans
-        :param deg: Input degree
-        :return: value * 0xFFFF
-        """
-        return 0xFFFF & self.f16(deg / 360.0)
-
     def cstring(self, s_value):
         """ Send a string TODO XXX, the string will be alligned to 4
         :param s_value: Input value
@@ -236,7 +235,7 @@ class BrtEveCommon(_EVE): # pylint: disable=too-many-public-methods
         """
         if isinstance(s_value, str):
             s_value = bytes(s_value, "utf-8")
-        self.cc(self.align4(s_value + _B0))
+        self.cc(align4(s_value + _B0))
 
     def fstring(self, s_value):
         """ Send a string and its format params TODO XXX, the string will be alligned to 4
