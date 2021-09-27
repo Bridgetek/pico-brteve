@@ -3,6 +3,7 @@ import busio
 import board
 
 from adafruit import adafruit_vc0706
+from brteve.brt_eve_common import align4
 from brteve.brt_eve_bt817_8 import BrtEve
 from brteve.brt_eve_rp2040 import BrtEveRP2040
 
@@ -23,7 +24,7 @@ class camera_live_stream:
 
     def write_image_buffer(self, buff):
         try:
-            self.eve.cc(self.eve.align4(buff))
+            self.eve.cc(align4(buff))
         except Exception:
             self.reset_eve()
             return 0

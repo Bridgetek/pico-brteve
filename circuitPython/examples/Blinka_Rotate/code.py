@@ -1,5 +1,6 @@
 import sys
 import math
+from brteve.brt_eve_common import f16, furmans
 from brteve.brt_eve_bt817_8 import BrtEve
 from brteve.brt_eve_rp2040 import BrtEveRP2040
 
@@ -67,7 +68,7 @@ def run():
         for i in range(10):
             angle = 360 * i / 10 + t
             gd.cmd_loadidentity()
-            gd.cmd_rotatearound(540 // 2, 540 // 2, gd.furmans(angle), gd.f16(scale))
+            gd.cmd_rotatearound(540 // 2, 540 // 2, furmans(angle), f16(scale))
             gd.cmd_setmatrix()
             th = math.radians(-angle)
             x = scale * r * math.sin(th)

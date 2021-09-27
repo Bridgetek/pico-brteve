@@ -1,3 +1,4 @@
+from brteve.brt_eve_common import align4
 from brteve.brt_eve_bt817_8 import BrtEve
 
 class Page2_UI:
@@ -21,7 +22,7 @@ class Page2_UI:
         self.eve.cmd_loadimage(0, 0)
 
     def write_image_buffer(self, buff):
-        self.eve.cc(self.eve.align4(buff))
+        self.eve.cc(align4(buff))
 
     def message(self, title, info):
         eve=self.eve

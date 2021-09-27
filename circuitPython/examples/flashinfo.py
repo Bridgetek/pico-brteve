@@ -1,4 +1,5 @@
 import sys
+from brteve.brt_eve_common import f16
 
 if sys.implementation.name == "circuitpython":
     from brteve.brt_eve_bt817_8 import BrtEve
@@ -42,7 +43,7 @@ scale = 12
 gd.cmd_setbitmap(4, gd.L1, 8, 8)
 gd.BitmapSize(gd.NEAREST, gd.BORDER, gd.BORDER, 8 * scale, 8 * scale)
 gd.BlendFunc(gd.SRC_ALPHA, 0)
-gd.cmd_scale(gd.f16(scale), gd.f16(scale))
+gd.cmd_scale(f16(scale), f16(scale))
 gd.cmd_setmatrix()
 gd.Vertex2f(10, 120)
 gd.swap()
