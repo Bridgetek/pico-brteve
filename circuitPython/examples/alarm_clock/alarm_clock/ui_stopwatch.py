@@ -32,11 +32,13 @@ class ui_stopwatch():
         helper = self.helper
         duration = self.milis_stop - self.milis_start
         ms = duration % 1000
-        ss = round(duration / 1000)
-        ss_float = round(duration / 1000, 5)
-        mm = round(ss / 60 - 0.5) # -0.5 =  rounddown
-        mm_float = ss / 60
-        hh = round(mm / 60 - 0.5) # -0.5 =  rounddown
+        ss_num = duration / 1000
+        ss = round(ss_num) % 60
+        ss_float = round(ss_num, 5) % 60
+        mm_num = ss_num / 60
+        mm = round(mm_num - 0.5) % 60 # -0.5 =  rounddown
+        mm_float = round(mm_num - 0.5, 5) % 60
+        hh = round(mm_num / 60 - 0.5) # -0.5 =  rounddown
 
         # limit the timer to 30 hours
         if hh > 30:
