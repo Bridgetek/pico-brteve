@@ -3,7 +3,7 @@
 This is a demo for an alarm clock using BridgeTek EVE and RP2040
 Tested with CircuitPython version 7.0.0
 ```
-![alt text](demo.png)
+![alt text](alarm_clock.png)
 ```
 
 ## HARDWARE 
