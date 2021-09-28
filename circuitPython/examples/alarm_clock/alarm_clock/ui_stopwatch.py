@@ -33,6 +33,7 @@ class ui_stopwatch():
         duration = self.milis_stop - self.milis_start
         ms = duration % 1000
         ss = round(duration / 1000)
+        ss_float = round(duration / 1000, 5)
         mm = round(ss / 60 - 0.5) # -0.5 =  rounddown
         mm_float = ss / 60
         hh = round(mm / 60 - 0.5) # -0.5 =  rounddown
@@ -47,7 +48,7 @@ class ui_stopwatch():
               helper.zfill(str(ss), 2) + '.' + \
               helper.zfill(str(ms), 3)
 
-        return s, hh, mm_float, ss, ms
+        return s, hh, mm_float, ss_float, ms
 
     def event(self):
         eve = self.eve
@@ -119,6 +120,15 @@ class ui_stopwatch():
         radius_bottom = -30
         radius_top = watch_w / 3 + 5
         clock_hand(eve, centerx, centery, radius_bottom * 7 / 10, radius_top    , mm % 60, 60, [0, 0xff, 0]       , 3)
+
+        # second
+        centerx = x + watch_w / 2 - 2
+        centery = y + watch_w / 2 + 84
+        radius_bottom = -50
+        radius_top = watch_w / 3 + 10
+        clock_hand(eve, centerx, centery, radius_bottom * 7 / 10, radius_top    , ss % 60, 60, [0, 0, 0]       , 1)
+
+        # center point
         widgets_point(eve, centerx, centery, 10, [0, 0xff, 0])
         widgets_point(eve, centerx, centery, 5, [0xff, 0xff, 0xff])
 
