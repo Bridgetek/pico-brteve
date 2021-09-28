@@ -2,9 +2,9 @@
 ## INTRODUCTION
 This is a demo for an alarm clock using BridgeTek EVE and RP2040
 Tested with CircuitPython version 7.0.0
-```
-![alt text](alarm_clock.png)
-```
+
+![image](https://user-images.githubusercontent.com/48436368/135060286-e849f190-14fc-42f8-b5e4-73b501db2de1.png)
+
 
 ## HARDWARE 
 - 1 ME817EV
