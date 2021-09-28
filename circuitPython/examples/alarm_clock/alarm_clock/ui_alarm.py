@@ -316,7 +316,7 @@ class ui_alarm():
             eve.cmd_text(x + 10, y + 30, 23, 0, repeat)
 
             #time = hh:mm
-            text = str(alarm[1][0]) + ':' + str(alarm[1][1])
+            text = self.helper.zfill(str(alarm[1][0]), 2) + ':' + self.helper.zfill(str(alarm[1][1]), 2)
             eve.cmd_text(x + 10, y + h - 50, 24, 0, text)
 
         # delete button
