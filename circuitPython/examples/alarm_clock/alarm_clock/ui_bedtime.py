@@ -260,28 +260,30 @@ class ui_bedtime():
         if self.time_changing == 1 and self.tag_hh_selected == 1:
             eve.ColorRGB(0xFF, 0, 0)
         eve.Tag(tag_ui_alarm_hh)
-        eve.cmd_text(x - w/2, y + h/2, 30, eve.OPT_CENTER, str(hh))
+        eve.cmd_text(x - w/2, y + h/2, 30, eve.OPT_CENTER, self.helper.zfill(str(hh), 2))
 
+        eve.ColorRGB(int('0x'+color_text[2:4], 16), int('0x'+color_text[4:6], 16), int('0x'+color_text[6:8], 16))
+        eve.cmd_text(x, y + h/2 + w + 10, 30, eve.OPT_CENTER, ' : ')
         if self.time2_changing == 1 and self.tag_hh2_selected == 1:
             eve.ColorRGB(0xFF, 0, 0)
         else:
             eve.ColorRGB(int('0x'+color_text[2:4], 16), int('0x'+color_text[4:6], 16), int('0x'+color_text[6:8], 16))
         eve.Tag(tag_ui_alarm_hh2)
-        eve.cmd_text(x - w/2, y + h/2 + w + 10, 30, eve.OPT_CENTER, str(hh2))
+        eve.cmd_text(x - w/2, y + h/2 + w + 10, 30, eve.OPT_CENTER, self.helper.zfill(str(hh2), 2))
 
         if self.time_changing == 1 and self.tag_mm_selected == 1:
             eve.ColorRGB(0xFF, 0, 0)
         else:
             eve.ColorRGB(int('0x'+color_text[2:4], 16), int('0x'+color_text[4:6], 16), int('0x'+color_text[6:8], 16))
         eve.Tag(tag_ui_alarm_mm)
-        eve.cmd_text(x + w/2, y + h/2, 30, eve.OPT_CENTER, str(mm))
+        eve.cmd_text(x + w/2, y + h/2, 30, eve.OPT_CENTER, self.helper.zfill(str(mm), 2))
 
         if self.time2_changing == 1 and self.tag_mm2_selected == 1:
             eve.ColorRGB(0xFF, 0, 0)
         else:
             eve.ColorRGB(int('0x'+color_text[2:4], 16), int('0x'+color_text[4:6], 16), int('0x'+color_text[6:8], 16))
         eve.Tag(tag_ui_alarm_mm2)
-        eve.cmd_text(x + w/2, y + h/2 + w + 10, 30, eve.OPT_CENTER, str(mm2))
+        eve.cmd_text(x + w/2, y + h/2 + w + 10, 30, eve.OPT_CENTER, self.helper.zfill(str(mm2), 2))
 
         #save/cancel
         if (self.time_changing == 1 and time_changed) or (self.time2_changing == 1 and time2_changed):
