@@ -1,6 +1,7 @@
 """ BridgeTek BT815 and BT816's definitions """
 from .brt_eve_bt81x_ft81x_common import BrtEveBT81xFT81xCommon
 from .brt_eve_common import align4, args_to_integer, const
+from .brt_eve_storage.brt_eve_storage import BrtEveStorage
 
 class BrtEve(BrtEveBT81xFT81xCommon): # pylint: disable=too-many-public-methods
     """BT815 and BT816 specific commands, options and registers"""
@@ -47,6 +48,12 @@ class BrtEve(BrtEveBT81xFT81xCommon): # pylint: disable=too-many-public-methods
     OPT_MEDIAFIFO          = const(16)
     OPT_SOUND              = const(32)
     OPT_FILL               = const(8192)
+
+    # flash status
+    FLASH_STATUS_INIT      = const(0)
+    FLASH_STATUS_DETACHED  = const(1)
+    FLASH_STATUS_BASIC     = const(2)
+    FLASH_STATUS_FULL      = const(3)
 
     # Memory Map
     RAM_G                  = const(0x000000)
@@ -177,6 +184,7 @@ class BrtEve(BrtEveBT81xFT81xCommon): # pylint: disable=too-many-public-methods
         self.eve = self
 
         self.eve_type = "bt815_6"
+        self.storage = BrtEveStorage(self.eve)
 
     # Same with FT81X
     @args_to_integer
