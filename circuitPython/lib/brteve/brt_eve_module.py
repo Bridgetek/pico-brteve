@@ -2,6 +2,8 @@
 import time
 import struct
 from collections import namedtuple
+
+from .brt_eve_movie_player import BrtEveMoviePlayer
 from .brt_eve_common import BrtEveCommon, align4
 
 # Order matches the register layout, so can fill with a single block read
@@ -49,7 +51,7 @@ def get_transfer_addess(address):
     """Pack an address"""
     return struct.pack(">I", address)[1:]
 
-class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes,too-many-public-methods
+class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-instance-attributes,too-many-public-methods
     """EVE management, including boot up and transfer data, via SPI port"""
 
     FIFO_MAX = (0xffc) # Maximum reported free space in the EVE command FIFO
@@ -58,8 +60,8 @@ class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes
     EVE_CMD_FIFO_MASK =(EVE_CMD_FIFO_SIZE - 1)
 
     def __init__(self):
-        self.host = None
-        self.eve = None
+        self.host = None # This is set in brt_eve_[chip id].py
+        self.eve = None # This is set in brt_eve_[chip id].py
 
         self.lcd_width=1280
         self.lcd_height=800
@@ -213,8 +215,12 @@ class BrtEveModule(BrtEveCommon): # pylint: disable=too-many-instance-attributes
         """Write a buffer to EVE"""
         self.transfer_write(address, buff)
 
-    def write_file(self, address, file):
+    def read_mem(self, address, size):
         """Write a buffer to EVE"""
+        return self.transfer_read(address, size)
+
+    def write_file(self, address, file):
+        """Write a buffer to EVE's RAM_G"""
         chunksize = 1000
         with open(file, 'rb') as file_handle:
             while True:
