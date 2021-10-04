@@ -14,7 +14,7 @@ def flash_video(eve: BrtEve, file, blob=''):
 def play_video_from_eve_flash(eve: BrtEve, file, blob=''):
     yes = widgets_dialog_yes_no(eve, "Preparing video", 
         "Write video from sdcard to EVE's connected flash at first?", 120, False) == True
-    if yes:
+    if yes == True:
         flash_video(eve, file, blob)
 
     mp = eve.movie_player_from_flash(4096)
@@ -30,10 +30,12 @@ def start(sdcard, eve):
     while 1:
         yes = widgets_dialog_yes_no(eve, "Select source video", 
             "Play video from EVE's connected flash?", 10) == True
-        if yes:
+        if yes == True:
             play_video_from_eve_flash(eve, file_16mb)
+            continue
 
         yes = widgets_dialog_yes_no(eve, "Select source video", 
             "Play video from PICO's connected sdcard?", 10) == True
-        if yes:
+        if yes == True:
             play_video_from_pico_sdcard(eve, file_16mb)
+            continue

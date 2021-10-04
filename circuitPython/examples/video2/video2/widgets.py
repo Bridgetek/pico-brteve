@@ -9,7 +9,6 @@ _last_tag = 0
 def _tag_release(new_tag):
     global _last_tag
     tag_released = 0
-
     if (new_tag == 0 and _last_tag != new_tag):
         tag_released = _last_tag
         _last_tag = 0
@@ -23,6 +22,8 @@ def milis():
 
 def widgets_dialog_yes_no(eve, title, question, timeout = 120, default_tag = 1, x=0, y=0, w=0, h=0, lcd_w=0, lcd_h=0, tag_yes=1, tag_no=2):
     # lcd_w and lcd_h may different with eve.lcd_w and eve.lcd_h, when cmd_setrotate is used
+    global _last_tag
+    _last_tag = 0
     if lcd_w == 0 or lcd_h == 0: # w and h are not set
         lcd_w = eve.lcd_width
         lcd_h = eve.lcd_height
@@ -75,7 +76,7 @@ def widgets_dialog_yes_no(eve, title, question, timeout = 120, default_tag = 1, 
         time_end=milis() / 1000
         duration = time_end - time_start
         if duration > timeout:
-            return default_tag
+            return default_tag == tag_yes
         
         eve.cmd_dlstart()
         eve.ClearColorRGB(255, 255, 255)
