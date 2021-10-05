@@ -32,10 +32,10 @@ def widgets_dialog_yes_no(eve, title, question, timeout = 120, default_tag = 1, 
     border = 2 # pixel
     base_lcd_w = 800
     base_lcd_h = 480
-    dialog_base_w = 400
-    dialog_base_h = 200
-    dialog_x = (base_lcd_w - dialog_base_w) / 2
-    dialog_y = (base_lcd_h - dialog_base_h) / 2
+    dialog_w = 400
+    dialog_h = 200
+    dialog_x = (base_lcd_w - dialog_w) / 2
+    dialog_y = (base_lcd_h - dialog_h) / 2
     htop = 50 #widget header height
     hbottom = 50 #widget footer height
     font = 20
@@ -46,8 +46,8 @@ def widgets_dialog_yes_no(eve, title, question, timeout = 120, default_tag = 1, 
     ratio = base_lcd_w * 100 / lcd_w
 
     if (ratio != 100):
-        dialog_w = dialog_base_w * 100 / ratio
-        dialog_h = dialog_base_h * 100 / ratio
+        dialog_w = dialog_w * 100 / ratio
+        dialog_h = dialog_h * 100 / ratio
         btn_w = btn_w * 100 / ratio
         btn_h = btn_h * 100 / ratio
         dialog_x = (lcd_w - dialog_w) / 2
