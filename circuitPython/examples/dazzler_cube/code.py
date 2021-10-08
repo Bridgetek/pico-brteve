@@ -357,4 +357,4 @@ if __name__ == "__main__":
     eve = BrtEve(host)
     eve.init(resolution="1280x800", touch="goodix")
 
-    cube(eve).cube_main()
+    cube().cube_main()
