@@ -173,6 +173,14 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
         """Write value to a register"""
         self.wr32(reg, value)
 
+    def pad_drive_strength(self, strength, group):
+        """ Set the drive strength for various pins
+        :param strength: Drive strength
+        :param group: Pin group to set
+        :return: none
+        """
+    	self.eve.host_cmd(0x70, group, strength)
+
     def transfer_read(self, address, number):
         """Transfer data to SPI in read mode"""
         return self.host.transfer(get_transfer_addess(address), 1 + number)[1:]
@@ -302,9 +310,11 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
         """Setting touch"""
         if touch ==  "goodix":
             print("Setup touch for Goodix\n")
+            self.wr8(self.eve.REG_ADAPTIVE_FRAMERATE, 0);
             self.wr8(self.eve.REG_CPURESET, 2)
             self.wr16(self.eve.REG_TOUCH_CONFIG, 0x05d0)
             self.wr8(self.eve.REG_CPURESET, 0)
+            time.sleep(0.3)
 
     def init_ili9488(self):
         """Init for ili9488 LCD"""
@@ -564,7 +574,7 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
             (self.eve.REG_DITHER, 0),
             (self.eve.REG_CSPREAD, 0),
             (self.eve.REG_PCLK_POL, 0),
-            (self.eve.REG_PCLK_2X, 1),
+            (self.eve.REG_PCLK_2X, 0),
 
             (self.eve.REG_HCYCLE, 1411),
             (self.eve.REG_HOFFSET, 120),
