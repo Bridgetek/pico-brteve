@@ -12,8 +12,14 @@
     - 1 MM2040EV
     - 1 LCD LCD 1280x800
 
+3. Flash data
+    User have to flash data "BT81X_Flash.bin" into EVE's connected flash, there is 2 way:
+    1. Use EAB tool
+    2. - Copy "BT81X_Flash.bin" into a sdcard at folder: /sd/EveApps/DemoEvChargePoint/Test/Flash/BT81X_Flash.bin
+       - Plug the sdcard into MM2040EV board
+       - Start this demo and select "Yes" when see this question on LCD: ""Write BT81X_Flash.bin from sdcard to EVE's connected flash at first?""
+
 4. STARTUP
-    - Flash file "BT81X_Flash.bin" into ME817EV (use EAB tool)
     - Start MM2040EV with adafruit-circuitpython-raspberry_pi_pico-en_US-6.3.0-rc.0.uf2
     - Copy source code in Python into CircuitPython drive:
         -> lib (which inclide "bteve" folder )
