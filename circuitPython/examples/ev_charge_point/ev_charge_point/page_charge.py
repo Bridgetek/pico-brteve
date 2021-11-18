@@ -1,4 +1,5 @@
 from brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_common import f16
 
 from .eve_helper import eve_helper
 from .gesture import gesture
@@ -148,8 +149,8 @@ class page_charge():
         self.eve.SaveContext()
 
         self.eve.cmd_loadidentity()
-        self.eve.cmd_scale(self.eve.f16(self.r_scale), self.eve.f16(self.r_scale))
-        self.eve.cmd_translate(self.eve.f16(1) , self.eve.f16(1))
+        self.eve.cmd_scale(f16(self.r_scale), f16(self.r_scale))
+        self.eve.cmd_translate(f16(1) , f16(1))
         self.eve.cmd_setmatrix()
         self.eve.Vertex2f((self.round_energy_x - self.TR_ROUND_ENERGY["width"]
             * (self.r_scale - 1) * 0.5),

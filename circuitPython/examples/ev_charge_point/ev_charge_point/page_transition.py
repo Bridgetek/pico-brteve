@@ -1,4 +1,5 @@
 from brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_common import f16, furmans
 
 from .eve_helper import eve_helper
 from .gesture import gesture
@@ -122,8 +123,8 @@ class page_transition():
         self.eve.SaveContext()
 
         self.eve.cmd_loadidentity()
-        self.eve.cmd_scale(self.eve.f16(self.r_scale), self.eve.f16(self.r_scale))
-        self.eve.cmd_translate(self.eve.f16(1) , self.eve.f16(1))
+        self.eve.cmd_scale(f16(self.r_scale), f16(self.r_scale))
+        self.eve.cmd_translate(f16(1) , f16(1))
         self.eve.cmd_setmatrix()
 
         x = self.x_ani + common.SCREEN_WIDTH - self.TR_CHARGE_BUTTON["width"] * 0.5\
@@ -273,13 +274,13 @@ class page_transition():
 
         tx=(self.TR_CHARGE_BUTTON["width"] - 1) / 2
         ty=(self.TR_CHARGE_BUTTON["height"] - 1) / 2
-        self.eve.cmd_translate(self.eve.f16(tx), self.eve.f16(ty))
+        self.eve.cmd_translate(f16(tx), f16(ty))
 
-        self.eve.cmd_rotate(self.eve.furmans(self.angle * 1 / 360))
+        self.eve.cmd_rotate(furmans(self.angle * 1 / 360))
 
         tx=-1 * (self.TR_CHARGE_BUTTON["width"] - 1) / 2
         ty=-1 * (self.TR_CHARGE_BUTTON["height"] - 1) / 2
-        self.eve.cmd_translate(self.eve.f16(tx), self.eve.f16(ty))
+        self.eve.cmd_translate(f16(tx), f16(ty))
 
         self.eve.cmd_setmatrix()
         self.eve.Vertex2f(
