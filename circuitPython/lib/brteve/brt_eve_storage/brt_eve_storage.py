@@ -239,7 +239,7 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
 
         with open(blob_file, "rb") as file_hanfler:
             self.flash_state(eve.FLASH_STATUS_BASIC) # basic mode
-            eve.write_mem(eve.RAM_G, file_hanfler.read())
+            eve.write_mem(eve.RAM_G, file_hanfler.read(4096))
             eve.finish()
 
         self.flash_update_flash_from_ramg(0, eve.RAM_G, BLOBSIZE)
@@ -300,15 +300,14 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
         progress.file_handler.seek(0, SEEK_END)
         file_size = progress.file_handler.tell()
         progress.file_handler.seek(0, SEEK_SET)
+        progress.file_handler.close()
 
         if file_size > 16*1024*1024:
-            progress.file_handler.close()
             print("File size is too big, max 16Mb")
             return 0
 
         if read_or_write == PROGESS_BAR_READ:
             if file_size <= 0:
-                progress.file_handler.close()
                 print("Unable to open file: ", file)
                 return 0
 
@@ -322,20 +321,24 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
                 status = self.flash_write_blob_default()
 
             if status == FLASH_CMD_UNSUCCESS:
-                progress.file_handler.close()
                 print("Blob update failed, stop file transfer")
                 return 0
 
             if file_size <= 0:
-                progress.file_handler.close()
                 print("Unable to open file:", file)
                 return 0
 
             # Jump to real data
             if addr == 0:
                 progress.sent = progress.addr = BLOBSIZE
-                progress.file_handler.seek(BLOBSIZE)
+            elif addr >= 4096:
+                progress.sent = progress.addr = 0
+            else:
+                print("Invalid flash address, must be 0 (blob update), or >=4096 (data raw)")
+                return 0
 
+            progress.file_handler = open(file, "rb") # pylint: disable=consider-using-with
+            progress.file_handler.seek(progress.addr)
             progress.message = "Writing " + progress.file_name + " to flash"
             progress.file_size = file_size
 
@@ -362,12 +365,11 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
 
             # Tranfer to eve.RAM_g
             while (ramg_sent < eve.RAM_G_SIZE
-          and progress.sent < progress.file_size
-          and sent < progress.byte_per_1percent) :
+                   and progress.sent < progress.file_size
+                   and sent < progress.byte_per_1percent) :
                 data = progress.file_handler.read(block_size)
                 byte_num = len(data)
                 if byte_num == 0:
-                    # print("Error on reading file:", progress.file)
                     print("Error on reading file:", progress.file)
                     return 0
 
@@ -377,11 +379,11 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
                 sent += byte_num
                 progress.sent += byte_num
 
-
             # Update flash from eve.RAM_g
             ramg_sent = (ramg_sent + 4095) & (~4095)#to ensure 4KB alignment
             self.flash_update_flash_from_ramg(progress.addr, 0, ramg_sent)
             progress.addr += ramg_sent
+
         return progress.sent * 100 / progress.file_size # Percent """
 
     def progress_bar_read_chunk(self, progress: _FlashProgressbar) :
