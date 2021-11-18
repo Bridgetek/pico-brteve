@@ -1,9 +1,9 @@
-from gesture import gesture
 from brteve.brt_eve_bt817_8 import BrtEve
-from eve_helper import eve_helper
 
-import language
-import common
+from .eve_helper import eve_helper
+from .gesture import gesture
+from . import language
+from . import common
 
 class page_report():
     def init(self, eve: BrtEve, helper:eve_helper, lan:language.language):

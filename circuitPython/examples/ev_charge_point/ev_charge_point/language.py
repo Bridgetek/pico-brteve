@@ -1,8 +1,3 @@
-import sys
-
-sys.path.append('../adafruit')
-
-
 s_languageEnglish = b'ENGLISH'
 s_languageGerman = b'DEUTSCH'
 s_languageChinese = b'\x01\x02'

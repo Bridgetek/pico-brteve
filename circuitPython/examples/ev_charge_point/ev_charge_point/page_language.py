@@ -1,9 +1,9 @@
-from gesture import gesture
 from brteve.brt_eve_bt817_8 import BrtEve
-from eve_helper import eve_helper
 
-import language
-import common
+from .eve_helper import eve_helper
+from .gesture import gesture
+from . import language
+from . import common
 
 class page_language():
     def init(self, eve: BrtEve, helper:eve_helper, lan:language.language):
@@ -65,7 +65,6 @@ class page_language():
                 lan.switch(lan.LANGUAGE_CN)
 
             self.start_ani_out = 1
-            print("self.start_ani_out = 1, tag=", tag)
             common.SS_START = helper.current_milli_time()
 
         if self.start_ani_out == 1:
@@ -79,7 +78,6 @@ class page_language():
         lan=self.lan
 
         if self.event() == 0:
-            print("if self.event() == 0:") # TODO: DELTETE THIS
             return 0 #drawing ends
 
         self.eve.cmd_flashread(helper.RAM_G_SIZE - common.SS_FRAME_SIZE,

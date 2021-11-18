@@ -1,16 +1,17 @@
 import time
 
-from eve_helper import eve_helper
-import language
 from brteve.brt_eve_bt817_8 import BrtEve
 
-from page_screensaver  import page_screensaver
-from page_language     import page_language
-from page_authenticate import page_authenticate
-from page_plugin       import page_plugin
-from page_charge       import page_charge
-from page_transition   import page_transition
-from page_report       import page_report
+from .eve_helper import eve_helper
+from . import language
+
+from .page_screensaver  import page_screensaver
+from .page_language     import page_language
+from .page_authenticate import page_authenticate
+from .page_plugin       import page_plugin
+from .page_charge       import page_charge
+from .page_transition   import page_transition
+from .page_report       import page_report
 
 class demo_evchargepoint:
     #enum
