@@ -81,8 +81,6 @@ class demo_evchargepoint:
         helper.flash_switch_fullmode()
         eve.cmd_flashread(0, 4096, helper.RAM_G_SIZE)
 
-        eve.calibrate()
-
         print("System clock=", self.Get_SystemClock())
 
         while 1:
