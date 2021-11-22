@@ -22,7 +22,6 @@ class demo_evchargepoint:
     EPAGE_TRANSITION   =5
     EPAGE_CHARGE       =6
     EPAGE_REPORT       =7
-    EPAGE_MAX          =7
     EPAGE_CURRENT      =EPAGE_SCREENSAVER
 
     def __init__(self, eve: BrtEve) -> None:
@@ -48,8 +47,8 @@ class demo_evchargepoint:
         self.lan.switch(self.lan.LANGUAGE_EN)
 
     def next_page(self):
-        if self.EPAGE_CURRENT == self.EPAGE_MAX:
-            self.EPAGE_CURRENT=self.EPAGE_SCREENSAVER
+        if self.EPAGE_CURRENT == self.EPAGE_REPORT:
+            self.EPAGE_CURRENT = self.EPAGE_SCREENSAVER
         else:
             self.EPAGE_CURRENT += 1
 
