@@ -7,6 +7,8 @@
     This is a audio playback example using BT8XX platform and MM2040EV.
     Audio are stored on the SDcard at location:
       /sd/pico-brteve/circuitPython/examples/audio-playback/media
+      
+    Audio must be converted by EAB with as 8-bit Signed PCM, rate 44100
 
 2. HARDWARE REQUIREMENT
     Below is the list of hardware used in this demo
