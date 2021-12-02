@@ -179,7 +179,7 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
         :param group: Pin group to set
         :return: none
         """
-    	self.eve.host_cmd(0x70, group, strength)
+        self.eve.host_cmd(0x70, group, strength)
 
     def transfer_read(self, address, number):
         """Transfer data to SPI in read mode"""
