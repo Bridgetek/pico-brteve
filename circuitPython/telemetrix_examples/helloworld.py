@@ -1,3 +1,6 @@
+# Hellowrold example
+# Run: Cd to this folder, type: py -3 helloworld.py
+
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
