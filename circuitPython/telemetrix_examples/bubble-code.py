@@ -1,10 +1,15 @@
 """ Buble example for Raspbery Pico RP2040 with EVE module MM817EV from BridgeTek and LCD 800x480"""
 import random
 import math
-from brteve.brt_eve_bt817_8 import BrtEve
-from brteve.brt_eve_rp2040 import BrtEveRP2040
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../lib")))
 
-host = BrtEveRP2040()
+from lib.brteve.brt_eve_bt817_8 import BrtEve
+from lib.brteve.brt_eve_telemetrix import BrtEveTelemetrix
+
+host = BrtEveTelemetrix()
 eve = BrtEve(host)
 eve.init(resolution="1280x800", touch="goodix")
 
@@ -40,6 +45,7 @@ class bubble:
         eve.PointSize(self.r)
         (dx, dy) = rots[int(self.a + num * self.w) & 1023]
         eve.Vertex2f(self.x + self.r * dx, self.y + self.r * dy)
+        
 
 bubbles = [bubble() for i in range(90)]
 
@@ -51,3 +57,4 @@ for i in range(999999):
     for b in bubbles:
         b.draw(i)
     eve.swap()
+    eve.finish()
