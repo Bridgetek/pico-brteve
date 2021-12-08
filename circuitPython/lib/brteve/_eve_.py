@@ -1,6 +1,6 @@
 # The _EVE class is already intergrated into CircuitPython binary
 # Documented at: https://circuitpython.readthedocs.io/en/latest/shared-bindings/_eve/index.html
-# Only import this file when there's no built-in _EVE class exist
+# Only import this file when there's no built-in _EVE class exist, such as CircuitPython
 
 # pylint: skip-file, disable-all
 import struct
@@ -9,9 +9,12 @@ class _EVE:
     def cc(self, s):
         assert (len(s) % 4) == 0
         self.buf += s
-        while len(self.buf) > 512:
-            self.write(self.buf[:512])
-            self.buf = self.buf[512:]
+        # On Telemetrix, buffer len = 30, so buffer len can up to 28, included 4 bytes command header
+        # On Circuitpython's _EVE built-in class, this buffer is 512 bytes
+        buffer_len=28-4 
+        while len(self.buf) > buffer_len:
+            self.write(self.buf[:buffer_len])
+            self.buf = self.buf[buffer_len:]
 
     def register(self, sub):
         self.buf = b''

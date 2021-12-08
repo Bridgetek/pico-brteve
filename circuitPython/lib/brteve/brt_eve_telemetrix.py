@@ -24,7 +24,7 @@ PIN_CS_EVE_ILI9488 = 9 #CSX pin of ILI9488
 PIN_DCX_EVE_ILI9488 = 8 #D/CX pin of ILI9488
 
 DUMMY_BYTE_LENGTH = 1  #2 for QSPI(Unsupported yet)
-FREQ = 30000000
+FREQ = 115200
 
 class _eve_report:
     data = None
