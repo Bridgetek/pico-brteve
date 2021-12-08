@@ -1,0 +1,18 @@
+name                                                    : id    : start  : size  : type  : stype : comp  : width : height
+
+unified.blob                                            : 0     : 0      : 4096  : 1     : 0     : 0     : 0     : 0    
+circle_70x70_72x72_COMPRESSED_RGBA_ASTC_4x4_KHR.raw     : 1     : 4096   : 5184  : 2     : 37808 : 0     : 72    : 72   
+circle_90x90_92x92_COMPRESSED_RGBA_ASTC_4x4_KHR.raw     : 2     : 9280   : 8512  : 2     : 37808 : 0     : 92    : 92   
+circle_140x140_140x140_COMPRESSED_RGBA_ASTC_4x4_KHR.raw : 3     : 17792  : 19648 : 2     : 37808 : 0     : 140   : 140  
+knob_250x250_252x252_COMPRESSED_RGBA_ASTC_4x4_KHR.raw   : 4     : 37440  : 63552 : 2     : 37808 : 0     : 252   : 252  
+loop1_72x72_COMPRESSED_RGBA_ASTC_4x4_KHR.raw            : 5     : 100992 : 5184  : 2     : 37808 : 0     : 72    : 72   
+loopall_72x72_COMPRESSED_RGBA_ASTC_4x4_KHR.raw          : 6     : 106176 : 5184  : 2     : 37808 : 0     : 72    : 72   
+loopoff_72x72_COMPRESSED_RGBA_ASTC_4x4_KHR.raw          : 7     : 111360 : 5184  : 2     : 37808 : 0     : 72    : 72   
+mixoff_48x48_COMPRESSED_RGBA_ASTC_4x4_KHR.raw           : 8     : 116544 : 2304  : 2     : 37808 : 0     : 48    : 48   
+mixon_48x48_COMPRESSED_RGBA_ASTC_4x4_KHR.raw            : 9     : 118848 : 2304  : 2     : 37808 : 0     : 48    : 48   
+mute_48x48_COMPRESSED_RGBA_ASTC_4x4_KHR.raw             : 10    : 121152 : 2304  : 2     : 37808 : 0     : 48    : 48   
+next_36x28_COMPRESSED_RGBA_ASTC_4x4_KHR.raw             : 11    : 123456 : 1024  : 2     : 37808 : 0     : 36    : 28   
+pause_36x28_COMPRESSED_RGBA_ASTC_4x4_KHR.raw            : 12    : 124480 : 1024  : 2     : 37808 : 0     : 36    : 28   
+play_36x28_COMPRESSED_RGBA_ASTC_4x4_KHR.raw             : 13    : 125504 : 1024  : 2     : 37808 : 0     : 36    : 28   
+prev_36x28_COMPRESSED_RGBA_ASTC_4x4_KHR.raw             : 14    : 126528 : 1024  : 2     : 37808 : 0     : 36    : 28   
+stop_36x28_COMPRESSED_RGBA_ASTC_4x4_KHR.raw             : 15    : 127552 : 1024  : 2     : 37808 : 0     : 36    : 28   
