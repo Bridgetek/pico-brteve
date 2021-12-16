@@ -183,7 +183,9 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
 
     def transfer_read(self, address, number):
         """Transfer data to SPI in read mode"""
-        return self.host.transfer(get_transfer_addess(address), 1 + number)[1:]
+        dummy_bytes = 1
+        return self.host.transfer(
+            get_transfer_addess(address), dummy_bytes + number)[dummy_bytes:]
 
     def transfer_write(self, address, value):
         """Transfer data to SPI in write mode"""

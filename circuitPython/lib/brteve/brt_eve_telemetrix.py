@@ -24,10 +24,11 @@ PIN_CS_EVE_ILI9488 = 9 #CSX pin of ILI9488
 PIN_DCX_EVE_ILI9488 = 8 #D/CX pin of ILI9488
 
 DUMMY_BYTE_LENGTH = 1  #2 for QSPI(Unsupported yet)
-FREQ = 115200
+FREQ = 1000 * 1000
 
 class _eve_report:
     data = None
+    count_ack  = 0
 
 """
  CALLBACKS
@@ -42,6 +43,7 @@ def the_device_callback(report):
     report = report[3:number_of_bytes+3]
     ret = bytes(struct.pack("B"*len(report),*report))
     _eve_report.data = ret
+    _eve_report.count_ack +=1
 
 class BrtEveTelemetrix():
     """ Host platform RP2040 to control EVE, this class initialize,
@@ -62,17 +64,31 @@ class BrtEveTelemetrix():
         # the qualify_pins parameter is set to FALSE
         self.pico.set_pin_mode_spi(SPI_PORT, MISO, MOSI, CLK, FREQ, CS, qualify_pins=False)
         _eve_report.data = None
+        _eve_report.count_ack = 0
+
+        self._active = 0
+
+    def spi_read_blocking(self, bytes_to_read, SPI_PORT):
+        _eve_report.data = None
+        _eve_report.count_ack = 0
+        self.pico.spi_read_blocking(bytes_to_read, SPI_PORT, the_device_callback) 
+        while _eve_report.count_ack < 1:
+            time.sleep(0.001)
+
+    def spi_write_blocking(self, write_data, SPI_PORT):
+        _eve_report.count_ack = 0
+        self.pico.spi_write_blocking(write_data, SPI_PORT, the_device_callback) 
+        while _eve_report.count_ack < 1:
+            time.sleep(0.001)
 
     def transfer(self, write_data, bytes_to_read = 0):
         """ Transfer data via SPI"""
         self.pico.spi_cs_control(CS_PIN,  LOW)
-        self.pico.spi_write_blocking(write_data, SPI_PORT) 
 
+        self.spi_write_blocking(write_data, SPI_PORT) 
         if bytes_to_read != 0:
-            _eve_report.data = None
-            self.pico.spi_read_blocking(bytes_to_read, SPI_PORT, the_device_callback) 
-            while _eve_report.data == None:
-                time.sleep(0.001)
+            self.spi_read_blocking(bytes_to_read, SPI_PORT) 
+        
         self.pico.spi_cs_control(CS_PIN,  HIGH)  
         return _eve_report.data
 

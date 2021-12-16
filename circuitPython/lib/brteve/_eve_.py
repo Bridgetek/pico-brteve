@@ -11,7 +11,7 @@ class _EVE:
         self.buf += s
         # On Telemetrix, buffer len = 30, so buffer len can up to 28, included 4 bytes command header
         # On Circuitpython's _EVE built-in class, this buffer is 512 bytes
-        buffer_len=28-4 
+        buffer_len=4096-8 # 7 bytes header: 0xee, size_msb, size_lsb, command, port, size_msb, size_lsb
         while len(self.buf) > buffer_len:
             self.write(self.buf[:buffer_len])
             self.buf = self.buf[buffer_len:]

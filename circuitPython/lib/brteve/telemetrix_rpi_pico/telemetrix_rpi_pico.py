@@ -18,6 +18,7 @@
 import sys
 import threading
 import time
+import struct
 from collections import deque
 
 import serial
@@ -1192,7 +1193,8 @@ class TelemetrixRpiPico(threading.Thread):
         else:
             self.spi_callback2 = call_back
 
-        command = [PrivateConstants.SPI_READ_BLOCKING, spi_port, number_of_bytes,
+        len_msb, len_lsb = struct.pack('<H', number_of_bytes)
+        command = [PrivateConstants.SPI_READ_BLOCKING, spi_port, len_msb, len_lsb,
                    repeated_tx_data]
         self._send_command(command)
 
@@ -1227,7 +1229,7 @@ class TelemetrixRpiPico(threading.Thread):
                    spi_polarity, spi_phase]
         self._send_command(command)
 
-    def spi_write_blocking(self, bytes_to_write, spi_port=0):
+    def spi_write_blocking(self, bytes_to_write, spi_port=0, call_back=None,):
         """
         Write a list of bytes to the SPI device.
 
@@ -1250,8 +1252,19 @@ class TelemetrixRpiPico(threading.Thread):
                     self.shutdown()
                 raise RuntimeError(
                     'spi_write_blocking: set_pin_mode_spi never called for spi port 1.')
+
+        if not call_back:
+            if self.shutdown_on_exception:
+                self.shutdown()
+            raise RuntimeError('spi_read_blocking: A Callback must be specified')
+        if spi_port == 0:
+            self.spi_callback = call_back
+        else:
+            self.spi_callback2 = call_back
+
+        len_msb, len_lsb = struct.pack('<H', len(bytes_to_write))
         command = [PrivateConstants.SPI_WRITE_BLOCKING, spi_port,
-                   len(bytes_to_write)]
+                   len_msb, len_lsb]
 
         for data in bytes_to_write:
             command.append(data)
@@ -1561,7 +1574,10 @@ class TelemetrixRpiPico(threading.Thread):
 
         """
         # the length of the list is added at the head
-        command.insert(0, len(command))
+        len_msb, len_lsb = struct.pack('<H', len(command))
+        command.insert(0, 0xee) # start byte
+        command.insert(1, len_msb)
+        command.insert(2, len_lsb)
         # print(command)
         send_message = bytes(command)
 
