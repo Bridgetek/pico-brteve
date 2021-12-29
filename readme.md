@@ -32,3 +32,5 @@ Or run on a PC as a client connect to Telemetrix server on Pico RP2040 mcu.
     ├───lvgl         | TBD
     ├───tools        | UF2 for Eve converter
 ```
+## Licence
+[MIT](LICENSE)
