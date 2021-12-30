@@ -5,6 +5,7 @@ This program is used to program Eve-connected flash via Raspberry Pi Pico.  It i
 
 ## Build 
 Need prepare pico-SDK from https://github.com/raspberrypi/pico-sdk version 1.3.0
+
 EveApps from this version: https://github.com/BRTSG-FOSS/EveApps/commit/5c6975de0709826cab0286ec52c06ef76f56faf7
 
 Open Developer command promt for VS2019
