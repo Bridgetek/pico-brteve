@@ -7,6 +7,8 @@
 #   nmake
 # 
 
+cmake_minimum_required(VERSION 3.13)
+
 FILE(GLOB SRCS *.c)
 FILE(GLOB HDRS *.h)
 SOURCE_GROUP("" FILES ${SRCS} ${HDRS})

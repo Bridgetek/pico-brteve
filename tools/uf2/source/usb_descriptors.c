@@ -25,7 +25,7 @@
 
 #include "board_api.h"
 #include "tusb.h"
-
+#define HID_PROTOCOL_NONE 0
 // String Descriptor Index
 enum
 {
@@ -93,7 +93,7 @@ uint8_t const desc_hid_report[] =
 // Invoked when received GET HID REPORT DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
-uint8_t const * tud_hid_descriptor_report_cb(void)
+uint8_t const * tud_hid_descriptor_report_cb(uint8_t instance)
 {
   return desc_hid_report;
 }
