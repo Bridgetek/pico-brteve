@@ -23,14 +23,14 @@ IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 IF(EVE_APPS_PLATFORM STREQUAL "RP2040")
-SET(IS_PLATFORM_RP2040   "RP2040"   CACHE STRING "Platform Target RP2040  ")
-mark_as_advanced(IS_PLATFORM_RP2040  )
+  SET(IS_PLATFORM_RP2040   "RP2040"   CACHE STRING "Platform Target RP2040  ")
+  mark_as_advanced(IS_PLATFORM_RP2040  )
 
-ADD_DEFINITIONS("-DEVE_PLATFORM_RP2040=1")
-ADD_DEFINITIONS("-DRP2040_PLATFORM=1")
+  ADD_DEFINITIONS("-DEVE_PLATFORM_RP2040=1")
+  ADD_DEFINITIONS("-DRP2040_PLATFORM=1")
 
 
-# Pull in Pico SDK (must be before project)
+  # Pull in Pico SDK (must be before project)
   INCLUDE("EveApps/pico_sdk_import.cmake")
   PROJECT("eve_flash_pico" C CXX ASM)
 
@@ -53,14 +53,12 @@ ADD_DEFINITIONS("-DRP2040_PLATFORM=1")
   
   TARGET_LINK_LIBRARIES(eve_flash_pico PRIVATE
     pico_bootrom
-	  pico_unique_id
+    pico_unique_id
     tinyusb_device
-	  tinyusb_board
+    tinyusb_board
     pico_stdlib
     eve_hal
     fatfs
   )
-  
-  
   
 ENDIF()
