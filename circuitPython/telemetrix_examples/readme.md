@@ -54,4 +54,5 @@ Below hardware are supported:
 ## Software
 
 Telemetrix server: https://github.com/BRTSG-FOSS/Telemetrix4RpiPico commit 79b9ef5
+
 Telemetrix client: https://github.com/BRTSG-FOSS/telemetrix-rpi-pico commit 05d646e
