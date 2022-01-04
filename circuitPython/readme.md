@@ -1,9 +1,11 @@
 # CircuitPython support for Raspberry Pi Pico with Eve module from Brdgetek Pte Ltd
 
 CircuitPython library is derived from the following repo:
+
 https://github.com/jamesbowman/CircuitPython_bteve
 
 Telemetrix library is fork from the following repo:
+
 https://github.com/MrYsLab/telemetrix-rpi-pico
 
 https://github.com/MrYsLab/Telemetrix4RpiPico
@@ -16,7 +18,8 @@ It provides a python class to control Eve via SPI.
 The circuitPython code to showcase the usage of graphics features from Eve.
 
 ## Telemetrix examples
-The python code to showcase the usage of graphics features from Eve via Telemetrix.
+The python code to showcase the usage of graphics features from Eve via Telemetrix:
+
 https://github.com/MrYsLab/Telemetrix4Connect2040
 
 ## Wiring
