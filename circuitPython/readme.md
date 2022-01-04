@@ -22,10 +22,15 @@ The python code to showcase the usage of graphics features from Eve via Telemetr
 https://github.com/MrYsLab/Telemetrix4Connect2040
 
 To run an Telemetrix example:
-```sh
-cd telemetrix_examples
-py -3 [example].py
-```
+
+1. Start Telemetrix server on Pico with this uf2: lib/brteve/telemetrix_rpi_pico/Telemetrix4RpiPico.uf2
+
+2. Run client example on a PC:
+
+  ```sh
+  cd telemetrix_examples
+  py -3 [example].py
+  ```
 
 ### Pico modules to work with Eve modules:
 
