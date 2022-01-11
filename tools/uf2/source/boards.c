@@ -25,8 +25,9 @@
 
 #include "board_api.h"
 #include "tusb.h"
+#include <sys/stat.h>   // stat
 
-#include "EVE_Hal.h"
+#include "common.h" //EveApps's common
 
 #include "pico/bootrom.h"
 #include "pico/unique_id.h"
@@ -44,6 +45,7 @@ uint32_t g_Uf2FamilyId = UF2_FAMILY_ID_EVE3;
 extern char infoUf2File[];
 
 unsigned char g_DeviceName[64] = "Bridgetek BT8XX";
+#define EFLASH "/e-flash.bin"
 
 EVE_HalContext g_Host;
 extern bool EVE_Hal_NoInit;
@@ -53,8 +55,68 @@ static_assert(sizeof(pico_unique_board_id_t) == BTFLASH_RUID_DATA_BYTES, "");
 
 bool g_HalOk = false;
 bool g_HalFlashOk = false;
+static bool is_eflash_initialized = false;
 
-bool cbCmdWait(EVE_HalContext *phost);
+bool cbCmdWait_uf2(EVE_HalContext *phost);
+
+static bool file_exists (char *filename) {
+  struct stat   buffer;   
+  return (stat (filename, &buffer) == 0);
+}
+
+static uint32_t eflash_write_with_progress(EVE_HalContext* phost, const char* filePath, const char* fileName, uint32_t address) {
+	Ftf_Progress_t* progress = Ftf_Progress_Init(phost, filePath, fileName, address, FTF_PROGESS_WRITE);
+
+	if (!progress) {
+		return -1; /// error
+	}
+
+	while (1) {
+		uint32_t pc = Ftf_Progress_Write_Next(phost, progress);
+
+		Ftf_Progress_Ui(phost, progress);
+    printf("\rFlashing " EFLASH " %d %%", pc);
+
+		if (pc >= 100) {
+			break;
+		}
+	}
+	Ftf_Progress_Close();
+
+	return progress->fileSize;
+}
+
+static void eve_eflash_init(){
+  EVE_HalContext *phost = &g_Host;
+
+#if !defined(BT8XXEMU_PLATFORM) && defined(EVE_FLASH_AVAILABLE)
+  
+  // detecting SD card
+  EVE_Util_loadSdCard(phost);
+	if (sdhost_card_detect() != SDHOST_CARD_INSERTED) {
+    printf("No SD card detected");
+		return;
+	}
+  printf("SD card detected");
+
+  // detecting e-flash.bin
+  if (file_exists(EFLASH) == 0){
+    printf(EFLASH " is not exist, skip auto-flashing");
+  }
+  printf(EFLASH " is detected, flashing it to EVE's connected flash");
+
+  // Flash EFLASH
+  int sent = eflash_write_with_progress(phost, EFLASH, "e-flash.bin", 0);
+  if (0 >= sent) {
+    printf("Error: Flash " EFLASH " failed");
+		is_eflash_initialized = false;
+		return; // error
+	}
+  printf("Flashed " EFLASH " successful");
+  is_eflash_initialized = true;
+
+#endif
+}
 
 void board_dfu_init(void)
 {
@@ -65,7 +127,7 @@ void board_dfu_init(void)
   EVE_Hal_NoInit = true;
   EVE_Hal_initialize();
   EVE_Hal_defaults(&params);
-  params.CbCmdWait = cbCmdWait;
+  params.CbCmdWait = cbCmdWait_uf2;
   if (!EVE_Hal_open(phost, &params))
   {
     eve_printf_debug("Failed to open device!\n");
@@ -78,6 +140,8 @@ void board_dfu_init(void)
     EVE_Hal_close(phost);
     return;
   }
+  
+  eve_eflash_init();
 
   g_HalOk = true;
 
@@ -151,12 +215,14 @@ void board_dfu_init(void)
     "Date: " __DATE__ "\r\n"
     "X-Eve-Flash-Status: %s\r\n"
     "X-Eve-Flash-Code: %x\r\n"
-    "X-Eve-Flash-Serial: %02x%02x%02x%02x%02x%02x%02x%02x\r\n",
+    "X-Eve-Flash-Serial: %02x%02x%02x%02x%02x%02x%02x%02x\r\n"
+    "X-Eve-Flash-image: %s\r\n",
     chipBranding, chipPrefix, chipId,
     chipPrefix, chipId,
     flashStatusStr, flashCode,
     (int)s_FlashUniqueId[0], (int)s_FlashUniqueId[1], (int)s_FlashUniqueId[2], (int)s_FlashUniqueId[3],
-    (int)s_FlashUniqueId[4], (int)s_FlashUniqueId[5], (int)s_FlashUniqueId[6], (int)s_FlashUniqueId[7]);
+    (int)s_FlashUniqueId[4], (int)s_FlashUniqueId[5], (int)s_FlashUniqueId[6], (int)s_FlashUniqueId[7],
+    is_eflash_initialized == true? EFLASH:"NONE");
 
   sprintf(g_UsbProduct, "%s%lx UF2", chipPrefix, chipId);
   sprintf(g_DeviceName, "%s %s%lx", chipBranding, chipPrefix, chipId);
@@ -310,7 +376,8 @@ static bool board_repeating_timer_callback(struct repeating_timer *t)
 
 void board_timer_start(uint32_t ms)
 {
-  add_repeating_timer_ms(-((int32_t)ms), board_repeating_timer_callback, NULL, &s_BoardTimer);
+  s_BoardTimer.alarm_id = 99;
+  add_repeating_timer_ms(-((int32_t)ms), board_repeating_timer_callback, &s_BoardTimer, &s_BoardTimer);
 }
 
 void board_timer_stop(void)

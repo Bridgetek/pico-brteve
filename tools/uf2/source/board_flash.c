@@ -38,7 +38,7 @@ static absolute_time_t s_LastBusyStart;
 static bool s_BusyWait;
 static bool s_BlockingWait;
 
-bool cbCmdWait(EVE_HalContext* phost)
+bool cbCmdWait_uf2(EVE_HalContext* phost)
 {
   if (s_BlockingWait)
   {

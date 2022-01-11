@@ -127,7 +127,8 @@ char infoUf2File[512] =
     "Date: " __DATE__ "\r\n"
     "X-Eve-Flash-Status: INIT\r\n"
     "X-Eve-Flash-Code: 0\r\n"
-    "X-Eve-Flash-Serial: 0000000000000000\r\n";
+    "X-Eve-Flash-Serial: 0000000000000000\r\n"
+    "X-Eve-Flash-image: NONE\r\n";
 
 const char indexFile[] =
     "<!doctype html>\n"
