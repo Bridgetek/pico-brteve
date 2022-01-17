@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['screenshot_5fft800_0',['screenshot_ft800',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a6b2788e72abd531c923c0d9f6b3d59a2',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['set_5fflag_1',['set_flag',['../classbrteve_1_1brt__eve__movie__player_1_1_brt_eve_movie_player.html#a3375398e5132e975c942baf0d1d989f2',1,'brteve::brt_eve_movie_player::BrtEveMoviePlayer']]],
+  ['set_5fvolume_2',['set_volume',['../classbrteve_1_1brt__eve__movie__player_1_1_brt_eve_movie_player.html#a286eaafb0ae03063fab93d2cc262c5e2',1,'brteve::brt_eve_movie_player::BrtEveMoviePlayer']]],
+  ['setup_5f1024x600_3',['setup_1024x600',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a21a7da08fa8701a08bdb042c395bfc85',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5f1280x720_4',['setup_1280x720',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#aafb65b1649252019d69be9083cf47960',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5f1280x800_5',['setup_1280x800',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a204dc2c9c9e4b4f039b8cc5f2a6c9108',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5f320x240_6',['setup_320x240',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#ad4cb9c16e708caa1faaa97b2070891c1',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5f320x480_7',['setup_320x480',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a2faca137269634d1db5c5086f83671f1',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5f480x272_8',['setup_480x272',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#af72a9c8917d267efa80777c25de55919',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5f640x480_9',['setup_640x480',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a063022cdc283b212c4e98b610e070c02',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5f800x480_10',['setup_800x480',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#aed121bd2421fb71927a710344d465a17',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['setup_5ftouch_11',['setup_touch',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#ae67ffd181c80895d048552c4b94e7e0a',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['spi_5fsdcard_12',['spi_sdcard',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a30626016044bad0cc83cede823d8bed8',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['spilock_13',['spilock',['../namespacebrteve_1_1brt__eve__rp2040.html#ae610a619cb94b976ec4642e0b92288c0',1,'brteve::brt_eve_rp2040']]],
+  ['standard_5fstartup_14',['standard_startup',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a4f8c5ee62cfdda75bb883b9af308148e',1,'brteve::brt_eve_module::BrtEveModule']]],
+  ['swap_15',['swap',['../classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a1e85764c7ca525c7fa75c9cf4f484a7e',1,'brteve::brt_eve_module::BrtEveModule']]]
+];
