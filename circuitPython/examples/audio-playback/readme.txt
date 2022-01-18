@@ -20,7 +20,7 @@
     User have to flash data "BT81X_Flash.bin" into EVE's connected flash, there is 2 ways:
     1. Use EAB tool
     2. - Copy "BT81X_Flash.bin" into a sdcard at folder: 
-          /sd/EveApps/DemoEvChargePoint/Test/Flash/BT81X_Flash.bin
+          /EveApps/DemoEvChargePoint/Test/Flash/BT81X_Flash.bin
        - Plug the sdcard into MM2040EV board
        - Start this demo and select "Yes" when see this question on LCD: 
           "Write BT81X_Flash.bin from sdcard to EVE's connected flash at first?"
@@ -28,7 +28,7 @@
 4. Copy audio to sdcard
     This application only play audio on a sdcard
     User must convert audio by EAB tool, then copy .raw file to sdcard at folder: 
-      /sd/pico-brteve/circuitPython/examples/audio-playback/media
+    /pico-brteve/circuitPython/examples/audio-playback/media
       
 5. STARTUP
     - Start MM2040EV with adafruit-circuitpython-raspberry_pi_pico-en_US-6.3.0-rc.0.uf2

@@ -15,7 +15,7 @@
 3. Flash data
     User have to flash data "BT81X_Flash.bin" into EVE's connected flash, there is 2 way:
     1. Use EAB tool
-    2. - Copy "BT81X_Flash.bin" into a sdcard at folder: /sd/EveApps/DemoEvChargePoint/Test/Flash/BT81X_Flash.bin
+    2. - Copy "BT81X_Flash.bin" into a sdcard at folder: /EveApps/DemoEvChargePoint/Test/Flash/BT81X_Flash.bin
        - Plug the sdcard into MM2040EV board
        - Start this demo and select "Yes" when see this question on LCD: ""Write BT81X_Flash.bin from sdcard to EVE's connected flash at first?""
 
