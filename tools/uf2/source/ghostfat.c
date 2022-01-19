@@ -31,6 +31,7 @@
 #include "compile_date.h"
 #include "board_api.h"
 #include "uf2.h"
+#include "EVE_Hal.h"
 
 //--------------------------------------------------------------------+
 //
@@ -130,6 +131,16 @@ char infoUf2File[512] =
     "X-Eve-Flash-Serial: 0000000000000000\r\n"
     "X-Eve-Flash-image: NONE\r\n";
 
+char infoSPIConfFile[128] =
+    "MISO" ": 4  \r\n"
+    "CS"   ": 5  \r\n"
+    "SCK"  ": 2  \r\n"
+    "MOSI" ": 3  \r\n"
+    "INT"  ": 6  \r\n"
+    "PWD"  ": 7  \r\n"
+    "IO2"  ": 14 \r\n"
+    "IO3"  ": 15 \r\n";
+
 const char indexFile[] =
     "<!doctype html>\n"
     "<html>"
@@ -141,16 +152,27 @@ const char indexFile[] =
     "</html>\n";
 
 static struct TextFile const info[] = {
+    // Number = NUM_FILES_INFO
     {.name = "INFO_UF2TXT", .content = infoUf2File},
     {.name = "INDEX   HTM", .content = indexFile},
+    {.name = "SPI_PIN CNF", .content = infoSPIConfFile},
 
-    // current.uf2 must be the last element and its content must be NULL
+    // Number = NUM_FILES_DYNAMIC
+    // current.uf2 and eflash.bin must be the last element and its content must be NULL
     {.name = "CURRENT UF2", .content = NULL},
+    {.name = "EFLASH  BIN", .content = NULL},
 };
+
 STATIC_ASSERT(UF2_ARRAY_SIZE(infoUf2File) < BPB_BYTES_PER_CLUSTER); // GhostFAT requires files to fit in one cluster
 STATIC_ASSERT(UF2_ARRAY_SIZE(indexFile)   < BPB_BYTES_PER_CLUSTER); // GhostFAT requires files to fit in one cluster
+STATIC_ASSERT(UF2_ARRAY_SIZE(infoSPIConfFile)   < BPB_BYTES_PER_CLUSTER); // GhostFAT requires files to fit in one cluster
 
-#define NUM_FILES          (UF2_ARRAY_SIZE(info))
+#define SPI_PIN_CNF_NTH    (2)
+#define CURRENT_UF2_NTH    (3)
+#define EFLASH_BIN_NTH     (4)
+#define NUM_FILES_INFO     (3)
+#define NUM_FILES_DYNAMIC  (2)
+#define NUM_FILES          (NUM_FILES_INFO + NUM_FILES_DYNAMIC)
 #define NUM_DIRENTRIES     (NUM_FILES + 1) // Code adds volume label as first root directory entry
 #define REQUIRED_ROOT_DIRECTORY_SECTORS ( ((NUM_DIRENTRIES+1) / DIRENTRIES_PER_SECTOR) + \
                                          (((NUM_DIRENTRIES+1) % DIRENTRIES_PER_SECTOR) ? 1 : 0))
@@ -177,9 +199,9 @@ STATIC_ASSERT( CLUSTER_COUNT >= 0x1015 && CLUSTER_COUNT < 0xFFD5 );
 
 // NOTE: First cluster number of the UF2 file calculation is:
 //       Starts with NUM_FILES because each non-UF2 file is limited to a single cluster in size
-//       -1 because NUM_FILES includes UF2 entry is included in that array, which is zero-indexed
+//       -NUM_FILES_DYNAMIC because NUM_FILES includes UF2 entry is included in that array, which is zero-indexed
 //       +2 because FAT decided first data sector would be in cluster number 2, rather than zero
-#define UF2_FIRST_CLUSTER_NUMBER ((NUM_FILES -1) + 2)
+#define UF2_FIRST_CLUSTER_NUMBER ((NUM_FILES - NUM_FILES_DYNAMIC) + 2)
 #define UF2_LAST_CLUSTER_NUMBER  (UF2_FIRST_CLUSTER_NUMBER + UF2_CLUSTER_COUNT - 1)
 
 #define FS_START_FAT0_SECTOR      BPB_RESERVED_SECTORS
@@ -214,6 +236,24 @@ static FAT_BootBlock const BootBlock = {
 
 // ota0 partition size
 static uint32_t _flash_size;
+
+// Flash file indicator
+static uint32_t _start_cluster_nth = 0;
+static uint32_t _flash_read_count = 0;
+static absolute_time_t _last_time = 0;
+
+/**
+ * @brief Calculate duration in milisecond
+ * 
+ * @return uint32_t milisecond duration
+ */
+static uint32_t duration_ms()
+{
+	absolute_time_t newTime = get_absolute_time();
+	int64_t diff_us = absolute_time_diff_us(_last_time, newTime);
+  _last_time = newTime;
+	return diff_us/1000;
+}
 
 //--------------------------------------------------------------------+
 //
@@ -350,15 +390,25 @@ void uf2_read_block (uint32_t block_no, uint8_t *data)
       d->updateTime = __DOSTIME__;
       d->updateDate = __DOSDATE__;
       d->startCluster = startCluster & 0xFFFF;
-      d->size = (inf->content ? strlen(inf->content) : UF2_BYTE_COUNT);
+      
+      d->size = 0;
+      if(inf->content){
+        d->size = strlen(inf->content);
+      }
+      else if (fileIndex == EFLASH_BIN_NTH){
+         d->size = _flash_size;
+      }
+      else if (fileIndex == CURRENT_UF2_NTH){
+         d->size = UF2_BYTE_COUNT;
+      }
     }
   }
   else if ( block_no < BPB_TOTAL_SECTORS )
   {
     sectionRelativeSector -= FS_START_CLUSTERS_SECTOR;
     uint32_t sectionRelativeClusterIndex = sectionRelativeSector / BPB_SECTORS_PER_CLUSTER;
-
-    if ( sectionRelativeClusterIndex < (NUM_FILES - 1) )
+    
+    if ( sectionRelativeClusterIndex < NUM_FILES_INFO )
     {
       // WARNING -- code presumes first data cluster == first file, second data cluster == second file, etc.
       struct TextFile const * inf = &info[ sectionRelativeSector / BPB_SECTORS_PER_CLUSTER ];
@@ -378,25 +428,58 @@ void uf2_read_block (uint32_t block_no, uint8_t *data)
         memcpy(data, dataStart, bytesToCopy);
       }
     }
-    else
-    {
-      // generate the UF2 file data on-the-fly
-      sectionRelativeSector -= (NUM_FILES - 1) * BPB_SECTORS_PER_CLUSTER;
-      uint32_t addr = BOARD_FLASH_APP_START + (sectionRelativeSector * UF2_FIRMWARE_BYTES_PER_SECTOR);
-      if ( addr < _flash_size ) // TODO abstract this out
-      {
-        UF2_Block *bl = (void*) data;
-        bl->magicStart0 = UF2_MAGIC_START0;
-        bl->magicStart1 = UF2_MAGIC_START1;
-        bl->magicEnd = UF2_MAGIC_END;
-        bl->blockNo = sectionRelativeSector;
-        bl->numBlocks = UF2_SECTOR_COUNT;
-        bl->targetAddr = addr;
-        bl->payloadSize = UF2_FIRMWARE_BYTES_PER_SECTOR;
-        bl->flags = (addr < EVE_FLASH_FIRMWARE_SIZE) ? UF2_FLAG_FAMILYID : 0;
-        bl->familyID = (addr < EVE_FLASH_FIRMWARE_SIZE) ? BOARD_UF2_FAMILY_ID : 0;
+    else{
+      #define TIMEDOUT_READING 10*1000
+      if (sectionRelativeClusterIndex <= NUM_FILES ){
+        // Start reading a whole flash
+        if(duration_ms() > TIMEDOUT_READING || _start_cluster_nth == 0){
+          _start_cluster_nth = sectionRelativeClusterIndex;
+          _flash_read_count = 0;
+        }
+      }
 
-        board_flash_read(addr, bl->data, bl->payloadSize);
+      uint32_t num_read=_flash_size / UF2_FIRMWARE_BYTES_PER_SECTOR;
+      if ( _start_cluster_nth == CURRENT_UF2_NTH )
+      {
+        // generate the UF2 file data on-the-fly
+        sectionRelativeSector -= (NUM_FILES - 1) * BPB_SECTORS_PER_CLUSTER;
+        uint32_t addr = BOARD_FLASH_APP_START + (sectionRelativeSector * UF2_FIRMWARE_BYTES_PER_SECTOR);
+
+        if ( addr < _flash_size ) // TODO abstract this out
+        {
+          UF2_Block *bl = (void*) data;
+          bl->magicStart0 = UF2_MAGIC_START0;
+          bl->magicStart1 = UF2_MAGIC_START1;
+          bl->magicEnd = UF2_MAGIC_END;
+          bl->blockNo = sectionRelativeSector;
+          bl->numBlocks = UF2_SECTOR_COUNT;
+          bl->targetAddr = addr;
+          bl->payloadSize = UF2_FIRMWARE_BYTES_PER_SECTOR;
+          bl->flags = (addr < EVE_FLASH_FIRMWARE_SIZE) ? UF2_FLAG_FAMILYID : 0;
+          bl->familyID = (addr < EVE_FLASH_FIRMWARE_SIZE) ? BOARD_UF2_FAMILY_ID : 0;
+
+          board_flash_read(addr, bl->data, bl->payloadSize);
+          _flash_read_count += 1;
+          if(_flash_read_count == num_read){
+            _start_cluster_nth = 0;
+          }
+        }
+      }
+      else if ( _start_cluster_nth == EFLASH_BIN_NTH )
+      {
+        num_read=_flash_size / 512;
+
+        // generate the EFlash.bin file data on-the-fly
+        sectionRelativeSector -= (NUM_FILES - 1) * BPB_SECTORS_PER_CLUSTER;
+        uint32_t addr = BOARD_FLASH_APP_START + (sectionRelativeSector * 512);
+        if ( addr < _flash_size ) // TODO abstract this out
+        {
+          board_flash_read(addr, data, 512);
+          _flash_read_count += 1;
+          if(_flash_read_count == num_read){
+            _start_cluster_nth = 0;
+          }
+        }
       }
     }
   }
