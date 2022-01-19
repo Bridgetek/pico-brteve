@@ -43,9 +43,12 @@ unsigned char g_UsbProduct[64] = "BT8XX UF2";
 uint32_t g_Uf2FamilyId = UF2_FAMILY_ID_EVE3;
 
 extern char infoUf2File[];
+extern char infoSPIConfFile[];
 
 unsigned char g_DeviceName[64] = "Bridgetek BT8XX";
-#define EFLASH "/e-flash.bin"
+#define EFLASH   "e-flash.bin"
+#define EFLASHV  "e-flash-v.bin"
+#define EFLASHRB "e-flash-readback.bin"
 
 EVE_HalContext g_Host;
 extern bool EVE_Hal_NoInit;
@@ -56,6 +59,7 @@ static_assert(sizeof(pico_unique_board_id_t) == BTFLASH_RUID_DATA_BYTES, "");
 bool g_HalOk = false;
 bool g_HalFlashOk = false;
 static bool is_eflash_initialized = false;
+static char eflash_file[100];
 
 bool cbCmdWait_uf2(EVE_HalContext *phost);
 
@@ -86,36 +90,64 @@ static uint32_t eflash_write_with_progress(EVE_HalContext* phost, const char* fi
 	return progress->fileSize;
 }
 
-static void eve_eflash_init(){
+/**
+ * @brief Read SD card to program the flash image to e-flash
+ * 
+ * @param file File to flash
+ * @return size_t Number of bytes flashed
+ */
+static uint32_t eve_eflash_init_file(const char * file){
   EVE_HalContext *phost = &g_Host;
 
-#if !defined(BT8XXEMU_PLATFORM) && defined(EVE_FLASH_AVAILABLE)
-  
+  // detecting e-flash.bin
+  if (file_exists(file) == 0 ){
+    printf("%s is not exist, skip auto-flashing\r\n", file);
+  }
+  printf("%s is detected, flashing it to EVE's connected flash\r\n");
+
+  // Flash EFLASH
+  uint32_t sent = eflash_write_with_progress(phost, file, file, 0);
+  if (0 >= sent) {
+    printf("Error: Flash %s failed\r\n", file);
+		is_eflash_initialized = false;
+		return 0; // error
+	}
+  sprintf(eflash_file, "%s", file);
+  printf("Flashed %s successful\r\n", file);
+  is_eflash_initialized = true;
+
+  return sent;
+}
+
+static void eve_eflash_init(){
+#if !defined(EVE_FLASH_AVAILABLE)
+  return;
+#endif
+  EVE_HalContext *phost = &g_Host;
+
   // detecting SD card
   EVE_Util_loadSdCard(phost);
 	if (sdhost_card_detect() != SDHOST_CARD_INSERTED) {
-    printf("No SD card detected");
+    printf("No SD card detected\r\n");
 		return;
 	}
-  printf("SD card detected");
+  printf("SD card detected\r\n");
 
-  // detecting e-flash.bin
-  if (file_exists(EFLASH) == 0){
-    printf(EFLASH " is not exist, skip auto-flashing");
+  uint32_t eflashv_size = eve_eflash_init_file("/" EFLASHV);
+  if(!eflashv_size)
+  {
+    eve_eflash_init_file("/" EFLASH);
   }
-  printf(EFLASH " is detected, flashing it to EVE's connected flash");
+  else
+  {
+    // Read the eve-connected flash and write the data into SD card 
+    // with the name e-flash-readback.bin if the pre-defined file "e-flash-v.bin" at the root directory.
+    Ftf_Read_File_From_Flash(phost, "/" EFLASHRB, 0, eflashv_size);
+  }
+}
 
-  // Flash EFLASH
-  int sent = eflash_write_with_progress(phost, EFLASH, "e-flash.bin", 0);
-  if (0 >= sent) {
-    printf("Error: Flash " EFLASH " failed");
-		is_eflash_initialized = false;
-		return; // error
-	}
-  printf("Flashed " EFLASH " successful");
-  is_eflash_initialized = true;
-
-#endif
+void board_dfu_spi_change(){
+  
 }
 
 void board_dfu_init(void)
@@ -222,7 +254,7 @@ void board_dfu_init(void)
     flashStatusStr, flashCode,
     (int)s_FlashUniqueId[0], (int)s_FlashUniqueId[1], (int)s_FlashUniqueId[2], (int)s_FlashUniqueId[3],
     (int)s_FlashUniqueId[4], (int)s_FlashUniqueId[5], (int)s_FlashUniqueId[6], (int)s_FlashUniqueId[7],
-    is_eflash_initialized == true? EFLASH:"NONE");
+    is_eflash_initialized == true? eflash_file:"NONE");
 
   sprintf(g_UsbProduct, "%s%lx UF2", chipPrefix, chipId);
   sprintf(g_DeviceName, "%s %s%lx", chipBranding, chipPrefix, chipId);
