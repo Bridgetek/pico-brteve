@@ -61,6 +61,11 @@ bool g_HalFlashOk = false;
 static bool is_eflash_initialized = false;
 static char eflash_file[100];
 
+spi_pins current_spi_pins;
+
+uint32_t bootup_starting = 0;
+uint32_t count_bootup_attempt = 0;
+
 bool cbCmdWait_uf2(EVE_HalContext *phost);
 
 static bool file_exists (char *filename) {
@@ -146,33 +151,97 @@ static void eve_eflash_init(){
   }
 }
 
-void board_dfu_spi_change(){
+extern char infoSPIConfFile[128];
+
+/**
+ * @brief Parse SPI pins text to struct
+ * 
+ * @param data SPI pins text
+ * @return true Parse Ok
+ * @return false Parse not ok
+ */
+bool board_spi_onChanged(char *data){
+  int spi_arr[8];
+  int id = 0;
+  char *data_next;
+  char *data_root = data;
   
+  while (*data) { // While there are more characters to process...
+    while(*data && data[0] != ':') { // Move pointer to ':'
+        data++;
+    }
+    while(*data && data[0] != ' ') { // Skip all space
+        data++;
+    }
+    
+    long val = strtol(data, &data_next, 10); // Read number
+    if (data_next != data)
+    {   // Found a number   
+        spi_arr[id++] = val;
+    }
+    else if (!(*data)){
+      goto end; // End of text
+    } 
+    else{
+      printf("Error: SPI pins cannot be parsed\r\n");
+      return false;
+    }
+    data = data_next+1;   
+  }
+
+end:
+  id=0;
+  current_spi_pins.MISO  = spi_arr[id++];
+  current_spi_pins.CS    = spi_arr[id++];
+  current_spi_pins.SCK   = spi_arr[id++];
+  current_spi_pins.MOSI  = spi_arr[id++];
+  current_spi_pins.INT   = spi_arr[id++];
+  current_spi_pins.PWD   = spi_arr[id++];
+  current_spi_pins.IO2   = spi_arr[id++];
+  current_spi_pins.IO3   = spi_arr[id++];
+  return true;
 }
 
-void board_dfu_init(void)
+/**
+ * @brief Initialize the EVE
+ * 
+ * @return true EVE is initialized successully 
+ * @return false EVE is initialized unsuccessully 
+ */
+bool board_dfu_init(void)
 {
   EVE_HalContext *phost = &g_Host;
   EVE_HalParameters params;
+
+  if(!board_spi_onChanged(infoSPIConfFile)) return false;
 
   // Initialize HAL
   EVE_Hal_NoInit = true;
   EVE_Hal_initialize();
   EVE_Hal_defaults(&params);
+  params.SpiSckPin = current_spi_pins.SCK;
+	params.SpiMosiPin = current_spi_pins.MOSI;
+	params.SpiMisoPin = current_spi_pins.MISO;
+	params.PowerDownPin = current_spi_pins.PWD;
+	params.SpiCsPin = current_spi_pins.CS;
   params.CbCmdWait = cbCmdWait_uf2;
-  if (!EVE_Hal_open(phost, &params))
+
+  bootup_starting = 1;
+  count_bootup_attempt = 0;
+  if (!EVE_Hal_open(phost, &params))// co goi ham nay thi sau khi return se panic 
   {
     eve_printf_debug("Failed to open device!\n");
-    return;
+    return false;
   }
 
   if (!EVE_Util_bootupConfig(phost))
   {
+    bootup_starting = 0;
     eve_printf_debug("Failed to bootup device!\n");
     EVE_Hal_close(phost);
-    return;
+    return false;
   }
-  
+  bootup_starting = 0;
   eve_eflash_init();
 
   g_HalOk = true;
@@ -215,12 +284,12 @@ void board_dfu_init(void)
   uint32_t flashStatus = EVE_CoCmd_flashFast(phost, &flashCode);
   if (flashCode)
   {
-      TU_LOG1("Flash error code: %x\n", flashCode);
-      TU_LOG1("Please upload the EVE firmware blob UF2\n");
+      eve_printf_debug("Flash error code: %x\n", flashCode);
+      eve_printf_debug("Please upload the EVE firmware blob UF2\n");
   }
   else
   {
-      TU_LOG1("Flash firmware blob OK\n");
+      eve_printf_debug("Flash firmware blob OK\n");
   }
 
   const char *flashStatusStr;
@@ -318,6 +387,7 @@ void board_dfu_init(void)
   EVE_CoDl_display(phost);
   EVE_CoCmd_swap(phost);
   EVE_Hal_flush(phost);
+  return true;
 }
 
 #if TINYUF2_DISPLAY

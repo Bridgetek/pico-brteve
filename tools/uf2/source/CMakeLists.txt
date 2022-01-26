@@ -15,11 +15,13 @@ SOURCE_GROUP("" FILES ${SRCS} ${HDRS})
 SOURCE_GROUP("tinyuf2" FILES usb_descriptors.c uf2.h screen.c msc.c images.c ghostfat.c compile_date.h board_api.h main.c)
 
 ADD_EXECUTABLE(eve_flash_pico ${SRCS} ${HDRS})
-
+ADD_DEFINITIONS(-DNDEBUG=1) # Prevent asserts fail in the TinyUSB
 #ADD_DEFINITIONS(-DTINYUF2_DISPLAY=0)
 
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  ADD_DEFINITIONS(-DCFG_TUSB_DEBUG=1)
+  ADD_DEFINITIONS(-D_DEBUG=1)
+  target_compile_definitions(eve_flash_pico PUBLIC _DEBUG=1)
+  add_compile_definitions(_DEBUG)
 ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 IF(EVE_APPS_PLATFORM STREQUAL "RP2040")
@@ -27,7 +29,6 @@ IF(EVE_APPS_PLATFORM STREQUAL "RP2040")
   INCLUDE("EveApps/pico_sdk_import.cmake")
   PROJECT("eve_flash_pico" C CXX ASM)
   
-
   # Initialise the Pico SDK
   pico_sdk_init()
 

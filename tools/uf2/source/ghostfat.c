@@ -133,12 +133,12 @@ char infoUf2File[512] =
 
 char infoSPIConfFile[128] =
     "MISO" ": 4  \r\n"
-    "CS"   ": 5  \r\n"
+    "CS"   ": 14  \r\n"
     "SCK"  ": 2  \r\n"
     "MOSI" ": 3  \r\n"
     "INT"  ": 6  \r\n"
     "PWD"  ": 7  \r\n"
-    "IO2"  ": 14 \r\n"
+    "IO2"  ": 5 \r\n"
     "IO3"  ": 15 \r\n";
 
 const char indexFile[] =
@@ -241,6 +241,7 @@ static uint32_t _flash_size;
 static uint32_t _start_cluster_nth = 0;
 static uint32_t _flash_read_count = 0;
 static absolute_time_t _last_time = 0;
+bool spi_changed = 0;
 
 /**
  * @brief Calculate duration in milisecond
@@ -501,6 +502,23 @@ int uf2_write_block (uint32_t block_no, uint8_t *data, WriteState *state)
   (void) block_no;
   UF2_Block *bl = (void*) data;
 
+  // Update SPI pins
+  if ( block_no < BPB_TOTAL_SECTORS ){
+   uint32_t sectionRelativeSector = block_no - FS_START_CLUSTERS_SECTOR;
+   uint32_t sectionRelativeClusterIndex = sectionRelativeSector / BPB_SECTORS_PER_CLUSTER;
+    
+   if (sectionRelativeClusterIndex == SPI_PIN_CNF_NTH){
+     printf("Updating new SPI pins, data = \n%s\n", data);
+     memcpy(infoSPIConfFile, data, strlen(data));
+     if(board_dfu_init()){
+        spi_changed = true;
+        board_flash_init();
+        uf2_init();
+      }
+     return -1;
+   }
+  }
+  
   if ( !is_uf2_block(bl) || // ignore if not a uf2 block
        !is_uf2_block_family(bl) || // disregard the entire block if family id does not match
        !is_uf2_block_flash(bl)) // skip writing if not intended to be flashed

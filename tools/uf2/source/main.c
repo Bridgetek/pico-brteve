@@ -31,6 +31,7 @@
 #include "board_api.h"
 #include "uf2.h"
 #include "tusb.h"
+#include "platform.h"
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -119,7 +120,7 @@ static bool check_dfu_mode(void)
 int main(void)
 {
   board_init();
-  TU_LOG1("TinyUF2\r\n");
+  eve_printf_debug("TinyUF2\r\n");
 
   // if not DFU mode, jump to App
   if ( !check_dfu_mode() )
@@ -127,10 +128,11 @@ int main(void)
     board_app_jump();
     while(1) {}
   }
-
-  board_dfu_init();
-  board_flash_init();
-  uf2_init();
+  
+  if(board_dfu_init()){
+    board_flash_init();
+    uf2_init();
+  }
   tusb_init();
 
   indicator_set(STATE_USB_UNPLUGGED);

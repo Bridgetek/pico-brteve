@@ -36,6 +36,7 @@ static uint32_t _write_ms;
 #endif
 
 static WriteState _wr_state = { 0 };
+extern bool spi_changed;
 
 //--------------------------------------------------------------------+
 // tinyusb callbacks
@@ -63,6 +64,14 @@ void tud_msc_inquiry_cb(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16
 bool tud_msc_test_unit_ready_cb(uint8_t lun)
 {
   (void) lun;
+
+  // RAM disk is ready until ejected
+  if (spi_changed) {
+    tud_msc_set_sense(lun, SCSI_SENSE_NOT_READY, 0x3a, 0x00);
+    spi_changed=false;
+    return false;
+  }
+
   return true;
 }
 
