@@ -38,14 +38,24 @@ static absolute_time_t s_LastBusyStart;
 static bool s_BusyWait;
 static bool s_BlockingWait;
 
+extern uint32_t bootup_starting ;
+extern uint32_t count_bootup_attempt ;
+
 bool cbCmdWait_uf2(EVE_HalContext* phost)
 {
-  if (s_BlockingWait)
+  if (bootup_starting){
+    if (count_bootup_attempt++ == 30){
+      eve_printf_debug("Coprocessor initialization timeout\n");
+      count_bootup_attempt = 0;
+      return false;
+    }
+  }
+  else if (s_BlockingWait)
   {
     int64_t diff = absolute_time_diff_us(s_LastBusyStart, get_absolute_time());
     if (diff > 3 * 1000 * 1000)
     {
-      TU_LOG1("Coprocessor timeout\n");
+      eve_printf_debug("Coprocessor timeout\n");
       s_LastBusyStart = get_absolute_time();
       return false;
     }
@@ -69,10 +79,10 @@ uint32_t board_flash_size(void)
     return 0;
 
   sz = EVE_Hal_rd32(phost, REG_FLASH_SIZE) * 1024 * 1024;
-  TU_LOG1("Flash size: %i\n", sz);
+  eve_printf_debug("Flash size: %i\n", sz);
   if (sz > CFG_UF2_FLASH_SIZE)
   {
-    TU_LOG1("Flash too large!\n");
+    eve_printf_debug("Flash too large!\n");
   }
   return min(sz, CFG_UF2_FLASH_SIZE);
 }
@@ -113,11 +123,11 @@ void board_flash_read(uint32_t addr, void* buffer, uint32_t len)
     EVE_CoCmd_flashFast(phost, &res);
     if (res)
     {
-      TU_LOG1("Flash error code: %x\n", res);
+      eve_printf_debug("Flash error code: %x\n", res);
     }
     if (!EVE_CoCmd_flashRead_flush(phost, OFFSET_RD, addr, len))
     {
-      TU_LOG1("Flash read failed at addr 0x%x!\n", addr);
+      eve_printf_debug("Flash read failed at addr 0x%x!\n", addr);
       memset(buffer, 0xFF, len);
 
 #if FAILURE_FORCE_RESET
@@ -143,7 +153,7 @@ static void board_flash_flush_pending()
     if (s_BlockFlags[2] == 0xFFFF || s_BlockFlags[cur])
     {
       // Flush previous page
-      // TU_LOG1("EVE_Cmd_waitFlush\n");
+      // eve_printf_debug("EVE_Cmd_waitFlush\n");
       s_BlockingWait = true;
       s_LastBusyStart = get_absolute_time();
       if (!EVE_Cmd_waitFlush(phost))
@@ -154,7 +164,7 @@ static void board_flash_flush_pending()
         EVE_CoCmd_flashUpdate(phost, s_LastPage << 12, s_RamOffset[cur ? 0 : 1], FLASH_PAGE_SIZE);
         if (!EVE_Cmd_waitFlush(phost))
         {
-          TU_LOG1("Flash write failed at addr 0x%x!\n", s_LastPage << 12);
+          eve_printf_debug("Flash write failed at addr 0x%x!\n", s_LastPage << 12);
           g_HalFlashOk = false;
 
 #if FAILURE_FORCE_RESET
@@ -184,7 +194,7 @@ static void board_flash_flush_pending()
       EVE_CoCmd_flashUpdate(phost, 0, OFFSET_FW, FLASH_PAGE_SIZE);
       if (!EVE_Cmd_waitFlush(phost))
       {
-        TU_LOG1("Flash write failed at addr 0!\n");
+        eve_printf_debug("Flash write failed at addr 0!\n");
         g_HalFlashOk = false;
 
 #if FAILURE_FORCE_RESET
@@ -195,18 +205,18 @@ static void board_flash_flush_pending()
     }
 
     // Reset
-    TU_LOG1("Flash firmware blob updated\n", res);
+    eve_printf_debug("Flash firmware blob updated\n", res);
     EVE_CoCmd_flashDetach(phost);
     EVE_Util_resetCoprocessor(phost);
-    TU_LOG1("Enter fast flash mode\n");
+    eve_printf_debug("Enter fast flash mode\n");
     EVE_CoCmd_flashFast(phost, &res);
     if (res)
     {
-      TU_LOG1("Flash error code: %x\n", res);
+      eve_printf_debug("Flash error code: %x\n", res);
     }
 
     // Firmware written
-    TU_LOG1("Ready\n");
+    eve_printf_debug("Ready\n");
     s_BlockFlags[2] = 0;
     s_BlockingWait = false;
   }
@@ -224,9 +234,9 @@ static void board_flash_flush_pending()
           int32_t o = i * 256;
           int32_t src = (curPage << 12) + o;
           int32_t dst = s_RamOffset[cur] + o;
-          // TU_LOG1("EVE_CoCmd_flashRead\n");
+          // eve_printf_debug("EVE_CoCmd_flashRead\n");
           EVE_CoCmd_flashRead(phost, dst, src, FLASH_PAGE_SIZE);
-          TU_LOG1("Data missing at 0x%x\n", (int)src);
+          eve_printf_debug("Data missing at 0x%x\n", (int)src);
         }
       }
       s_BlockFlags[2] = 0;
@@ -234,7 +244,7 @@ static void board_flash_flush_pending()
     }
 
     // Write complete block at once
-    // TU_LOG1("EVE_CoCmd_flashUpdate %x %x %i\n", curPage << 12, s_RamOffset[cur], FLASH_PAGE_SIZE);
+    // eve_printf_debug("EVE_CoCmd_flashUpdate %x %x %i\n", curPage << 12, s_RamOffset[cur], FLASH_PAGE_SIZE);
     EVE_CoCmd_flashUpdate(phost, curPage << 12, s_RamOffset[cur], FLASH_PAGE_SIZE);
     s_LastPage = curPage;
     
@@ -258,11 +268,11 @@ void board_flash_flush()
   // Check firmware block
   if (s_BlockFlags[2])
   {
-    TU_LOG1("Firmware incomplete, not written!\n");
+    eve_printf_debug("Firmware incomplete, not written!\n");
   }
 
   // Flush coprocessor
-  TU_LOG1("Flash flush\n");
+  eve_printf_debug("Flash flush\n");
   EVE_Cmd_waitFlush(phost);
 }
 
@@ -280,7 +290,7 @@ bool board_flash_busy()
     int64_t diff = absolute_time_diff_us(s_LastBusyStart, get_absolute_time());
     if (diff > 3 * 1000 * 1000)
     {
-      TU_LOG1("Timeout while busy\n");
+      eve_printf_debug("Timeout while busy\n");
       s_BusyWait = false;
       return false;
     }
@@ -309,7 +319,7 @@ void board_flash_write(uint32_t addr, void const *data, uint32_t len)
   int cur;
   if (addr < FLASH_PAGE_SIZE)
   {
-    TU_LOG1("Write firmware addr 0x%x\n", addr);
+    eve_printf_debug("Write firmware addr 0x%x\n", addr);
     cur = 2; /* Special buffer for first page */
   }
   else
@@ -324,7 +334,7 @@ void board_flash_write(uint32_t addr, void const *data, uint32_t len)
   }
   int block = (addr >> 8) & 0xF; // 0 to 16
   uint32_t dst = s_RamOffset[cur] + (block << 8);
-  // TU_LOG1("EVE_Hal_wrMem %x %i\n", dst, len);
+  // eve_printf_debug("EVE_Hal_wrMem %x %i\n", dst, len);
   EVE_Hal_wrMem(phost, dst, data, len);
 #if MATRIX_RAIN
   // EVE_Hal_wr32(phost, REG_MACRO_0, BITMAP_TRANSFORM_F(-addr));

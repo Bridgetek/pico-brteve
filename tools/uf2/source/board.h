@@ -61,4 +61,16 @@ extern unsigned char g_DeviceName[64];
 // Size of firmware that is device family specific
 #define EVE_FLASH_FIRMWARE_SIZE 4096
 
+typedef struct spi_pins
+{
+    uint32_t MISO ;
+    uint32_t CS   ;
+    uint32_t SCK  ;
+    uint32_t MOSI ;
+    uint32_t INT  ;
+    uint32_t PWD  ;
+    uint32_t IO2  ;
+    uint32_t IO3  ;
+}spi_pins;
+
 #endif

@@ -89,7 +89,7 @@ bool board_app_valid(void);
 void board_app_jump(void);
 
 // Init DFU process
-void board_dfu_init(void);
+bool board_dfu_init(void);
 
 // DFU is complete, should reset or jump to application mode and not return
 void board_dfu_complete(void);
