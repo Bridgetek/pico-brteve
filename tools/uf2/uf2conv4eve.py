@@ -131,16 +131,59 @@ def convert_to_uf2(eve3_firmware, eve4_firmware, file_content):
 def to_str(b):
     return b.decode("utf-8")
 
+def get_drives_win32_wmic_portable():
+    drives = []
+    # command = wmic PATH Win32_LogicalDisk get DeviceID, VolumeName, FileSystem,  DriveType
+    r = subprocess.check_output(["wmic\\wmic", "PATH", "Win32_LogicalDisk",
+                                 "get", "DeviceID,", "VolumeName,",
+                                 "FileSystem,", "DriveType"])
+    for line in to_str(r).split('\n'):
+        words = re.split('\s+', line)
+        if len(words) >= 3 and words[1] == "2" and words[2] == "FAT":
+            drives.append(words[0])
+    return drives
+
+def get_drives_win32_wmic_system():
+    drives = []
+    # command = wmic PATH Win32_LogicalDisk get DeviceID, VolumeName, FileSystem,  DriveType
+    r = subprocess.check_output(["wmic", "PATH", "Win32_LogicalDisk",
+                                 "get", "DeviceID,", "VolumeName,",
+                                 "FileSystem,", "DriveType"])
+    for line in to_str(r).split('\n'):
+        words = re.split('\s+', line)
+        if len(words) >= 3 and words[1] == "2" and words[2] == "FAT":
+            drives.append(words[0])
+    return drives
+    
+def get_drives_win32_powershell():
+    drives = []
+    r = subprocess.check_output(["PowerShell ", "Get-CimInstance -ClassName Win32_LogicalDisk | Format-Table",
+                                "DeviceID,DriveType,FileSystem,VolumeNam"])
+    for line in to_str(r).split('\n'):
+        words = re.split('\s+', line)
+        if len(words) >= 3 and words[1] == "2" and words[2] == "FAT":
+            drives.append(words[0])
+    return drives
+    
 def get_drives():
     drives = []
     if sys.platform == "win32":
-        r = subprocess.check_output(["wmic", "PATH", "Win32_LogicalDisk",
-                                     "get", "DeviceID,", "VolumeName,",
-                                     "FileSystem,", "DriveType"])
-        for line in to_str(r).split('\n'):
-            words = re.split('\s+', line)
-            if len(words) >= 3 and words[1] == "2" and words[2] == "FAT":
-                drives.append(words[0])
+        try:
+          drives = get_drives_win32_powershell()
+        except:
+          pass
+        
+        try:
+            if not drives:
+                drives = get_drives_win32_wmic_portable()
+        except:
+          pass
+        
+        try:
+            if not drives:
+                drives = get_drives_win32_wmic_system()
+        except:
+          pass
     else:
         rootpath = "/media"
         if sys.platform == "darwin":
@@ -151,7 +194,6 @@ def get_drives():
                 rootpath = tmp
         for d in os.listdir(rootpath):
             drives.append(os.path.join(rootpath, d))
-
 
     def has_info(d):
         try:
@@ -206,7 +248,31 @@ def write_file(name, buf):
     #     f.write(buf)
     print("Wrote %d bytes to %s" % (len(buf), name))
 
-
+def pin_select(args):
+    pins=[
+        ["MISO", 4 ],
+        ["CS"  , 5 ],
+        ["SCK" , 2 ],
+        ["MOSI", 3 ],
+        ["INT" , 6 ],
+        ["PWD" , 7 ],
+        ["IO2" , 14],
+        ["IO3" , 15],
+    ]
+    spliter='-'
+    for arg in args[0]:
+        pin_nth = 0 
+        for i, pin in enumerate(pins):
+            print(pin)
+            pin_name_pos=arg.find(spliter)
+            if arg[0:pin_name_pos].upper() ==  pin[0]:
+                pins[i][1] = arg[pin_name_pos+1::]
+            
+    print("Setting SPI pin:", pins)
+    
+    with open(name, "wb") as f:
+        f.write(buf[s:s + 8192])
+    
 def main():
     def error(msg):
         print(msg)
@@ -232,6 +298,8 @@ def main():
                         help='wait for original drive to come back up')
     parser.add_argument('-k' , '--keep', action='store_true',
                         help='keep the original firmware if flash is already in full mode (does not work if input is already in uf2)')
+    parser.add_argument('-p' , '--pin', dest='pin', type=str, action='append', nargs='*',
+                        help='Set the pin assignment of Eve SPI interface')
     args = parser.parse_args()
 
     if args.list:
@@ -243,6 +311,9 @@ def main():
                 inpbuf = f.read()
         eve3blob = []
         eve4blob = []
+        if args.pin:
+            pin_select(args.pin)
+            
         if args.firmware:
             for fw in args.firmware:
                 if len(fw) == 0:
