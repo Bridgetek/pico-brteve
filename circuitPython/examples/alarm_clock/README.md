@@ -13,6 +13,9 @@ Tested with CircuitPython version 7.0.0
 
 ## STARTUP
 - Start MM2040EV with adafruit-circuitpython-raspberry_pi_pico-en_US-7.0.0-alpha.3.uf2
+
+  Follow this guideline: https://learn.adafruit.com/intro-to-rp2040-pio-with-circuitpython/installing-circuitpython
+
 - Copy source code in Python into CircuitPython drive:
     + lib (which include "bteve" folder )
     + code.py
