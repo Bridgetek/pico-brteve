@@ -70,13 +70,13 @@
       https://io.adafruit.com/tuan_nguyen_brtchip/dashboards/test1?kiosk=true
 
     - Touch on screen to show an image on internet
-      Images are downloaded from this hosting: http://ancuviet.com:
-         + http://ancuviet.com/image0006.jpg
-         + http://ancuviet.com/image0005.jpg
-         + http://ancuviet.com/image0004.jpg
-         + http://ancuviet.com/image0003.jpg
-         + http://ancuviet.com/image0002.jpg
-         + http://ancuviet.com/image0001.jpg
+      Images are downloaded from this folder: https://github.com/BRTSG-FOSS/pico-brteve/tree/main/circuitPython/examples/internet-data-display/images/
+         + image0006.jpg
+         + image0005.jpg
+         + image0004.jpg
+         + image0003.jpg
+         + image0002.jpg
+         + image0001.jpg
      - Touch "Back" button to switch back to sensor data page
 
 

@@ -173,7 +173,7 @@ class internet_display:
 
         imagepath='/sd/image_downloaded.jpg'
         while 1:
-            img = 'http://ancuviet.com/' + img_array[self._ast_img_id]
+            img = 'https://github.com/BRTSG-FOSS/pico-brteve/tree/main/circuitPython/examples/internet-data-display/images/' + img_array[self._ast_img_id]
             page2.message('Downloading ' + img, ' ')
 
             try:
