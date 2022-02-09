@@ -65,8 +65,8 @@ class wifi():
     def get(self, url):
         return requests.get(url)
 
-    def request(self, url):
-        return requests.request(url)
+    def request(self, method, url):
+        return requests.request(method, url)
 
     def get_raw(self, url):
         print("Fetching text from", url)
