@@ -186,9 +186,11 @@ class internet_display:
             else:
                 self.page_2_update()
 
-            if self.isTouch() != 0:
-                self._last_touch = 0
-                _page_active = (_page_active+1) % 2
+            for i in range(30):
+                if self.isTouch() != 0:
+                    self._last_touch = 0
+                    _page_active = (_page_active+1) % 2
+                    break
 
     def init_screen(self, message, step, totalstep, skip_button = True):
         eve=self.eve
@@ -238,8 +240,7 @@ class internet_display:
                 r=self.wifi.get(img)
             except Exception as e:
                 print(e, img)
-                time.sleep(1)
-                continue
+                return
             t=r.iter_content(chunk_size=(64 * 4))
             num=0
 
