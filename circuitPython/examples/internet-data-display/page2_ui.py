@@ -27,17 +27,27 @@ class Page2_UI:
     def message(self, title, info):
         eve=self.eve
 
+        text = title + "\n\n" + info
+        new_input = ""
+        for i, letter in enumerate(text):
+            if i % 50 == 0:
+                new_input += '\n'
+            new_input += letter
+
+        # this is just because at the beginning too a `\n` character gets added
+        text = new_input[1:]
+
         eve.ClearColorRGB(255, 255, 255)
         eve.Clear()
         eve.ColorRGB(255, 255, 255)
         eve.VertexFormat(4)
 
-        tx=eve.lcd_width/2 - len(title) * 5
+        tx=eve.lcd_width/2
         ty=eve.lcd_height/2
 
         eve.ColorRGB(0, 0, 0)
-        eve.cmd_text(tx, ty, 30, 0, title)
-        eve.cmd_text(tx, ty + 50, 25, 0, info)
+        eve.cmd_fillwidth(eve.lcd_width / 2)
+        eve.cmd_text(tx, ty, 30, eve.OPT_CENTERX | eve.OPT_FILL, text)
         eve.swap()
 
     def draw_image(self, img, title):
