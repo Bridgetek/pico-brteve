@@ -682,15 +682,18 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
                 if offset:
                     file_handler.seek(offset)
 
+                remain = nbytes
                 while (file_size > 0 and sent < nbytes) :
-                    data = file_handler.read(buffer_size)
-                    blocklen = len(data)
+                    blocklen = remain if buffer_size>remain else buffer_size
                     if (sent + blocklen) > nbytes:
                         blocklen = nbytes - sent
+                    data = file_handler.read(blocklen)
 
-                    eve.write_mem(addr, data, blocklen)
+                    eve.write_mem(addr, data)
                     file_size -= blocklen
+                    remain -= blocklen
                     sent += blocklen
+                    addr += blocklen
         except OSError as exception:
             print("Unable to open file: ", file)
             print(exception)
@@ -715,7 +718,7 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
         """
         eve = self.eve
         try:
-            with open(file, "rb") as file_handler:
+            with open(file, "wb") as file_handler:
                 block = 0
                 offset = 0
                 while size > 0:
