@@ -41,7 +41,6 @@ add_executable(${PROJECT_NAME}
         lib/eve_ui/ports/eve_arch_rpi/eve_ui_mcu_rp2040.c
         lib/eve_ui/source/eve_ram_g.c
         # Source code
-        assets/fonts.c
         assets/images_raw.s
         assets/images_array.c
 )
