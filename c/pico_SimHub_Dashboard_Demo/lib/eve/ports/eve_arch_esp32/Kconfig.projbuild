@@ -1,0 +1,15 @@
+menu "EVE Configuration"
+
+config FT8XX_TYPE
+    string "EVE Device"
+	default "FT812"
+	help
+		Choose from FT811, FT812.
+
+config FT8XX_DISPLAY
+    string "EVE Display Size"
+	default "WVGA"
+	help
+		Choose from WVGA (800x480)
+
+endmenu
