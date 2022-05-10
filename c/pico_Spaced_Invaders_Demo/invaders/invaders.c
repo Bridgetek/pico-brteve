@@ -1085,7 +1085,7 @@ static void invaders_render_text(uint16_t xcrd, uint16_t ycrd, uint8_t *text)
 		if (*text == 'I')
 		{
 			// need to centre the letter 'I' ...
-			bitmap_draw(xcrd + (1 * ZOOM), ycrd, FIXED_FONT, *text);
+			bitmap_draw(xcrd + 2, ycrd, FIXED_FONT, *text);
 		}
 		else
 		{
