@@ -83,6 +83,14 @@
 const uint LED_PIN = PICO_DEFAULT_LED_PIN;
 
 /**
+ * @brief Pins for GPIO for the controller.
+ * 
+ */
+const uint FIRE_PIN = 28;
+const uint LEFT_PIN = 27;
+const uint RIGHT_PIN = 26;
+
+/**
  @brief Page number in datalogger memory in Flash for touchscreen calibration
  values.
  */
@@ -101,6 +109,21 @@ void setup(void);
 void led_state(uint8_t state)
 {
     gpio_put(LED_PIN, state);
+}
+
+uint8_t fire_button_state(void)
+{
+    return gpio_get(FIRE_PIN);
+}
+
+uint8_t left_button_state(void)
+{
+    return gpio_get(LEFT_PIN);
+}
+
+uint8_t right_button_state(void)
+{
+    return gpio_get(RIGHT_PIN);
 }
 
 /* FUNCTIONS ***********************************************************************/
@@ -136,21 +159,35 @@ void setup(void)
     // Turn on the pico LED to show activity
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
-    gpio_put(LED_PIN, 0);
+    gpio_put(LED_PIN, 1);
     
-#ifdef DEBUG
+    // Turn on the pico GPIO for buttons and joystick
+    gpio_init(FIRE_PIN);
+    gpio_set_dir(FIRE_PIN, GPIO_IN);
+    gpio_set_pulls(FIRE_PIN, true, false);
+    gpio_init(LEFT_PIN);
+    gpio_set_dir(LEFT_PIN, GPIO_IN);
+    gpio_set_pulls(LEFT_PIN, true, false);
+    gpio_init(RIGHT_PIN);
+    gpio_set_dir(RIGHT_PIN, GPIO_IN);
+    gpio_set_pulls(RIGHT_PIN, true, false);
+ 
+ #ifdef DEBUG
     /* Print out a welcome message... */
     printf ("(C) Copyright, Bridgetek Pte. Ltd. \r\n \r\n");
     printf ("---------------------------------------------------------------- \r\n");
     printf ("Welcome to Raspberry Pi Pico RP2040 Spaced Invaders\r\n");
     printf ("\n");
 	printf ("Pin configuration for example:\n");
-	printf ("Use SPI 1 hardware bus to match IDM2040-7A from Bridgetek\n");
-	printf ("Pin 15 - MOSI (GPIO11)\n");
-	printf ("Pin 16 - MISO (GPIO12)\n");
-	printf ("Pin 14 - SCLK (GPIO10)\n");
-	printf ("Pin 17 - CS (GPIO13) - Note this is not the SPI0_CS0 pin\n");
-	printf ("Pin 10 - PD# (GPIO7) - Powerdown pin\n");
+	printf ("Use SPI 0 hardware bus to match IDM2040-7A from Bridgetek\n");
+	printf ("Pin 5 - MOSI (GPIO3)\n");
+	printf ("Pin 6 - MISO (GPIO4)\n");
+	printf ("Pin 4 - SCLK (GPIO2)\n");
+	printf ("Pin 7 - CS (GPIO5) - Note this is not the SPI0_CS0 pin\n");
+	printf ("Pin 20 - PD# (GPIO15) - Powerdown pin\n");
+	printf ("Pin 34 - Fire/Start Button - pulled up (GPIO28)\n");
+	printf ("Pin 32 - Left Button - pulled up (GPIO27)\n");
+	printf ("Pin 31 - Right Button - pulled up (GPIO26)\n");
 	printf ("Pin 40 - 5v supply for FT8xx\n");
 	printf ("Pin 23 - signal GND for SPI\n");
 #endif

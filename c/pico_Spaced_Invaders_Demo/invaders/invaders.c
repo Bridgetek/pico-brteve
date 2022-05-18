@@ -10,10 +10,18 @@
 
 #include "example.h"
 
+extern uint8_t right_button_state(void);
+extern uint8_t fire_button_state(void);
+extern uint8_t left_button_state(void);
+
 // =================================================================================================================
 // Screen Zoom factor
 // =================================================================================================================
+#if (DISPLAY_RES == WQVGA)
+#define ZOOM 1
+#elif (DISPLAY_RES == WVGA)
 #define ZOOM 2
+#endif
 
 // =================================================================================================================
 // Spaced Invaders - #defines
@@ -66,7 +74,7 @@
 
 // Player specific info ...
 #define PLAYERS_TOTL 1 // Total number of players
-#define PLAYERS_XPOS 16 
+#define PLAYERS_XPOS ((PLAYERS_XMIN + PLAYERS_XMAX)/2)
 #define PLAYERS_YPOS (8 * 27)
 #define PLAYERS_XPIX 15
 #define PLAYERS_YPIX 8
@@ -460,7 +468,11 @@ static void setup_object(invader_object_t *data, uint8_t xcrd, uint8_t ycrd, uin
 
 static inline void bitmap_draw(uint16_t xcrd, uint16_t ycrd, char hndl, char cell)
 {
+#if !defined (EVE1_ENABLE)
 	EVE_VERTEX2II((xcrd * ZOOM), (ycrd * ZOOM), hndl, cell);
+#else // !defined (EVE1_ENABLE)
+	EVE_VERTEX2II(DISPLAY_XOFF + (xcrd * ZOOM), DISPLAY_YOFF + (ycrd * ZOOM), hndl, cell);
+#endif // !defined (EVE1_ENABLE)
 }
 
 // Initialisation
@@ -1073,11 +1085,11 @@ static void invaders_render_text(uint16_t xcrd, uint16_t ycrd, uint8_t *text)
 		if (*text == 'I')
 		{
 			// need to centre the letter 'I' ...
-			bitmap_draw(xcrd + (1 * ZOOM), ycrd, FIXED_FONT, *text);
+			bitmap_draw(xcrd + 2, ycrd, FIXED_FONT, *text);
 		}
 		else
 		{
-			bitmap_draw(xcrd, ycrd, 20, *text);
+			bitmap_draw(xcrd, ycrd, FIXED_FONT, *text);
 		}
 		xcrd += 8;
 	} while (*++text != 0);
@@ -1264,6 +1276,7 @@ static void invaders_render_background()
 	EVE_CMD_GRADIENT(0, 0, EVE_ENC_COLOR_RGB(7, 22, 35), 0, EVE_DISP_HEIGHT, EVE_ENC_COLOR_RGB(0, 46, 51));
 	EVE_END();
 
+#if !defined(EVE1_ENABLE)
 	// Render moon ... yes, I know ... it's not very moon like (needs some craters)!
 	EVE_BEGIN(EVE_BEGIN_POINTS);
 	// Add some alpha blending ...
@@ -1277,7 +1290,8 @@ static void invaders_render_background()
 		size += 3;
 	}
 	EVE_END();
-
+#endif
+#
 	// Render rectangle outlining actual play area (aiming for a raised panel look) ...
 	EVE_BEGIN(EVE_BEGIN_LINE_STRIP);
 	EVE_COLOR_RGB(96, 96, 96);
@@ -1303,8 +1317,12 @@ static void invaders_render_background()
 
 static void render_play(void)
 {
+#if defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	EVE_VERTEX_TRANSLATE_X(DISPLAY_XOFF << 4);
 	EVE_VERTEX_TRANSLATE_Y(DISPLAY_YOFF << 4);
+#else
+	EVE_CMD_TRANSLATE(DISPLAY_XOFF << 16, DISPLAY_YOFF << 16);
+#endif // defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	EVE_BEGIN(EVE_BEGIN_BITMAPS);
 
@@ -1321,8 +1339,12 @@ static void render_play(void)
 
 static void render_buttons()
 {
+#if defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	EVE_VERTEX_TRANSLATE_X(0 << 4);
 	EVE_VERTEX_TRANSLATE_Y(0 << 4);
+#else
+	EVE_CMD_TRANSLATE(DISPLAY_XOFF << 16, DISPLAY_YOFF << 16);
+#endif // defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	// Add invisible control buttons to display list ...
 	EVE_COLOR_MASK(0, 0, 0, 0);
@@ -1348,8 +1370,12 @@ static void render_buttons()
 
 static void render_start_button()
 {
+#if defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	EVE_VERTEX_TRANSLATE_X(0 << 4);
 	EVE_VERTEX_TRANSLATE_Y(0 << 4);
+#else
+	EVE_CMD_TRANSLATE(DISPLAY_XOFF << 16, DISPLAY_YOFF << 16);
+#endif // defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	// Add invisible control buttons to display list ...
 	EVE_COLOR_MASK(0, 0, 0, 0);
@@ -1432,6 +1458,19 @@ static void check_buttons()
 		uint8_t tagTouch = HAL_MemRead8(EVE_REG_TOUCH_TAG);
 		uint8_t randInvader = 0;
 
+		if (fire_button_state() == 0)
+		{
+			tagTouch = BUTTON_FIRE;
+		}
+		if (left_button_state() == 0)
+		{
+			tagTouch = BUTTON_LEFT;
+		}
+		if (right_button_state() == 0)
+		{
+			tagTouch = BUTTON_RIGHT;
+		}
+
 		switch (tagTouch)
 		{
 		case BUTTON_LEFT:
@@ -1480,6 +1519,19 @@ static void wait_for_button(uint8_t button)
 
 		uint8_t tagTouch = HAL_MemRead8(EVE_REG_TOUCH_TAG);
 
+		if (fire_button_state() == 0)
+		{
+			tagTouch = BUTTON_FIRE;
+		}
+		if (left_button_state() == 0)
+		{
+			tagTouch = BUTTON_LEFT;
+		}
+		if (right_button_state() == 0)
+		{
+			tagTouch = BUTTON_RIGHT;
+		}
+
 		if (tagTouch == button)
 		{
 			break;
@@ -1497,12 +1549,14 @@ static void wait_for_start()
 	// add background and startup text ...
 	invaders_render_background();
 
+#if defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	EVE_CMD_LOADIDENTITY();
 	EVE_CMD_SCALE(ZOOM * 65536, ZOOM * 65536);
 	EVE_CMD_SETMATRIX();
 
 	EVE_VERTEX_TRANSLATE_X(DISPLAY_XOFF << 4);
 	EVE_VERTEX_TRANSLATE_Y(DISPLAY_YOFF << 4);
+#endif // defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	EVE_BEGIN(EVE_BEGIN_BITMAPS);
 
