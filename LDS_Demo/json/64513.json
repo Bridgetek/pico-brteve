@@ -1,0 +1,117 @@
+{
+    "OBJ": "32779",
+    "VER": "1.00",
+    "CAP": "1",
+    "NAME": "CO2-S2 Sensor",
+    "SNS": [{
+            "NAME": "CO2",
+            "MFI": "Sensirion",
+            "PART": "SCD4x",
+            "REGSIZE": "1",
+            "ADDRESS": "97",
+            "BOMID": "1234",
+            "CLS": "772",
+            "VSPEC": "1234",
+            "SAID": "0",
+            "UNIT": "ppm",
+            "FORMAT": "integer",
+            "REPORTRATE": "1000",
+            "TYPE": "INPUT",
+            "ACCURACY": "2",
+            "MIN":"400",
+            "MAX":"8000"
+        },
+        {
+            "NAME": "Temperature",
+            "MFI": "Texas Instrument",
+            "PART": "HDC1080",
+            "REGSIZE": "1",
+            "ADDRESS": "64",
+            "BOMID": "1234",
+            "CLS": "256",
+            "VSPEC": "1234",
+            "SAID": "1",
+            "UNIT": "C",
+            "FORMAT": "float",
+            "REPORTRATE": "1000",
+            "TYPE": "INPUT",
+            "OPTIONS": ["MODE"],
+            "MODE": [{
+                    "ID": "0",
+                    "NAME": "14bit mode",
+                    "MIN": "-25",
+                    "MAX": "150",
+                    "ACCURACY": "2",
+                    "DESCRIPTION": ""
+                },
+                {
+                    "ID": "1",
+                    "NAME": "11bit mode",
+                    "MIN": "-25",
+                    "MAX": "150",
+                    "ACCURACY": "2",
+                    "DESCRIPTION": ""
+                },
+                {
+                    "ID": "255",
+                    "NAME": "Custom",
+                    "MIN": "-25",
+                    "MAX": "150",
+                    "ACCURACY": "2",
+                    "DESCRIPTION": ""
+                }
+            ]
+        },
+        {
+            "NAME": "Humidity",
+            "MFI": "Texas Instrument",
+            "PART": "HDC1080",
+            "REGSIZE": "1",
+            "ADDRESS": "64",
+            "BOMID": "1234",
+            "CLS": "512",
+            "VSPEC": "1234",
+            "SAID": "2",
+            "UNIT": "%",
+            "FORMAT": "float",
+            "REPORTRATE": "1000",
+            "TYPE": "INPUT",
+            "OPTIONS": ["MODE"],
+            "MODE": [{
+                    "ID": "0",
+                    "NAME": "14bit mode",
+                    "MIN": "0",
+                    "MAX": "100",
+                    "ACCURACY": "2",
+                    "DESCRIPTION": ""
+                },
+                {
+                    "ID": "1",
+                    "NAME": "11bit mode",
+                    "MIN": "0",
+                    "MAX": "100",
+                    "ACCURACY": "2",
+                    "DESCRIPTION": ""
+                }
+            ]
+        },
+        {
+            "NAME": "Ambient Light",
+            "MFI": "BH1730",
+            "PART": "BH1730",
+            "REGSIZE": "1",
+            "ADDRESS": "29",
+            "BOMID": "1234",
+            "CLS": "1024",
+            "VSPEC": "1234",
+            "SAID": "3",
+            "FORMAT": "integer",
+            "REPORTRATE": "1000",
+            "TYPE": "INPUT",
+            "UNIT": "LUX",
+            "ACCURACY": "0",
+            "MIN": "0",
+            "MAX": "100000"
+        }
+    ]
+}

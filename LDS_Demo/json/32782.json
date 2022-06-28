@@ -1,0 +1,35 @@
+{
+  "OBJ": "32782",
+  "VER": "1.00",
+  "CAP": "0",
+  "NAME": "ORP Sensor",
+  "SNS": [
+    {
+      "NAME": "ORP Sensor",
+      "MFI": "Bridgetek Pte Ltd.",
+      "PART": "LS0XXX",
+      "REGSIZE": "0",
+      "ADDRESS": "0",
+      "BOMID": "0",
+      "CLS": "2308",
+      "VSPEC": "0000",
+      "SAID": "0",
+      "UNIT" : "mV",
+      "UNIT_LIST": {
+        "DEFAULT": "0",
+        "OPTIONS": [
+          {
+            "MES": "Millivolts",
+            "UNIT": "mV"
+          }
+        ]
+      },
+      "FORMAT": "integer",
+      "REPORTRATE": "1000",
+      "TYPE": "INPUT",
+      "ACCURACY": "0",
+      "MIN": "-2000",
+      "MAX": "2000"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+    "OBJ": "32780",
+    "VER": "1.00",
+    "CAP": "0",
+    "NAME": "DO Sensor",
+    "SNS": [{
+        "NAME": "DO Sensor",
+        "MFI": "BridgeTek Pte Ltd.",
+        "PART": "LS0XXX",
+        "REGSIZE": "0",
+        "ADDRESS": "0",
+        "BOMID": "1234",
+        "CLS": "773",
+        "VSPEC": "1234",
+        "SAID": "0",
+        "UNIT": "mg/L",
+        "FORMAT": "float",
+        "REPORTRATE": "1000",
+        "TYPE": "INPUT",
+        "ACCURACY": "0",
+        "MIN": "5",
+        "MAX": "14"
+    }]
+}

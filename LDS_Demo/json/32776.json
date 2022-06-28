@@ -1,0 +1,26 @@
+{
+  "OBJ": "32776",
+  "VER": "1.00",
+  "CAP": "0",
+  "NAME": "pH Sensor",
+  "SNS": [
+    {
+      "NAME": "pH",
+      "MFI": "BridgeTek",
+      "PART": "pH Sensor",
+      "REGSIZE": "0",
+      "ADDRESS": "0",
+      "BOMID": "1234",
+      "CLS": "2304",
+      "VSPEC": "1234",
+      "SAID": "0",
+      "UNIT": "pH",
+      "FORMAT": "integer",
+      "REPORTRATE" : "1000",
+      "TYPE": "INPUT",	  
+      "ACCURACY": "0",
+      "MIN": "0",
+      "MAX": "14"
+    }    
+  ]
+}

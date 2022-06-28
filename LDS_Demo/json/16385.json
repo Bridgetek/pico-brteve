@@ -1,0 +1,201 @@
+{
+    "OBJ": "16385",
+    "VER": "1.00",
+    "CAP": "0",
+    "NAME": "Relay Controller",
+    "SNS": [
+        {
+            "NAME": "Relay - CH 1",
+            "MFI": "Bridgetek Pte Ltd.",
+            "REGSIZE": "0",
+            "PART": "LS0XXX",
+            "ADDRESS": "88",
+            "BOMID": "1234",
+            "CLS": "32768",
+            "VSPEC": "XXXX",
+            "SAID": "0",
+            "UNIT": "",
+            "FORMAT": "integer",
+            "REPORTRATE": "1000",
+            "TYPE": "OUTPUT",
+            "ACCURACY": "0",
+            "MIN": "0",
+            "MAX": "1",
+            "OPTIONS": [
+                "MODE"
+            ],
+            "MODE": [
+                {
+                    "NAME": "Static",
+                    "ID": "0",
+                    "MIN": "0",
+                    "MAX": "1",
+                    "ACCURACY": "0",
+                    "VALUETYPE": "boolean",
+                    "DESCRITPTION": "Logic mode On/Off"
+                },
+                {
+                    "NAME": "Loop",
+                    "ID": "1",
+                    "MIN": "",
+                    "MAX": "",
+                    "VALUETYPE": "int",
+                    "ACCURACY": "",
+                    "DESCRITPTION": "Loop mode On/Off",
+                    "CTRL_OPTIONS": [
+                        "ENABLE_WITH",
+                        "LOOP_CNT",
+                        "ACTIVATE_TIMER",
+                        "DEACTIVATE_TIMER"
+                    ],
+                    "ENABLE_WITH": {
+                        "TYPE": "Select",
+                        "OPTIONS": [
+                            "ACTIVATED",
+                            "DEACTIVATED"
+                        ],
+                        "UNIT": ""
+                    },
+                    "LOOP_CNT": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": ""
+                    },
+                    "ACTIVATE_TIMER": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": "Secs"
+                    },
+                    "DEACTIVATE_TIMER": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": "Secs"
+                    }
+                },
+                {
+                    "NAME": "Timer Conditioned",
+                    "ID": "2",
+                    "VALUETYPE": "int",
+                    "ACCURACY": "",
+                    "CTRL_OPTIONS": [
+                        "ENABLE_WITH",
+                        "TIMER"
+                    ],
+                    "ENABLE_WITH": {
+                        "TYPE": "Select",
+                        "OPTIONS": [
+                            "ACTIVATED",
+                            "DEACTIVATED"
+                        ],
+                        "UNIT": ""
+                    },
+                    "TIMER": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": "Secs"
+                    }
+                }
+            ]
+        },
+        {
+            "NAME": "Relay - CH 2",
+            "MFI": "Bridgetek Pte Ltd.",
+            "REGSIZE": "0",
+            "PART": "LS0XXX",
+            "ADDRESS": "88",
+            "BOMID": "1234",
+            "CLS": "32768",
+            "VSPEC": "XXXX",
+            "SAID": "1",
+            "UNIT": "",
+            "FORMAT": "integer",
+            "REPORTRATE": "1000",
+            "TYPE": "OUTPUT",
+            "ACCURACY": "0",
+            "MIN": "0",
+            "MAX": "1",
+            "OPTIONS": [
+                "MODE",
+                "POLARITY"
+            ],
+            "MODE": [
+                {
+                    "NAME": "Static",
+                    "ID": "0",
+                    "MIN": "0",
+                    "MAX": "1",
+                    "ACCURACY": "0",
+                    "VALUETYPE": "boolean",
+                    "DESCRITPTION": "Logic mode On/Off",
+                    "DEFAULT": "false"
+                },
+                {
+                    "NAME": "Loop",
+                    "ID": "1",
+                    "VALUETYPE": "int",
+                    "ACCURACY": "",
+                    "CTRL_OPTIONS": [
+                        "ENABLE_WITH",
+                        "LOOP_CNT",
+                        "ACTIVATE_TIMER",
+                        "DEACTIVATE_TIMER"
+                    ],
+                    "ENABLE_WITH": {
+                        "TYPE": "Select",
+                        "OPTIONS": [
+                            "ACTIVATED",
+                            "DEACTIVATED"
+                        ],
+                        "UNIT": ""
+                    },
+                    "LOOP_CNT": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": ""
+                    },
+                    "ACTIVATE_TIMER": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": "Secs"
+                    },
+                    "DEACTIVATE_TIMER": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": "Secs"
+                    }
+                },
+                {
+                    "NAME": "Timer Conditioned",
+                    "ID": "2",
+                    "VALUETYPE": "int",
+                    "ACCURACY": "",
+                    "CTRL_OPTIONS": [
+                        "ENABLE_WITH",
+                        "TIMER"
+                    ],
+                    "ENABLE_WITH": {
+                        "TYPE": "Select",
+                        "OPTIONS": [
+                            "ACTIVATED",
+                            "DEACTIVATED"
+                        ],
+                        "UNIT": ""
+                    },
+                    "TIMER": {
+                        "TYPE": "int",
+                        "MIN": "1",
+                        "MAX": "65535",
+                        "UNIT": "Secs"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+{
+  "OBJ": "32783",
+  "VER": "1.00",
+  "CAP": "0",
+  "NAME": "Salinity Sensor",
+  "SNS": [
+    {
+      "NAME": "Salinity Sensor",
+      "MFI": "Bridgetek Pte Ltd.",
+      "PART": "LS0XXX",
+      "REGSIZE": "0",
+      "ADDRESS": "0",
+      "BOMID": "0",
+      "CLS": "2307",
+      "VSPEC": "0000",
+      "SAID": "0",
+      "UNIT" : "ppt",
+      "UNIT_LIST": {
+        "DEFAULT": "0",
+        "OPTIONS": [
+          {
+            "MES": "Parts per thousand",
+            "UNIT": "ppt"
+          },
+          {
+            "MES": "Parts per million",
+            "UNIT": "ppm"
+          },
+          {
+            "MES": "Percentage",
+            "UNIT": "%"
+          }
+        ]
+      },
+      "FORMAT": "float",
+      "REPORTRATE": "1000",
+      "TYPE": "INPUT",
+      "ACCURACY": "2",
+      "MIN": "1",
+      "MAX": "120"
+    }
+  ]
+}

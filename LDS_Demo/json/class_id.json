@@ -1,0 +1,71 @@
+{
+    "classes": [{
+            "AttributeName": "Temperature",
+            "AttributeID": "0x0100"
+        },
+        {
+            "AttributeName": "Humidity",
+            "AttributeID": "0x0200"
+        },
+        {
+            "AttributeName": "eCO2",
+            "AttributeID": "0x0301"
+        },
+        {
+            "AttributeName": "VOC",
+            "AttributeID": "0x0302"
+        },
+        {
+            "AttributeName": "CO2",
+            "AttributeID": "0x0304"
+        },
+        {
+            "AttributeName": "DO",
+            "AttributeID": "0x0305"
+        },
+        {
+            "AttributeName": "Ambient Light",
+            "AttributeID": "0x0400"
+        },
+        {
+            "AttributeName": "Motion",
+            "AttributeID": "0x0500"
+        },
+        {
+            "AttributeName": "Pressure",
+            "AttributeID": "0x0700"
+        },
+        {
+            "AttributeName": "Moisture",
+            "AttributeID": "0x0800"
+        },
+        {
+            "AttributeName": "pH",
+            "AttributeID": "0x0900"
+        },
+        {
+            "AttributeName": "IAQ",
+            "AttributeID": "0x0303"
+        },
+        {
+            "AttributeName": "EC",
+            "AttributeID": "0x0A00"
+        },
+        {
+            "AttributeName": "Water Level",
+            "AttributeID": "0x7D01"
+        },
+        {
+            "AttributeName": "Water detection",
+            "AttributeID": "0x7D02"
+        },
+        {
+            "AttributeName": "Current Sensor",
+            "AttributeID": "0x0B00"
+        },
+        {
+            "AttributeName": "Relay Switch",
+            "AttributeID": "0x8000"
+        }
+    ]
+}

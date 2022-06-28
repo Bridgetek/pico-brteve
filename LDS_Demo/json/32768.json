@@ -1,0 +1,141 @@
+{
+    "OBJ": "32768",
+    "VER": "1.00",
+    "CAP": "1",
+    "NAME": "4in1 Sensor",
+    "SNS": [
+      {
+        "NAME": "Motion Sensor",
+        "MFI": "BridgeTek Pte Ltd.",
+        "PART": "PIR-VDEV",
+        "REGSIZE": "1",
+        "ADDRESS": "0",
+        "BOMID": "1234",
+        "CLS": "1280",
+        "VSPEC": "1234",
+        "SAID": "0",
+        "FORMAT": "integer",
+        "REPORTRATE": "1000",
+        "TYPE": "INPUT",
+        "UNIT": "",
+        "ACCURACY": "0",
+        "MIN": "0",
+        "MAX": "1",
+        "OPTIONS": ["RANGE", "THRESHOLD"],
+        "RANGE": [
+          {
+            "ID": "0",
+            "NAME": "Sensitivity",
+            "MIN": "0",
+            "MAX": "256",
+            "ACCURACY": "0",
+            "DESCRIPTION": "High to low distance coverage (0-256)"
+          }
+        ],
+        "THRESHOLD": [
+          {
+            "ID": "1",
+            "NAME": "Detection threshold",
+            "MIN": "1",
+            "MAX": "256",
+            "ACCURACY": "0",
+            "DESCRIPTION": "Pulse high period (1-256)"
+          }
+        ]
+      },
+      {
+        "NAME": "Temperature",
+        "MFI": "Texas Instrument",
+        "PART": "HDC1080",
+        "REGSIZE": "1",
+        "ADDRESS": "64",
+        "BOMID": "1234",
+        "CLS": "256",
+        "VSPEC": "1234",
+        "SAID": "1",
+        "UNIT": "C",
+        "FORMAT": "float",
+        "REPORTRATE": "1000",
+        "TYPE": "INPUT",
+        "OPTIONS": ["MODE"],
+        "MODE": [
+          {
+            "ID": "0",
+            "NAME": "14bit mode",
+            "MIN": "-25",
+            "MAX": "150",
+            "ACCURACY": "2",
+            "DESCRIPTION": ""
+          },
+          {
+            "ID": "1",
+            "NAME": "11bit mode",
+            "MIN": "-25",
+            "MAX": "150",
+            "ACCURACY": "2",
+            "DESCRIPTION": ""
+          },
+          {
+            "ID": "255",
+            "NAME": "Custom",
+            "MIN": "-25",
+            "MAX": "150",
+            "ACCURACY": "2",
+            "DESCRIPTION": ""
+          }
+        ]
+      },
+      {
+        "NAME": "Humidity",
+        "MFI": "Texas Instrument",
+        "PART": "HDC1080",
+        "REGSIZE": "1",
+        "ADDRESS": "64",
+        "BOMID": "1234",
+        "CLS": "512",
+        "VSPEC": "1234",
+        "SAID": "2",
+        "UNIT": "%",
+        "FORMAT": "float",
+        "REPORTRATE": "1000",
+        "TYPE": "INPUT",
+        "OPTIONS": ["MODE"],
+        "MODE": [
+          {
+            "ID": "0",
+            "NAME": "14bit mode",
+            "MIN": "0",
+            "MAX": "100",
+            "ACCURACY": "2",
+            "DESCRIPTION": ""
+          },
+          {
+            "ID": "1",
+            "NAME": "11bit mode",
+            "MIN": "0",
+            "MAX": "100",
+            "ACCURACY": "2",
+            "DESCRIPTION": ""
+          }
+        ]
+      },
+      {
+        "NAME": "Ambient Light",
+        "MFI": "LITE-ON Technology Corp.",
+        "PART": "LTR-303ALS-01",
+        "REGSIZE": "1",
+        "ADDRESS": "41",
+        "BOMID": "1234",
+        "CLS": "1024",
+        "VSPEC": "1234",
+        "SAID": "3",
+        "FORMAT": "integer",
+        "REPORTRATE": "1000",
+        "TYPE": "INPUT",
+        "UNIT": "LUX",
+        "ACCURACY": "0",
+        "MIN": "0",
+        "MAX": "100000"
+      }
+    ]
+  }

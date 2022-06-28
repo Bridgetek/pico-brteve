@@ -1,0 +1,44 @@
+{
+  "OBJ": "32775",
+  "VER": "1.00",
+  "CAP": "0",
+  "NAME": "Soil Sensor",
+  "SNS": [
+    {
+	    "NAME": "Temperature",
+      "MFI": "NXP",
+      "PART": "LM75BGD",
+      "REGSIZE": "0",
+      "ADDRESS": "118",
+      "BOMID": "1234",
+      "CLS": "256",
+      "VSPEC": "1234",
+      "SAID": "0",
+      "UNIT": "C",
+      "FORMAT": "float",
+      "REPORTRATE" : "1000",
+      "TYPE": "INPUT",
+      "ACCURACY": "2",
+	    "MIN" :  "-55",
+	    "MAX" :  "125"
+    },
+    {
+      "NAME": "Moisture",
+      "MFI": "BridgeTek Pte Ltd.",
+      "PART": "BRT-MST-001",
+      "REGSIZE": "0",
+      "ADDRESS": "118",
+      "BOMID": "1234",
+      "CLS": "2048",
+      "VSPEC": "1234",
+      "SAID": "1",
+      "UNIT": "%",
+      "FORMAT": "float",
+      "REPORTRATE" : "1000",
+      "TYPE": "INPUT",
+      "ACCURACY": "1",
+	    "MIN" :  "0",
+	    "MAX" :  "100"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+    "OBJ": "32777",
+    "VER": "1.00",
+    "CAP": "0",
+    "NAME": "EC Sensor",
+    "SNS": [{
+        "NAME": "EC",
+        "MFI": "BridgeTek Pte Ltd.",
+        "PART": "LS0401",
+        "REGSIZE": "0",
+        "ADDRESS": "0",
+        "BOMID": "1234",
+        "CLS": "2560",
+        "VSPEC": "1234",
+        "SAID": "0",
+        "UNIT": "mS/cm",
+        "FORMAT": "integer",
+        "REPORTRATE": "1000",
+        "TYPE": "INPUT",
+        "ACCURACY": "0",
+        "MIN": "0",
+        "MAX": "2000"
+    }]
+}

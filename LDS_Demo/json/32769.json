@@ -1,0 +1,50 @@
+{
+  "OBJ": "32769",
+  "VER": "1.00", 
+  "CAP": "1", 
+  "NAME": "Thermocouple Sensor",
+  "SNS": [
+    {
+      "NAME": "Thermocouple",
+      "MFI": "Microchip", 
+      "PART": "MCP9600",
+      "REGSIZE": "0", 
+      "ADDRESS": "60", 
+      "BOMID": "1234", 
+      "CLS": "256", 
+      "VSPEC": "1234",
+      "SAID": "0", 
+      "UNIT": "C", 
+      "FORMAT": "float",
+      "REPORTRATE": "1000",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"], 
+      "MODE": [
+        {
+          "ID": "0",
+          "NAME": "16bit mode",
+          "MIN": "-25",
+          "MAX": "128",
+          "ACCURACY": "3",
+          "DESCRIPTION": ""
+        },
+        {
+          "ID": "1",
+          "NAME": "14bit mode",
+          "MIN": "-25",
+          "MAX": "128",
+          "ACCURACY": "3",
+          "DESCRIPTION": ""
+        },
+        {
+          "ID": "2",
+          "NAME": "12bit mode",
+          "MIN": "-25",
+          "MAX": "128",
+          "ACCURACY": "3",
+          "DESCRIPTION": ""
+        }
+      ]
+    }
+  ]
+}

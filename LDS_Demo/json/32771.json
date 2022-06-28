@@ -1,0 +1,118 @@
+{
+  "OBJ": "32771",
+  "VER": "1.00", 
+  "CAP": "0",
+  "NAME": "AQS-Type B",
+  "SNS": [
+    {
+      "NAME": "Temperature",
+      "MFI": "Texas Instrument",
+      "PART": "HDC1080",
+      "REGSIZE": "1",
+      "ADDRESS": "64", 
+      "BOMID": "1234",
+      "CLS": "256",
+      "VSPEC": "1234",
+      "SAID": "0",
+      "UNIT": "C",
+      "FORMAT": "float",
+      "REPORTRATE": "1000",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"],
+      "MODE": [
+        {
+          "ID": "0",
+          "NAME": "14bit mode",
+          "MIN": "-25",
+          "MAX": "150",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        },
+        {
+          "ID": "1",
+          "NAME": "11bit mode",
+          "MIN": "-25",
+          "MAX": "150",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        }
+      ]
+    },
+    {
+      "NAME": "Humidity",
+      "MFI": "Texas Instrument",
+      "PART": "HDC1080",
+      "REGSIZE": "1",
+      "ADDRESS": "64",
+      "BOMID": "1234",
+      "CLS": "512",
+      "VSPEC": "1234",
+      "SAID": "1",
+      "UNIT": "%",
+      "FORMAT": "float",
+      "REPORTRATE": "1000",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"],
+      "MODE": [
+        {
+          "ID": "0",
+          "NAME": "14bit mode",
+          "MIN": "0",
+          "MAX": "1000",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        },
+        {
+          "ID": "1",
+          "NAME": "11bit mode",
+          "MIN": "0",
+          "MAX": "1000",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        }
+      ]
+    },
+    {
+      "NAME": "Pressure",
+      "MFI": "Bosch SensorTec",
+      "PART": "BMP280",
+      "REGSIZE": "0",
+      "ADDRESS": "118",
+      "BOMID": "1234",
+      "CLS": "1792",
+      "VSPEC": "1234",
+      "SAID": "2",
+      "UNIT": "hPa",
+      "FORMAT": "float",
+      "REPORTRATE": "1000",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"],
+      "MODE": [
+        {
+          "ID": "0",
+          "NAME": "16bit mode",
+          "MIN": "300",
+          "MAX": "1100",
+          "ACCURACY": "0",
+          "DESCRIPTION": "Standard resolution"
+        },
+        {
+          "ID": "1",
+          "NAME": "18bit mode",
+          "MIN": "300",
+          "MAX": "1100",
+          "ACCURACY": "0",
+          "DESCRIPTION": "High Resolution"
+        },
+        {
+          "ID": "2",
+          "NAME": "20bit mode",
+          "MIN": "300",
+          "MAX": "1100",
+          "ACCURACY": "0",
+          "DESCRIPTION": "Ultra high resolution"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "OBJ": "32772",
+  "VER": "1.00",
+  "CAP": "0",
+  "NAME": "AQS-Type C",
+  "SNS": [
+    {
+      "NAME": "Temperature",
+      "MFI": "Texas Instrument",
+      "PART": "HDC1080",
+      "REGSIZE": "1",
+      "ADDRESS": "64",
+      "BOMID": "1234",
+      "CLS": "256",
+      "VSPEC": "1234",
+      "SAID": "0",
+      "UNIT": "C",
+      "FORMAT": "float",
+      "REPORTRATE" : "1000",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"],
+      "MODE": [
+        {
+          "ID": "0",
+          "NAME": "14bit mode",
+          "MIN": "-25",
+          "MAX": "150",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        },
+        {
+          "ID": "1",
+          "NAME": "11bit mode",
+          "MIN": "-25",
+          "MAX": "150",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        }
+      ]
+    },
+    {
+      "NAME": "Humidity",
+      "MFI": "Texas Instrument",
+      "PART": "HDC1080",
+      "REGSIZE": "1",
+      "ADDRESS": "64",
+      "BOMID": "1234",
+      "CLS": "512",
+      "VSPEC": "1234",
+      "SAID": "1",
+      "UNIT": "%",
+      "FORMAT": "float",
+      "REPORTRATE" : "1000",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"],
+      "MODE": [
+        {
+          "ID": "0",
+          "NAME": "14bit mode",
+          "MIN": "0",
+          "MAX": "1000",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        },
+        {
+          "ID": "1",
+          "NAME": "11bit mode",
+          "MIN": "0",
+          "MAX": "1000",
+          "ACCURACY": "2",
+          "DESCRIPTION": ""
+        }
+      ]
+    },
+    {
+      "NAME": "eCO2",
+      "MFI": "AMS",
+      "PART": "CCS811",
+      "REGSIZE": "1",
+      "ADDRESS": "90",
+      "BOMID": "1234",
+      "CLS": "769",
+      "VSPEC": "1234",
+      "SAID": "2",
+      "UNIT": "ppm",
+      "FORMAT": "integer",
+      "REPORTRATE" : "1000",
+      "TYPE": "INPUT",
+      "MIN": "400",
+      "MAX": "8192",
+      "ACCURACY": "2"
+    },
+    {
+      "NAME": "VOC",
+      "MFI": "AMS",
+      "PART": "CCS811",
+      "REGSIZE": "1",
+      "ADDRESS": "90",
+      "BOMID": "1234",
+      "CLS": "770",
+      "VSPEC": "1234",
+      "SAID": "3",
+      "UNIT": "ppm",
+      "FORMAT": "integer",
+      "REPORTRATE" : "1000",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"],
+      "MODE": [
+        {
+          "ID": "0",
+          "NAME": "Idle",
+          "MIN": "0",
+          "MAX": "1187",
+          "ACCURACY": "0",
+          "DESCRIPTION": "Measurements are disabled in this mode"
+        },
+        {
+          "ID": "1",
+          "NAME": "Constant power mode",
+          "MIN": "0",
+          "MAX": "1187",
+          "ACCURACY": "0",
+          "DESCRIPTION": "Constant power mode, IAQ measurement every second"
+        },
+        {
+          "ID": "2",
+          "NAME": "Pulse heating mode",
+          "MIN": "0",
+          "MAX": "1187",
+          "ACCURACY": "0",
+          "DESCRIPTION": " Pulse heating mode IAQ measurement every 10 seconds"
+        },
+        {
+          "ID": "3",
+          "NAME": "Low power pulse heating mode",
+          "MIN": "0",
+          "MAX": "1187",
+          "ACCURACY": "0",
+          "DESCRIPTION": " Low power pulse heating mode IAQ measurement every 60"
+        }
+      ]
+    }
+  ]
+}

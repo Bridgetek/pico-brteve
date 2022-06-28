@@ -1,0 +1,44 @@
+{
+    "OBJ": "64512",
+    "VER": "1.00",
+    "CAP": "0",
+    "NAME": "Water Level Sensor",
+    "SNS": [
+        {
+            "NAME": "Water Level",
+            "MFI": "BridgeTek Pte Ltd.",
+            "REGSIZE": "0",
+            "PART": "LS0XXX",
+            "ADDRESS": "0",
+            "BOMID": "1234",
+            "CLS": "32001",
+            "VSPEC": "1234",
+            "SAID": "0",
+            "UNIT": "cm",
+            "FORMAT": "integer",
+            "REPORTRATE": "1000",
+            "TYPE": "INPUT",
+            "ACCURACY": "1",
+            "MIN": "0",
+            "MAX": "500"
+        },
+        {
+            "NAME": "Water detection",
+            "MFI": "BridgeTek Pte Ltd.",
+            "REGSIZE": "0",
+            "PART": "LS0XXX",
+            "ADDRESS": "0",
+            "BOMID": "1234",
+            "CLS": "32002",
+            "VSPEC": "1234",
+            "SAID": "1",
+            "UNIT": "",
+            "FORMAT": "integer",
+            "REPORTRATE": "1000",
+            "TYPE": "INPUT",
+            "ACCURACY": "0",
+            "MIN": "0",
+            "MAX": "1"
+        }
+    ]
+}

@@ -1,0 +1,138 @@
+{
+  "OBJ": "32768", // LDSU CLSect type
+  "VER": "1.00", // ver corresponding to PRV
+  "CAP": "1", // Capability
+  "NAME": "PanL Sensor 4in1",
+  "SNS": [
+    {
+      "NAME": "Motion",
+      "MFI": "BridgeTek Pte Ltd.",
+      "PART": "Motion",
+      "REGSIZE": "1",
+      "ADDRESS": "0",
+      "BOMID": "1234",
+      "CLS": "1280",
+      "VSPEC": "1234",
+      "SAID": "3",
+      "FORMAT": "boolean",
+      "TYPE": "INPUT",
+      "UNIT": "",
+      "ACCURACY": "0",
+      "MIN": "0",
+      "MAX": "1",
+      "OPTIONS": ["RANGE", "THRESHOLD"], // Options related to the sensor properties and settings
+      "RANGE": [
+        {
+          "ID": "0", // Mode ID
+          "Name": "Sensitivity", // Name  of the mode
+          "Min": "0", // Minimum value of the attribute
+          "Max": "256", // Maximum value of the attribute
+          "ACCURACY": "0", // Accuracy of the sensor 2 decimal points
+          "Description": "High to low distance coverage (0-256)" // Description,
+        }
+      ],
+      "THRESHOLD": [
+        {
+          "ID": "1", // Mode ID
+          "Name": "Detection threshold", // Name  of the mode
+          "Min": "1", // Minimum value of the attribute
+          "Max": "256", // Maximum value of the attribute
+          "ACCURACY": "0", // Accuracy of the sensor 2 decimal points
+          "Description": "Pulse high period (1-256)" // Description,
+        }
+      ]
+    },
+    {
+      "NAME": "Temperature",
+      "MFI": "Texas Instrument", // Manfacturer Information
+      "PART": "HDC1080", // Part Number
+      "REGSIZE": "1", // Register size
+      "ADDRESS": "64", // I2C address
+      "BOMID": "1234", // Bill of material ID
+      "CLS": "256", // Sensor /Actuator Class
+      "VSPEC": "1234", // Vendor Specification
+      "SAID": "0", // Sensor /Actuator ID
+      "UNIT": "C", // Unit
+      "FORMAT": "float", // format
+      "TYPE": "INPUT", // Type of the Sensor,
+      "OPTIONS": ["MODE"], // Options related to the sensor properties and settings
+      "MODE": [
+        {
+          "ID": "0", // Mode ID
+          "Name": "14bit mode", // Name  of the mode
+          "Min": "-25", // Minimum value of the attribute
+          "Max": "150", // Maximum value of the attribute
+          "ACCURACY": "2", // Accuracy of the sensor 2 decimal points
+          "Description": "" // Description
+        },
+        {
+          "ID": "1",
+          "Name": "11bit mode",
+          "Min": "-25",
+          "Max": "150",
+          "ACCURACY": "2",
+          "Description": ""
+        },
+        /*Improvement needed*/
+        {
+          "ID": "255",
+          "Name": "Custom",
+          "Min": "-25", // Minimum limit to the user to select the range
+          "Max": "150", // Maximum limit to the user to select the range
+          "ACCURACY": "2", // Maximum Accuracy level  //FB: step level for for accuracy
+          "Description": ""
+        }
+      ]
+    },
+    {
+      "NAME": "Humidity",
+      "MFI": "Texas Instrument",
+      "PART": "HDC1080",
+      "REGSIZE": "1",
+      "ADDRESS": "64",
+      "BOMID": "1234",
+      "CLS": "512",
+      "VSPEC": "1234",
+      "SAID": "1",
+      "UNIT": "%",
+      "FORMAT": "float",
+      "TYPE": "INPUT",
+      "OPTIONS": ["MODE"],
+      "MODE": [
+        {
+          "ID": "0",
+          "Name": "14bit mode",
+          "Min": "0",
+          "Max": "1000",
+          "ACCURACY": "2",
+          "Description": ""
+        },
+        {
+          "ID": "1",
+          "Name": "11bit mode",
+          "Min": "0",
+          "Max": "1000",
+          "ACCURACY": "2",
+          "Description": ""
+        }
+      ]
+    },
+    {
+      "NAME": "Ambient Light",
+      "MFI": "LITE-ON Technology Corp.",
+      "PART": "LTR-303ALS-01",
+      "REGSIZE": "1",
+      "ADDRESS": "41",
+      "BOMID": "1234",
+      "CLS": "1024",
+      "VSPEC": "1234",
+      "SAID": "2",
+      "FORMAT": "integer",
+      "TYPE": "INPUT",
+      "UNIT": "LUX",
+      "ACCURACY": "0",
+      "MIN": "0",
+      "MAX": "1000"
+    }
+  ]
+}

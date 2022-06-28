@@ -1,0 +1,78 @@
+{
+    "devices": [{
+            "obj": "32768",
+            "name":"4IN1",
+            "file": "32768.json"
+        },
+        {
+            "obj": "32769",
+            "name":"THERMOCOUPLE",
+            "file": "32769.json"
+        },
+        {
+            "obj": "32770",
+            "name":"AQS-A",
+            "file": "32770.json"
+        },
+        {
+            "obj": "32771",
+            "name":"AQS-B",
+            "file": "32771.json"
+        },
+        {
+            "obj": "32772",
+            "name":"AQS-C",
+            "file": "32772.json"
+        },
+        {
+            "obj": "32773",
+            "name":"AQS-D",
+            "file": "32773.json"
+        },
+        {
+            "obj": "32775",
+            "name":"SOIL",
+            "file": "32775.json"
+        },
+        {
+            "obj": "32776",
+            "name":"PH",
+            "file": "32776.json"
+        },
+        {
+            "obj": "32777",
+            "name":"EC",
+            "file": "32777.json"
+        },
+        {
+            "obj": "32778",
+            "name":"CO2-A",
+            "file": "32778.json"
+        },
+        {
+            "obj": "32779",
+            "name":"CO2-S",
+            "file": "32779.json"
+        },
+        {
+            "obj": "32780",
+            "name":"DO",
+            "file": "32780.json"
+        },
+        {
+            "obj": "32781",
+            "name":"3IN1",
+            "file": "32781.json"
+        },
+        {
+            "obj": "64512",
+            "name":"WATER-LEVEL",
+            "file": "64512.json"
+        },
+        {
+            "obj": "256",
+            "name":"RELAY",
+            "file": "256.json"
+        }
+    ]
+}
