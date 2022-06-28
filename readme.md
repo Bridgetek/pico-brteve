@@ -5,7 +5,7 @@ Pico-BrtEve is a set of example application to drive Eve with Pico RP2040.
 Application can run on a Pico RP2040 mcu as a C or CircuitPython application.
 Or run on a PC as a client connect to Telemetrix server on Pico RP2040 mcu.
 
-#### Connections
+### Connections
 
 | RP2040 | EVE | UART | SD |
 | --- | --- | --- | --- |
@@ -17,9 +17,20 @@ Or run on a PC as a client connect to Telemetrix server on Pico RP2040 mcu.
 | GP5 (GPIO) | CS | | |
 | GP6 (GPIO) | INT | | |
 | GP7 (GPIO) | PWD | | |
+| GP10 (SPI1 SCK) | | |SCK|
+| GP11 (SPI1 MOSI) | | |MOSI|
+| GP12 (SPI1 MISO) | | |MISO|
+| GP13 (GPIO) | | |CS|
 | 5V | 5V | | |
 | GND | GND | | |
 
+## Embedded World 2022 -- IDM2040-7A demo circuitPython source code 
+
+Please get it from:  https://github.com/BRTSG-FOSS/pico-brteve/tree/EW2022
+
+## Low-level BridgeTek EVE bindings for CircuitPython 
+CircuitPython has the built-in low-level BridgeTek EVE bindings, see: 
+https://docs.circuitpython.org/en/latest/shared-bindings/_eve/index.html
 
 ## Folder introduction
 
