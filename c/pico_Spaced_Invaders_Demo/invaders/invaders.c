@@ -26,6 +26,14 @@ extern uint8_t left_button_state(void);
 // =================================================================================================================
 // Spaced Invaders - #defines
 // =================================================================================================================
+
+// Enable screenshot
+#undef ENABLE_SCREENSHOT
+
+// Enable hardware buttons on GPIOs
+// Touch screen is always active
+#undef ARCADE_BUTTONS
+
 // Game state values ...
 #define GAME_START_NEW false
 #define GAME_NEXT_WAVE true
@@ -1383,8 +1391,8 @@ static void render_start_button()
 	// Whole screen is for start.
 	EVE_CMD_FGCOLOR(0x880000);
 	EVE_CMD_GRADCOLOR(0xff0000);
-	EVE_TAG(BUTTON_START);
 	EVE_BEGIN(EVE_BEGIN_RECTS);
+	EVE_TAG(BUTTON_START);
 	EVE_VERTEX2F(0, 0);
 	EVE_VERTEX2F(EVE_DISP_WIDTH * 16, EVE_DISP_HEIGHT * 16);
 
@@ -1451,6 +1459,36 @@ static void display_list_end()
 	EVE_LIB_AwaitCoProEmpty();
 }
 
+#ifdef ENABLE_SCREENSHOT
+static int screenshot = 100;
+void invaders_screenshot()
+{
+	uint8_t buffer[256];
+	int i, j;
+
+	// Write screenshot into RAM_G
+	EVE_LIB_BeginCoProList();
+	EVE_CMD_DLSTART();
+	EVE_CMD_SNAPSHOT(ramNextBit);
+	EVE_LIB_EndCoProList();
+	EVE_LIB_AwaitCoProEmpty();
+
+	printf("ARGB start\n"); // Use this marker to identify the start of the image.
+	for (i = 0; i < (EVE_DISP_WIDTH * 2) * EVE_DISP_HEIGHT; i += sizeof(buffer))
+	{
+		EVE_LIB_ReadDataFromRAMG(buffer, sizeof(buffer), ramNextBit+ i);
+		for (j = 0; j < sizeof(buffer); j++)
+		{
+			printf("%c", buffer[j]);
+		}
+	}
+	printf("ARGB end\n"); // Marker to identify the end of the image.
+
+	eve_ui_splash("Screenshot completed...");
+	eve_ui_arch_sleepms(2000);
+}
+#endif // ENABLE_SCREENSHOT
+
 static void check_buttons()
 {
 	if (invaders_TIMER_EXPIRED(REFRESH_BUTTONS))
@@ -1458,18 +1496,23 @@ static void check_buttons()
 		uint8_t tagTouch = HAL_MemRead8(EVE_REG_TOUCH_TAG);
 		uint8_t randInvader = 0;
 
-		if (fire_button_state() == 0)
+#ifdef ARCADE_BUTTONS
+		if (tagTouch == 0)
 		{
-			tagTouch = BUTTON_FIRE;
+			if (fire_button_state() == 0)
+			{
+				tagTouch = BUTTON_FIRE;
+			}
+			if (left_button_state() == 0)
+			{
+				tagTouch = BUTTON_LEFT;
+			}
+			if (right_button_state() == 0)
+			{
+				tagTouch = BUTTON_RIGHT;
+			}
 		}
-		if (left_button_state() == 0)
-		{
-			tagTouch = BUTTON_LEFT;
-		}
-		if (right_button_state() == 0)
-		{
-			tagTouch = BUTTON_RIGHT;
-		}
+#endif // ARCADE_BUTTONS
 
 		switch (tagTouch)
 		{
@@ -1499,6 +1542,17 @@ static void check_buttons()
 					}
 				}
 			}
+#ifdef ENABLE_SCREENSHOT
+			if (screenshot)
+			{
+				screenshot--;
+			}
+			else
+			{
+				invaders_screenshot();
+				screenshot = 100;
+			}
+#endif // ENABLE_SCREENSHOT
 			break;
 		}
 		updateTimer[REFRESH_BUTTONS] = TIMER_BUTTONS;
@@ -1519,18 +1573,23 @@ static void wait_for_button(uint8_t button)
 
 		uint8_t tagTouch = HAL_MemRead8(EVE_REG_TOUCH_TAG);
 
-		if (fire_button_state() == 0)
+#ifdef ARCADE_BUTTONS
+		if (tagTouch == 0)
 		{
-			tagTouch = BUTTON_FIRE;
+			if (fire_button_state() == 0)
+			{
+				tagTouch = BUTTON_FIRE;
+			}
+			if (left_button_state() == 0)
+			{
+				tagTouch = BUTTON_LEFT;
+			}
+			if (right_button_state() == 0)
+			{
+				tagTouch = BUTTON_RIGHT;
+			}
 		}
-		if (left_button_state() == 0)
-		{
-			tagTouch = BUTTON_LEFT;
-		}
-		if (right_button_state() == 0)
-		{
-			tagTouch = BUTTON_RIGHT;
-		}
+#endif // ARCADE_BUTTONS
 
 		if (tagTouch == button)
 		{
