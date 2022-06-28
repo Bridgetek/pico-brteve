@@ -280,6 +280,7 @@ void EVE_CMD_SETSCRATCH(uint32_t handle);
 
 
 #if defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
+void EVE_BITMAP_SOURCE2(uint8_t flash_or_ram, int32_t addr);
 void EVE_CMD_FILLWIDTH(uint32_t s);
 void EVE_CMD_NOP();
 void EVE_CMD_GETPOINT(int16_t x, int16_t y, uint32_t sx, uint32_t sy);

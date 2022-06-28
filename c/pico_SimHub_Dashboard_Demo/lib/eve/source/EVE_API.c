@@ -435,6 +435,14 @@ void EVE_BITMAP_SOURCE(int32_t addr)
 	HAL_IncCmdPointer(4);
 }
 
+#if (defined EVE3_ENABLE || defined EVE4_ENABLE)
+void EVE_BITMAP_SOURCE2(uint8_t flash_or_ram, int32_t addr)
+{
+	HAL_Write32(EVE_ENC_BITMAP_SOURCE2(flash_or_ram, (int32_t)addr));
+	HAL_IncCmdPointer(4);
+}
+#endif // (defined EVE3_ENABLE || defined EVE4_ENABLE)
+
 void EVE_BITMAP_LAYOUT(uint8_t format, uint16_t linestride, uint16_t height )
 {
 	HAL_Write32(EVE_ENC_BITMAP_LAYOUT(format, linestride, height));

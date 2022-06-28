@@ -80,7 +80,10 @@ extern const uint32_t Theme_colours[];
 
 // Do not send any debug information to the stdio. The stdio channel is connected
 // to the host via the USB CDC_ACM interface and is used as a channel for game data.
-#undef DEBUG
+#define DEBUG
+
+// Define to enable a screenshot when a touchscreen event detected.
+#define ENABLE_SCREENSHOT
 
 // Allow the use of the pico LED for feedback.
 const uint LED_PIN = PICO_DEFAULT_LED_PIN;
@@ -937,6 +940,13 @@ int main(void)
     {
 		if (serial_task())
 			screen_loop();
+
+#ifdef ENABLE_SCREENSHOT
+		if (!(HAL_MemRead16(EVE_REG_TOUCH_RAW_XY) & 0x8000))
+		{
+			eve_ui_screenshot();
+		}
+#endif // ENABLE_SCREENSHOT
     }
 
     // function never returns
