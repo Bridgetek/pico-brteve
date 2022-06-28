@@ -28,6 +28,10 @@ Or run on a PC as a client connect to Telemetrix server on Pico RP2040 mcu.
 
 Please get it from:  https://github.com/BRTSG-FOSS/pico-brteve/tree/EW2022
 
+## Low-level BridgeTek EVE bindings for CircuitPython 
+CircuitPython has the built-in low-level BridgeTek EVE bindings, see: 
+https://docs.circuitpython.org/en/latest/shared-bindings/_eve/index.html
+
 ## Folder introduction
 
 ```
