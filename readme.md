@@ -5,7 +5,7 @@ Pico-BrtEve is a set of example application to drive Eve with Pico RP2040.
 Application can run on a Pico RP2040 mcu as a C or CircuitPython application.
 Or run on a PC as a client connect to Telemetrix server on Pico RP2040 mcu.
 
-#### Connections
+### Connections
 
 | RP2040 | EVE | UART | SD |
 | --- | --- | --- | --- |
@@ -20,6 +20,9 @@ Or run on a PC as a client connect to Telemetrix server on Pico RP2040 mcu.
 | 5V | 5V | | |
 | GND | GND | | |
 
+## Embedded World 2022 -- IDM2040-7A demo circuitPython source code 
+
+Please get it from:  https://github.com/BRTSG-FOSS/pico-brteve/tree/EW2022
 
 ## Folder introduction
 
