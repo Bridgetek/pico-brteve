@@ -69,14 +69,6 @@ class main_app():
         eve.Tag(tag_video_playback)
         eve.cmd_button(x2, y3, btn_w, btn_h, 31, 0, "Video Playback")
   
-    def showException(self):
-        self.eve.cmd_dlstart()  
-        self.eve.ColorRGB(255, 0, 0)  
-        self.eve.cmd_text(520, 10, 30, 0, "Exception !")
-        self.eve.Display()
-        self.eve.cmd_swap()   
-        self.eve.flush()
-        time.sleep(2)
       
     def get_event(self):
         eve = self.eve     
