@@ -4,11 +4,17 @@ A minimal project to draw a simple screen on LCD
 
 ## pico_SimHub_Dashboard_Demo
 
-A dashboard application running with SimHub
+A dashboard application running with SimHub. This will render a speedometer and gear selector in response to SimHub updates.
+
+![Dashboard Screenshot](./pico_SimHub_Dashboard_Demo/dash.jpg)
 
 ## pico_SimHub_Leaderboard_Demo
 
-A leaderboard application running with SimHub
+An animated leaderboard application running with data from SimHub.
+
+![Leaderboard Screenshot](./pico_SimHub_Leaderboard_Demo/leader.jpg)
+
+There is also test code to simulate the output of SimHub. 
 
 ## pico_Spaced_Invaders_Demo 
 

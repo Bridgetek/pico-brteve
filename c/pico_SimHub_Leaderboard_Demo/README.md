@@ -1,25 +1,42 @@
 # pico SimHub Dashboard Demo
 
-This is a simplified leaderboard for use with SimHub. It will accept a custom message from SimHub. The format of the messages is:
+This is a simplified leaderboard for use with SimHub. It will accept a custom message from SimHub. 
 
-## Identify driver:
+The screen will show the data received from SimHub. Here is a sample of the display.
+
+![Leaderboard Screenshot](./leader.jpg)
+
+## Test Program
+
+It is not always easy to setup the correct data from SimHub. There is a python script (for python 3) in
+the "test" directory. This will connect to the console/stdio port on the pico and send valid test data
+to the device.
+
+By default the script will use *COM18* to transmit data. This *MUST* be changed to correspond to the
+CDC ACM Virtual Com Port made by the program on the pico. 
+
+## SimHub Messages
+
+The format of the messages is:
+
+### Identify driver:
 ```!PD;<car number>;<driver name>;<time>```
-### Examples:
+#### Examples:
 ```!PD;99;27;Jimmy McRae;0.000```
 
-## Notify new lap time:
+### Notify new lap time:
 ```!PL;<lap number>;<lap time>```
-### Examples:
+#### Examples:
 ```!PL;1;34:35.369```<br>
 ```!PL;2;32:31.467```
 
-## Update rankings:
+### Update rankings:
 There can be up-to 5 drivers ahead or behind reported by SimHub.<br>
 Start ranking update: ```!PS```<br>
 Rank ahead: ```!PA;<places ahead>;<car number>;<driver name>;<time difference>```<br>
 Rank behind: ```!PB;<places ahead>;<car number>;<driver name>;<time difference>```<br>
 Commit ranking update: ```!PU```<br>
-### Examples:
+#### Examples:
 ```
 	!PS
 	!PA;4;2;Russell Brooks;-03.436
@@ -34,14 +51,15 @@ Commit ranking update: ```!PU```<br>
 	!PB;4;9;James Hunt;+01.504
 	!PU
 ```
+## Setup SimHub Messages
 
-## Step 1: 
+### Step 1: 
 Open Arduino -> My Hardware
 
-## Step 2: 
+### Step 2: 
 Select **Multiple Arduinos**. Find the pico COM port appears in the Hardware scan.
 
-## Step 3: 
+### Step 3: 
 At new **MULTIPLE USB SETTINGS**:
  * Fill in Device Name “pico EVE Dash”. The baud rate is not used.
  * Edit the Custom protocol:
@@ -63,9 +81,10 @@ At new **MULTIPLE USB SETTINGS**:
 ```
 The current driver and car number can be set by adding 'D;<your car number>;<Your Name>' to the command
 
-## Step 4: 
+### Step 4: 
 Then Click the button **Apply Changes Now**.
 
+## Default Build
 By default the project will build for the BT817 as used in the IDM2040-7A module. To change this alter the FT8XX_TYPE in the CMakeLists.txt file.
 
 ```
