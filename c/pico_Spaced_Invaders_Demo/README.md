@@ -26,7 +26,7 @@ The pins on a pico module used for the buttons are as follows:
 
 A screenshot can be taken by defining the ENABLE_SCREENSHOT macro. To enable 'action' screenshots it it implemented that every 100 times the fire button is pressed it will take a screenshot.
 
-The screenshot sends the data from the screen to the stdio port as a binary stream. The game will pause for up-to a minute to allow the data to be sent. It can be captured with a terminal emulator. The data is in the format ARGB4 and is bookended by the string "ARGB start\n" and "ARGB end\n". This muse be stripped before use.
+The screenshot sends the data from the screen to the stdio port as a binary stream. The game will pause for up-to a minute to allow the data to be sent. It can be captured with a terminal emulator. The data is in the format ARGB4 and is bookended by the string "ARGB start\n" and "ARGB end\n". This must be stripped before use.
 
 To convert the screenshot from the ARGB4 format to JPG the following command can be used within Imagemagick to make the conversion:
 ```
