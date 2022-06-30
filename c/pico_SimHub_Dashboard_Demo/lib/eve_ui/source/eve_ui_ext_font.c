@@ -168,6 +168,10 @@ static uint32_t eve_ui_load_fontx(uint8_t first, const uint8_t *font_data, uint3
 						font_hdr->FontHeightInPixels);
 				EVE_BITMAP_LAYOUT(font_hdr->FontBitmapFormat,
 						font_hdr->FontLineStride, font_hdr->FontHeightInPixels);
+#if defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
+				EVE_BITMAP_LAYOUT_H((font_hdr->FontLineStride) >> 10, font_hdr->FontHeightInPixels >> 9);
+				EVE_BITMAP_SIZE_H(font_hdr->FontWidthInPixels >> 9, font_hdr->FontHeightInPixels >> 9);
+#endif
 				if (first == 0)
 				{
 					EVE_BITMAP_SOURCE(hdr_addr + sizeof(EVE_GPU_FONT_HEADER)

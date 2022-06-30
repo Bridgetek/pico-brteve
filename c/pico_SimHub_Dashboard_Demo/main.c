@@ -63,6 +63,7 @@
 
 #include "EVE.h"
 #include "eve_ui.h"
+#include "eve_ram_g.h"
 
 #include "assets.h"
 
@@ -79,6 +80,9 @@ extern const uint8_t img_needle[];
 // Do not send any debug information to the stdio. The stdio channel is connected
 // to the host via the USB CDC_ACM interface and is used as a channel for game data.
 #undef DEBUG
+
+// Define to enable a screenshot when a touchscreen event detected.
+#undef ENABLE_SCREENSHOT
 
 // Allow the use of the pico LED for feedback.
 const uint LED_PIN = PICO_DEFAULT_LED_PIN;
@@ -200,6 +204,7 @@ float NeedleDeaccelaration[4] = {0};
 // Forward declaration of board setup.
 static void setup(void);
 static void led_state(uint8_t state);
+static void screenshot(void);
 
 static void Get_GameInfo(char *cmdstr, uint16_t len)
 {
@@ -368,6 +373,11 @@ static int serial_task(void)
 			// Boost gauge
 			if (opt == 'U') {
 
+			}
+
+			if (opt == '!')
+			{
+				screenshot();
 			}
 
 			// Features command
@@ -581,6 +591,56 @@ static void cluster_loop(void)
 	
 	// Draw the dashboard.
 	cluster_draw();
+}
+
+static void screenshot(void)
+{
+#ifdef ENABLE_SCREENSHOT
+	uint32_t img_end_address = malloc_ram_g(EVE_DISP_WIDTH * 4);
+	int row_num = 0;
+	int line_counter = 0;
+	uint32_t line_data[EVE_DISP_WIDTH] __attribute__((aligned(4)));
+	uint32_t pixel_data;
+
+	printf("PPM start\n"); // Use this marker to identify the start of the image.
+	stdio_set_translate_crlf(&stdio_usb, false);
+	
+	// PPM Header
+	printf("P6\n%d\n%d\n255\n", EVE_DISP_WIDTH, EVE_DISP_HEIGHT);
+	while (row_num < EVE_DISP_HEIGHT) 
+	{
+		// Write screenshot into RAM_G
+		EVE_LIB_BeginCoProList();
+		EVE_CMD_DLSTART();
+		// ARGB8 format (0x20) is not equivalent to a BITMAP_FORMAT
+		EVE_CMD_SNAPSHOT2(0x20, img_end_address, 0, row_num, (EVE_DISP_WIDTH * 2), 1);
+		EVE_LIB_EndCoProList();
+		EVE_LIB_AwaitCoProEmpty();
+
+		eve_ui_arch_sleepms(20); // ensure co-pro has finished taking snapshot
+
+		EVE_LIB_ReadDataFromRAMG((uint8_t *)line_data, EVE_DISP_WIDTH * 4, img_end_address);
+		line_counter = 0;
+		while (line_counter < EVE_DISP_WIDTH)
+		{
+			pixel_data = line_data[line_counter];
+			putchar_raw((uint8_t)(pixel_data >> 16));
+			putchar_raw((uint8_t)(pixel_data >> 8));
+			putchar_raw((uint8_t)(pixel_data >> 0));
+			line_counter++; // increment address
+		}
+		fflush(stdout);
+		row_num++;
+	}
+	stdio_set_translate_crlf(&stdio_usb, true);
+	printf("\nPPM end\n"); // Marker to identify the end of the image.
+
+	free_ram_g(img_end_address);
+	
+	eve_ui_splash("Screenshot completed...");
+	eve_ui_arch_sleepms(2000);
+
+#endif // ENABLE_SCREENSHOT
 }
 
 /* TINYUSB FUNCTIONS ********************************************************/

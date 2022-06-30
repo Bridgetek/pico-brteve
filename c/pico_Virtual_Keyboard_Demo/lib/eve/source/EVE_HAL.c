@@ -64,7 +64,6 @@ static uint16_t writeCmdPointer = 0x0000;
 void HAL_EVE_Init(void)
 {
 	uint8_t val;
-
 	MCU_Init();
 
 	// Set Chip Select OFF
@@ -97,6 +96,7 @@ void HAL_EVE_Init(void)
 	HAL_HostCmdWrite(0x68, 0x00); // Reset
 #endif
 
+	
 	// Set active
 	HAL_HostCmdWrite(0, 0x00);
 	

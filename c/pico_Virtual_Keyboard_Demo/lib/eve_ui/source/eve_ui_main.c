@@ -55,11 +55,6 @@
 
 /* GLOBAL VARIABLES ****************************************************************/
 
-/**
- @brief Free RAM_DL after custom images.
- */
-uint32_t img_end_address;
-
 /* LOCAL VARIABLES *****************************************************************/
 
 /* MACROS **************************************************************************/
@@ -145,6 +140,7 @@ void eve_ui_calibrate()
 void eve_ui_screenshot()
 {
 #ifdef ENABLE_SCREENSHOT
+	uint32_t img_end_address = malloc_ram_g(EVE_DISP_WIDTH * EVE_DISP_HEIGHT * 2);
 	uint8_t buffer[256];
 	int i, j;
 
@@ -166,6 +162,8 @@ void eve_ui_screenshot()
 	}
 	printf("ARGB end\n"); // Marker to identify the end of the image.
 
+	free_ram_g(img_end_address);
+	
 	eve_ui_splash("Screenshot completed...");
 	eve_ui_arch_sleepms(2000);
 

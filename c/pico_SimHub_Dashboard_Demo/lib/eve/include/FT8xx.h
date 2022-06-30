@@ -1062,7 +1062,7 @@
 #define EVE_ENC_VERTEX2F(x,y)                                ((1UL<<30)|(((x)&32767UL)<<15)|(((y)&32767UL)<<0))
 #define EVE_ENC_VERTEX2II(x,y,handle,cell)                   ((2UL<<30)|(((x)&511UL)<<21)|(((y)&511UL)<<12)|(((handle)&31UL)<<7)|(((cell)&127UL)<<0))
 
-#define EVE_ENC_BITMAP_ADDR_MASK 16777215UL
+#define EVE_ENC_BITMAP_ADDR_MASK 0x7FFFFFUL
 #define EVE_ENC_BITMAP_SOURCE(addr)                     ((1UL << 24) | ((addr)&EVE_ENC_BITMAP_ADDR_MASK))
 #define EVE_ENC_BITMAP_SOURCE2(flash_or_ram, addr)      ((1UL << 24) | ((flash_or_ram) << 23) | (((addr) & (EVE_ENC_BITMAP_ADDR_MASK >> 1)) << 0))
 #define EVE_ENC_CLEAR_COLOR_RGB(red,green,blue)              ((2UL<<24)|(((red)&255UL)<<16)|(((green)&255UL)<<8)|(((blue)&255UL)<<0))

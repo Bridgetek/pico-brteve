@@ -2,8 +2,8 @@
 cmake_minimum_required(VERSION 3.12)
 
 # Modify these to set the target GPU and display
-set(FT8XX_TYPE FT800)
-set(DISPLAY_RES WQVGA)
+set(FT8XX_TYPE BT817)
+set(DISPLAY_RES WVGA)
 
 #include build functions from Pico SDK
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
@@ -76,6 +76,6 @@ add_custom_command(TARGET ${PROJECT_NAME}
     VERBATIM
 )
 # Enable stdio on UART
-#pico_enable_stdio_uart(${PROJECT_NAME} 1)
+pico_enable_stdio_uart(${PROJECT_NAME} 1)
 # Do NOT enable stdio on USB as we have our own USB device emulated.
-pico_enable_stdio_usb(${PROJECT_NAME} 1)
+#pico_enable_stdio_usb(${PROJECT_NAME} 1)
