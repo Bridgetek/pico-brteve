@@ -37,7 +37,6 @@ class LDSBus_Sensor(ui_config):
         self.turnOnLDS()
 
     def turnOnLDS(self):
-        print("turnOnLDS")
         #print(LDSBus_Sensor.__dict__)
         if self.skipSensor: return
         """

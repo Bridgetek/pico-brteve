@@ -1,24 +1,14 @@
 import time
-import math
-#import random
-from random import randint
 import json
 from .helper import helper
 from .gesture import gesture
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .layout import layout
 from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_common import ui_common
 from .ui_common import ui_config
 from .tags import *
-from . import datetime
 from .widgets import widgets_box, widgets_point
-
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_4in1_sensor(ui_common):
     data_gui=1
@@ -114,11 +104,10 @@ class ui_4in1_sensor(ui_common):
         ldsuid = int(lds['DID'])      
         eve.TagMask(1)
         eve.Tag(tag_ui_lds_4in1_t)
-        if (self.useBlend==1): eve.SaveContext() 
+        eve.SaveContext() 
         self.barGraphHis(x = x, y=y, w = boxW, h = boxH, border=1,  data=ui_4in1_sensor.temperature_data ,scale=1,blend=1)
-        if (self.useBlend==1):
-            self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1 ,scale=1,blend=1) 
-            eve.RestoreContext()
+        self.blendBk(x=x,y=y,w=boxW,h = boxH, border=1 ,scale=1,blend=1) 
+        eve.RestoreContext()
         self.coordinateMarker(x,y,boxW,boxH,1,1,0,tvalue=self.value_t)            
         self.eve.Tag(tag_ui_lds_4in1_a)
         self.circle_box(x =x+xHalf, y=y, w = boxW, h = boxH, border=1, title="Ambient",unit="Lux", vmin=0, vmax=1000, lwarning=70, hwarning=900, value=self.value_a)

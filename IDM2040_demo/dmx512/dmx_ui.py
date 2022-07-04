@@ -1,14 +1,8 @@
 from brteve.brt_eve_bt817_8 import BrtEve
 from  main_menu.brt_eve_rp2040_dmx import BrtEveRP2040_dmx as BrtEveRP2040
-
-from  .gesture import gesture
-import supervisor
-import microcontroller
+from  image_viewer.gesture import gesture
 import math
 import time
-import array
-# import uctypes
-import ulab.numpy as np
 import board
 from .dmx512 import dmx512
 
@@ -18,13 +12,6 @@ tag_Back=tag_count;tag_count+=1
 tag_colorpicker=tag_count;tag_count+=1
 tag_lightness=tag_count;tag_count+=1
 tag_white=tag_count;tag_count+=1
-
- 
-
-tag_all_red=tag_count;tag_count+=1
-tag_all_green=tag_count;tag_count+=1
-tag_all_blue=tag_count;tag_count+=1
-tag_all_dark=tag_count;tag_count+=1
 
 class dmx_ui(object):
     def __init__(self , eve: BrtEve):
@@ -40,17 +27,14 @@ class dmx_ui(object):
         h = self.eve.lcd_height
         left = w/2 - 252/2
         self.images = {
-                              #addr0           size1  w2  h3  tag4 scale5 x6                y7
-            'circular_colorwheel'    : [128576 - 4096 , 63552 , 252, 252,  0,  1,     100  , 50      ],
-            #'gs-16b-2c-44100hz.raw'    : [144960 - 4096 , 699328 , 250, 250,  0,  1,     100  , 50      ],
+             #name                      addr            size 
+            'circular_colorwheel'    : [128576 - 4096 , 63552    ],
         } 
             
         img = self.images['circular_colorwheel']
         eve.cmd_flashread(img[0], img[0]+4096, img[1])  
         eve.finish()
-
         self.tWhitePercent=0
-
         self.radius=125
         self.sat=0.5
         self.hue=50
@@ -65,10 +49,7 @@ class dmx_ui(object):
         self.wInterval=100 # write to DMX   interval 
         self.c_w=0
         self.counter=0
-        self.lastTouch=time.monotonic_ns() / 1000_000
-        self.touchCounter=0
-        self.longTouch=0
-        self.snapCounter=0
+
 
         
     def hsv_to_rgb(self,h, s, v):
@@ -261,25 +242,6 @@ class dmx_ui(object):
         eve.cmd_swap()   
         eve.flush() 
         self.dmx.deinit()
-        del self.dmx 
+ 
 
-
-if __name__ == '__main__':
-    # File "/lib/brteve/brt_eve_rp2040.py", line 23, in pin
-    # self.pin_dcx_eve_ili9488 = pin(board.GP8) #D/CX pin of ILI9488
-     
-    host = BrtEveRP2040()
-    eve = BrtEve(host)
-    #self.eve = BrtEveExt(self.host)
-    #eve.init(resolution="1280x800", touch="goodix")
-    eve.init(resolution="800x480", touch="capacity")
-    #eve=self.eve
-    #eve.calibrate()
-    # eve.wr32(eve.REG_TOUCH_TRANSFORM_A, 0xfffefefc) # pre setting for 1280x800 lcd
-    # eve.wr32(eve.REG_TOUCH_TRANSFORM_B, 0xfffffcbf)
-    # eve.wr32(eve.REG_TOUCH_TRANSFORM_C, 0x506adb4)
-    # eve.wr32(eve.REG_TOUCH_TRANSFORM_D, 0xfffffed1)
-    # eve.wr32(eve.REG_TOUCH_TRANSFORM_E, 0xfffefc79)
-    # eve.wr32(eve.REG_TOUCH_TRANSFORM_F, 0x32c3211)
-
-    dmx_ui(eve).loop()
+ 

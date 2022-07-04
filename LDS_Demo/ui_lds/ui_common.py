@@ -1,23 +1,14 @@
 import time
 import math
-#import random
-from random import randint
 import json
 from .helper import helper
 from .gesture import gesture
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .layout import layout
 from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_config import ui_config
 from .tags import *
-from . import datetime
 from .widgets import widgets_box, widgets_point
-
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_common(ui_config):
     data_gui=1
@@ -46,14 +37,10 @@ class ui_common(ui_config):
         self.hData=2
         self.hBk=3
         self.hBk512=4
-        self.useBlend=1
         self.boxW=272
         self.boxH=180
         self.last_timeout =  time.monotonic_ns() / 1000_000
 
- 
-    def interrupt(self):
-        return 0
 
     def rotate_str_up(self, sss, angle, fontsize, opt, x, y):
         e=self.eve
@@ -528,11 +515,8 @@ class ui_common(ui_config):
             eve.Vertex2f(x , y+h )
             eve.Vertex2f(x , y  )    
 
-
-
-        if (blend==1) and (self.useBlend==1 ):
+        if (blend==1) :
             eve.BlendFunc(eve.SRC_ALPHA, eve.ZERO) # Reset blend ,new 
-
 
         eve.ColorRGB(255, 255, 255)
         if scale==1:
@@ -639,7 +623,7 @@ class ui_common(ui_config):
         MAX_VALUE=80  #40-80
        
         #self.coordinateMarker(x,y,w*scale,h*scale,1,scale,blend)
-        if (blend==1) and (self.useBlend==1 ):
+        if (blend==1):
             eve.BlendFunc(eve.SRC_ALPHA, eve.ZERO) # Reset blend ,new     
 
         eve.BitmapHandle(0)
@@ -698,9 +682,9 @@ class ui_common(ui_config):
         bmAdd=1024*1024 - 200*1024
          
 
-        if (blend==0) or (self.useBlend==0):return
+        if (blend==0) :return
          
-        if (blend==1) and (self.useBlend==1 ):
+        if (blend==1) :
            eve.BlendFunc(eve.DST_ALPHA,eve.ONE_MINUS_DST_ALPHA)
 
         if scale==1:
@@ -722,49 +706,6 @@ class ui_common(ui_config):
         else:        eve.Vertex2f(x+PADDING_X+37, y+PADDING_X) 
         eve.End() 
 
-    def snapshot2( self,title):
-        eve = self.eve
-        block=60   #  -- 96000
-        #block=480 # --- 768000
-        file="/sd/Snap565_"+title+"_"+str(block)+".raw"
-        total=480/block
-        #chunk_size=800*block*4  #RGBA
-        block_size=800*block*2  #RGB565
-        chunk_size=2048
-        print("total" ,file,total ,block_size,chunk_size)
-        with open(file, 'wb') as f:
-            address = eve.RAM_G+(1024-256)*1024
-            for i in range(0,total):
-                #print("snapshotOne" ,i,block*i ,block_size)
-                eve.cmd_snapshot2(eve.RGB565, address, 0, block*i, 800, block)  #RGB565
-                eve.finish()
-                readAdd=0
-                while readAdd<block_size:
-                    leftSize=block_size-readAdd
-                    if (leftSize)>chunk_size:
-                        buf=eve.read_mem(address+readAdd,chunk_size)
-                    else:
-                        buf=eve.read_mem(address+readAdd,leftSize)
-                    readAdd+=chunk_size
-                    if not buf:
-                        print("error snapshotOne" ,i,address)
-                        return -1
-                    f.write(buf)
-    #         print("f.tell=", f.tell())
-        print("snapshot2 finish",total*block_size)
-        
-    def drawBtn(self):
-        eve = self.eve
-        eve.ColorRGB(0xff, 0xff, 0xff)
-        eve = self.eve
-        eve.ColorRGB(0xff, 0xff, 0xff)
-        y = self.layout.APP_Y 
-        btn_w = self.btn_w
-        btn_h = self.btn_h
-        x1 = self.xStart
-        x5 = x1 + 310
-        eve.Tag(tag_ui_lds_back)
-        eve.cmd_button(x5, y, btn_w, btn_h, 31, 0, "Back")
-        eve.Tag(0)
-                 
+  
+
     

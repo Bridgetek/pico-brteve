@@ -1,8 +1,5 @@
 import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ..lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 def _color_tag(eve, color, tag):
     if(tag):

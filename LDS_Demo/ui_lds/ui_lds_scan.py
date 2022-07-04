@@ -1,19 +1,12 @@
 import time
 from .helper import helper
 from .gesture import gesture
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .layout import layout
 from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_config import ui_config
 from .tags import *
-from . import datetime
 from .widgets import widgets_box, widgets_point
-
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_lds_scan(ui_config):
     def __init__(self, eve: BrtEve, helper: helper, gesture: gesture, layout: layout,LDSBus_Sensor: LDSBus_Sensor,exit=0):
@@ -28,9 +21,6 @@ class ui_lds_scan(ui_config):
         self._rescan=True
         #self._rescan=False
  
-    def interrupt(self):
-        return 0
-
     def drawBtn(self):
         eve = self.eve
         eve.ColorRGB(0xff, 0xff, 0xff)
@@ -105,8 +95,5 @@ class ui_lds_scan(ui_config):
             y+=distance
             i=i+1
             widgets_box(eve,x,y-1,800,1, 1, [0x00, 0xff, 0xff])
-"""
-   {3: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus Thermocouple Sensor', 'MFG': '23062021', 'DID': '3', 'NICK': 'LDSBus Thermocouple Sensor', 'UID': 'LS01010105232113104', 'SNO': '000003EB', 'OBJ': '32769'}, 
-   1: {'TERM': 'off', 'PRV': '1.0', 'NAME': 'LDSBus 4in1 Sensor', 'MFG': '17092021', 'DID': '1', 'NICK': 'LDSBus 4in1 Sensor', 'UID': 'LS01010101272100039', 'SNO': '41363B88', 'OBJ': '32768'}}
-"""
+
             

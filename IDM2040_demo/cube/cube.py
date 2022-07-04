@@ -22,7 +22,6 @@ def normalize(vector):
         mag += e*e
     if mag == 0:
         return vector, 0
-
     mag = math.sqrt(mag)
     for i in range(0,len(vector)):
         vector[i] = vector[i] / mag
@@ -397,14 +396,7 @@ class cube:
 if __name__ == "__main__":
     host = BrtEveRP2040()
     eve = BrtEve(host)
-    #eve.init(resolution="1280x800", touch="goodix")
     eve.init(resolution="800x480", touch="capacity")
     cube(eve).loop()
-else:
-    # host = BrtEveRP2040()
-    # eve = BrtEve(host)
-    # #eve.init(resolution="1280x800", touch="goodix")
-    # eve.init(resolution="800x480", touch="capacity")
-    # cube().cube_main()
- 
+
   

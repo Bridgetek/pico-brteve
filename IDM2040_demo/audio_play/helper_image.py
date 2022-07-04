@@ -1,4 +1,4 @@
-import time
+
 from brteve.brt_eve_bt817_8 import BrtEve
 
 # Configuration
@@ -59,69 +59,6 @@ class helper_image():
         self.misRotate = 0
         self.misScale = 0
 
-    def getformatW(self, format):
-        if format == self.eve.ASTC_4x4  :
-            return 4
-        if format == self.eve.ASTC_5x4  :
-            return 5
-        if format == self.eve.ASTC_5x5  :
-            return 5
-        if format == self.eve.ASTC_6x5  :
-            return 6
-        if format == self.eve.ASTC_6x6  :
-            return 6
-        if format == self.eve.ASTC_8x5  :
-            return 8
-        if format == self.eve.ASTC_8x6  :
-            return 8
-        if format == self.eve.ASTC_8x8  :
-            return 8
-        if format == self.eve.ASTC_10x5 :
-            return 10
-        if format == self.eve.ASTC_10x6 :
-            return 10
-        if format == self.eve.ASTC_10x8 :
-            return 10
-        if format == self.eve.ASTC_10x10:
-            return 10
-        if format == self.eve.ASTC_12x10:
-            return 12
-        if format == self.eve.ASTC_12x12:
-            return 12
-
-        return 4
-
-    def getformatH(self, format):
-        if format == self.eve.ASTC_4x4  :
-            return 4
-        if format == self.eve.ASTC_5x4  :
-            return 4
-        if format == self.eve.ASTC_5x5  :
-            return 5
-        if format == self.eve.ASTC_6x5  :
-            return 5
-        if format == self.eve.ASTC_6x6  :
-            return 6
-        if format == self.eve.ASTC_8x5  :
-            return 5
-        if format == self.eve.ASTC_8x6  :
-            return 6
-        if format == self.eve.ASTC_8x8  :
-            return 8
-        if format == self.eve.ASTC_10x5 :
-            return 5
-        if format == self.eve.ASTC_10x6 :
-            return 6
-        if format == self.eve.ASTC_10x8 :
-            return 8
-        if format == self.eve.ASTC_10x10:
-            return 10
-        if format == self.eve.ASTC_12x10:
-            return 10
-        if format == self.eve.ASTC_12x12:
-            return 12
-
-        return 4
 
     def setup_bitmap(self, img: _image) :
         address = img.addressRamg

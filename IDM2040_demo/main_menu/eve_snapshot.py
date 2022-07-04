@@ -1,20 +1,13 @@
-# Changed to use self lib brt_eve_rp2040_dmx.py instead of changing original   brt_eve_rp2040.py
-import os
-import board
-import busio
-import digitalio
-import sdcardio # pylint: disable=import-error
-import storage # pylint: disable=import-error
+import sdcardio  
+import storage  
 
-def snapshot2( eve,title):
-    block=60   #  -- 96000
-    #block=480 # --- 768000
+def snapshot2( eve,title,block):
+    #block=60 is one typical 
     file="/sd/Snap565_"+title+"_"+str(block)+".raw"
     total=480/block
     #chunk_size=800*block*4  #RGBA
     block_size=800*block*2  #RGB565
     chunk_size=2048
-    print("total" ,file,total ,chunk_size)
     with open(file, 'wb') as f:
         address = eve.RAM_G+(1024-128)*1024
         for i in range(0,total):
@@ -33,5 +26,4 @@ def snapshot2( eve,title):
                     print("error snapshotOne" ,i,address)
                     return -1
                 f.write(buf)
-#         print("f.tell=", f.tell())
-    print("snapshot2 finish",total*block_size)
+    print("snapshot2 finish",file,total*block_size)

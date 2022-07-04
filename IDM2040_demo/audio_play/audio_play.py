@@ -6,11 +6,7 @@ from .helper_gesture import helper_gesture
 from .ui import ui
 from .audio_eve import audio_eve
 
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_rp2040 import BrtEveRP2040
 
 class audio_play():
     def __init__(self, eve: BrtEve) -> None:
@@ -116,28 +112,8 @@ class audio_play():
         eve = self.eve
         ges = self.helper_gesture.renew()
         tag = ges.tagReleased
-#         if ges.isTouch:
-#             ms = time.monotonic_ns() / 1000_000
-#             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 100):
-#                 self.touchCounter+=1
-#                 if self.touchCounter>9:
-#                     self.touchCounter=0
-#                     self.longTouch=1
-#             else:
-#                 self.touchCounter=0
-#                 self.longTouch=0
-#             self.lastTouch=ms
-#         else:
-#                 self.touchCounter=0
-#                 self.longTouch=0                       
-#         if self.longTouch:
-#                 from main_menu.eve_tools import snapshot2
-#                 snapshot2(self.eve,"audio_"+str(self.snapCounter))
-#                 self.snapCounter+=1
-                
+
         if tag == tag_play: # play/pause is same button
-            # blocking function
-            #self.play_pause()      
             self.play_pauseFromFlash()
         elif tag == tag_stop: 
             self.stop()
@@ -187,23 +163,6 @@ class audio_play():
             if '.raw' in f:
                 self.files.append(f)
 
-    def play_pause(self):
-        self.ui.play(not self.audio_eve.is_playing())
-        if not self.audio_eve.is_playing():
-            self.ui.set_playing_file_id(self.file_selected_id)
-            SEEK_SET = 0
-            SEEK_CUR = 1
-            SEEK_END = 2
-            with open(self.media_location +'/'+ self.files[self.file_selected_id], "rb") as file_handler:
-                file_handler.seek(0, SEEK_END)
-                self.file_size = file_handler.tell()
-                file_handler.seek(0, SEEK_SET)
-
-        #self.ui.render()
-        # this is a blocking function, use callback function (fifo_interrupt) to check playback status
-        self.audio_eve.play(self.fifo_interrupt, 
-            self.media_location +'/'+ self.files[self.file_selected_id],
-            44100, self.eve.LINEAR_SAMPLES);
 
     def play_pauseFromFlash(self):
         #print('play_pauseFromFlash'  )
@@ -216,10 +175,6 @@ class audio_play():
             SEEK_SET = 0
             SEEK_CUR = 1
             SEEK_END = 2
-            # with open(self.media_location +'/'+ self.files[self.file_selected_id], "rb") as file_handler:
-            #     file_handler.seek(0, SEEK_END)
-            #     self.file_size = file_handler.tell()
-            #     file_handler.seek(0, SEEK_SET
         self.audio_eve.playfromFlash(self.fifo_interrupt,self.wfiles[fname][0],self.wfiles[fname][1],44100, self.eve.LINEAR_SAMPLES)
 
     def stop(self):
@@ -242,7 +197,6 @@ class audio_play():
         self.stop()
         while(self.audio_eve.is_playing()):
             time.sleep(0.001)
-        #self.play_pause()
         self.play_pauseFromFlash()
         
     def prev_file(self):
@@ -264,9 +218,7 @@ class audio_play():
         while(self.audio_eve.is_playing()):
             time.sleep(0.001)
         self.ui.set_playing_file_id(self.file_selected_id)
-        #self.play_pause()
-        #self.play_pauseFromFlash()
-        
+
     def set_loop(self):
         if self.loop == 0:
             self.loop = 1
@@ -295,29 +247,11 @@ class audio_play():
         angel = track >> 16
         if tag == tag_volume:
             angel = angel * 360 // 65535
-            #print("angel>",angel,self.last_angle_volume)
-            
-#             if self.last_angle_volume != 0 and angel != self.last_angle_volume:
-#                 diff = angel - self.last_angle_volume
-#                 print("diff",diff)
-#                 if diff > 180: # decreasing, counter clock wise
-#                     diff = diff - 360
-#                 elif diff < -180: # increasing, clock wise
-#                     diff = diff + 360
-# 
-#                 if (self.vol < 255 and diff > 0) or (self.vol > 0 and diff < 0):
-#                     self.vol += diff
-#                     self.vol =max(0, self.vol)
-#                     self.vol =min(255, self.vol)
-#                     self.ui.set_volume(self.vol)
-#                     self.audio_eve.set_volume(self.vol)
-            
+            #print("angel>",angel,self.last_angle_volume)                   
             if angel<45: angel=360
             self.last_angle_volume = angel
             
             self.angle_vol(angel-90)
-#         else:
-#             self.last_angle_volume = 0
         
     def jump_to(self, time):
         print("Function is not implemented")

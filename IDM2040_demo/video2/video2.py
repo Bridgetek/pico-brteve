@@ -1,11 +1,8 @@
 import sys
 from .widgets import widgets_dialog_yes_no
-
 import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
+
 
 def flash_video(eve: BrtEve, file, blob=''):
     eve.storage.write_flash_with_progressbar(file, 4096)

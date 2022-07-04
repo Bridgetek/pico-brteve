@@ -49,8 +49,7 @@ class BrtEveRP2040_dmx():
         self.pin_cs = pin(board.GP5) #cs of SPI for Eve
         self.pin_pdn = pin(board.GP7) #power down pin of Eve
 
-        # self.pin_cs_eve_ili9488 = pin(board.GP9) #CSX pin of ILI9488
-        # self.pin_dcx_eve_ili9488 = pin(board.GP8) #D/CX pin of ILI9488
+
 
         self.pin_cs_sdcard = board.GP13 #cs of SPI for SD card
 
@@ -87,17 +86,4 @@ class BrtEveRP2040_dmx():
             self.spi_eve.readinto(read_buffer)
         self.pin_cs.value = True
         return read_buffer
-
-    def write_ili9488(self,cmd,data):
-        """ Write command and data to ili9488 LCD"""
-
-
-    @spilock
-    def write_ili9488_cmd(self, cmd):
-        """ Write command to ili9488 LCD"""
-
-
-    @spilock
-    def write_ili9488_data(self, data):
-        """ Write data to ili9488 LCD"""
 

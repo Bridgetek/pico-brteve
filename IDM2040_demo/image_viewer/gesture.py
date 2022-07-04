@@ -1,8 +1,12 @@
+import time
 from brteve.brt_eve_bt817_8 import BrtEve
-from .datetime import milis
 
 MIN_MOVE         = 15
 SWIPE_LIMIT      = 5
+
+# return value is the number of milliseconds that have elapsed since the system was started.
+def milis():
+    return round(time.monotonic_ns() / 1000_000)
 
 class Gesture_Touch():
     tagTrackTouched = 0
@@ -25,7 +29,7 @@ class gesture():
     SWIPE_DOWN=3
     SWIPE_UP=4   
     sIsSwipe = 0 # SWIPE_LEFT.SWIPE_RIGHT
-    def __init__(self,eve: BrtEve):
+    def __init__(self, eve: BrtEve):
         self.eve = eve
         self._gesture = Gesture_Touch()
         self._last_y = 0
@@ -36,10 +40,8 @@ class gesture():
         self.prev_time = 0
         self._delay = 0
 
-
     def _tag_release(self, new_tag):
         tag_released = 0
-
         if (new_tag == 0 and self._last_tag != new_tag):
             tag_released = self._last_tag
             self._last_tag = 0
@@ -55,33 +57,39 @@ class gesture():
         if self._delay < 30:
             return self._last_is_swipe
         self._delay = 0
-
         if new_x != 32768:
             distance_x = new_x - self._last_x
+            self._last_x  = new_x
             if abs(distance_x) > MIN_MOVE:
                 if self._count_swipe >= SWIPE_LIMIT:
-                    self._last_is_swipe = True
-                    return True
+                    if (distance_x>0):self._last_is_swipe=self.SWIPE_RIGHT  
+                    else: self._last_is_swipe=self.SWIPE_LEFT
+                    self.sIsSwipe=self._last_is_swipe
+                    self._count_swipe = 0
+                    return self._last_is_swipe
                 else:
                     self._count_swipe +=1
             else:
                 self._count_swipe = 0
-
-        elif new_y != 32768:
+        if new_y != 32768:
             distance_y = new_y - self._last_y
+            self._last_y  = new_y
             if abs(distance_y) > MIN_MOVE:
-                if self._count_swipe >= SWIPE_LIMIT:
-                    self._last_is_swipe = True
-                    return True
+                if self._count_swipe_y >= SWIPE_LIMIT:
+                    if (distance_y>0):self._last_is_swipe=self.SWIPE_DOWN
+                    else : self._last_is_swipe=self.SWIPE_UP
+                    self.sIsSwipe=self._last_is_swipe
+                    self._count_swipe_y = 0                  
+                    return self._last_is_swipe
                 else:
-                    self._count_swipe +=1
+                    self._count_swipe_y +=1
             else:
-                self._count_swipe = 0
+                self._count_swipe_y = 0
         else:
-            self._count_swipe = 0
-
-        self._last_is_swipe = False
-        return False
+            self._count_swipe_y = 0
+        self._last_is_swipe = 0
+        self.sIsSwipe=self._last_is_swipe
+        return 0
 
     def renew(self):
         eve = self.eve
@@ -102,4 +110,5 @@ class gesture():
 
     def get(self):
         return self._gesture
+
 

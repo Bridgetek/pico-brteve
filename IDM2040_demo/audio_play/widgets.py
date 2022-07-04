@@ -1,9 +1,8 @@
 import sys
 import time
 
-if sys.implementation.name != "circuitpython":
-    from ...lib.brteve.brt_eve_bt817_8 import BrtEve
-    from ...lib.brteve.brt_eve_rp2040 import BrtEveRP2040
+from brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_rp2040 import BrtEveRP2040
 
 _last_tag = 0
 def _tag_release(new_tag):

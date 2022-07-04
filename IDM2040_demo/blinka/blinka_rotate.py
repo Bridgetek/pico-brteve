@@ -84,6 +84,7 @@ class blinka_rotate(object):
                 x = scale * r * math.sin(th)
                 y = scale * r * math.cos(th)
                 gd.Vertex2f(x, y)
+        t=0
         while True:
             gd.VertexFormat(2)
             gd.ColorRGB(0x40, 0x50, 0x70)           
@@ -116,6 +117,7 @@ class blinka_rotate(object):
             if tag == tag_Back:     
                   break                         
             gd.swap()
+            t += 1
         eve=gd
         eve.cmd_dlstart()    
         eve.VertexFormat(2)
@@ -131,13 +133,5 @@ class blinka_rotate(object):
 if __name__ == '__main__':
     host = BrtEveRP2040()
     eve = BrtEve(host)
-    #eve.init(resolution="1280x800", touch="goodix")
     eve.init(resolution="800x480", touch="capacity")
     blinka_rotate(eve).run()
-#else:
-#     import bteve as eve
-#     from spidriver import SPIDriver
-#     gd = eve.Gameduino(SPIDriver(sys.argv[1]))
-#     assetdir = "assets/"
-#     gd.init()
-

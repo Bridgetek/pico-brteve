@@ -3,9 +3,7 @@ from ui_lds.gesture import gesture
 from ui_lds.layout import layout
 from ui_lds.helper import helper
 import time
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .tags import *
-import sys
 from .ui_lds_scan import ui_lds_scan
 from .ui_4in1_sensor import ui_4in1_sensor
 from .ui_4in1_sensor_t import ui_4in1_sensor_t
@@ -15,17 +13,12 @@ from .ui_4in1_sensor_m import ui_4in1_sensor_m
 from .ui_co2_sensor import ui_co2_sensor
 from .ui_co2_sensor_t import ui_co2_sensor_t
 from .ui_co2_sensor_h import ui_co2_sensor_h
-#from .ui_co2_sensor_a import ui_co2_sensor_a
 from .ui_co2_sensor_ambient import ui_co2_sensor_ambient
 from .ui_co2_sensor_co2 import ui_co2_sensor_co2
 from .ui_relay import ui_relay
 from .ui_lds_Details import ui_lds_Details
 from .LDSBus_Sensor import LDSBus_Sensor
-
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 # controler class
 class ui_main():
@@ -35,8 +28,6 @@ class ui_main():
         self.gesture = gesture()
         self.layout = layout(eve, self.helper)
         ui_config.skipSensor=skipSensor
-
-
         self.LDSBus_Sensor=LDSBus_Sensor()
         self.ui_lds_scan=ui_lds_scan(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor,exit)
         self.ui_4in1_sensor=ui_4in1_sensor(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
@@ -50,13 +41,10 @@ class ui_main():
         self.ui_co2_sensor_ambient=ui_co2_sensor_ambient(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
         self.ui_co2_sensor_co2=ui_co2_sensor_co2(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
         self.ui_relay=ui_relay(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
-        self.ui_lds_Details=ui_lds_Details(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)
-        
+        self.ui_lds_Details=ui_lds_Details(eve, self.helper, self.gesture, self.layout,self.LDSBus_Sensor)        
         self.ui_active = self.ui_lds_scan
         self.currType=''
-
         self.hBk512=4
-        self.useBlend=1
         time.sleep(0.2)
         assetdir = "ui_lds/"
         eve.cmd_dlstart()  
@@ -71,7 +59,6 @@ class ui_main():
         self.flush()
         time.sleep(0.2)
         self.showScan()
-
         self.lastTouch=time.monotonic_ns() / 1000_000
         self.touchCounter=0
         self.longTouch=0 
@@ -101,11 +88,8 @@ class ui_main():
         self.start()
         self.draw(50,300,30,"Scaning Sensor...")
         self.flush()
-
-  
  
     def getType(self,cIndex):
-        mame=''
         i=0
         currLDS =None
         for index, lds in self.LDSBus_Sensor.lds_list.items():
@@ -118,50 +102,20 @@ class ui_main():
         if name=="scan" :self.ui_active = self.ui_lds_scan
         elif  name=="4in1" :self.ui_active = self.ui_4in1_sensor
         
-    def snapshot2( self,title):
-        eve = self.eve
-        block=60   #  -- 96000
-        #block=480 # --- 768000
-        file="/sd/Snap565_"+title+"_"+str(block)+".raw"
-        total=480/block
-        #chunk_size=800*block*4  #RGBA
-        block_size=800*block*2  #RGB565
-        chunk_size=2048
-        print("total" ,file,total ,chunk_size)
-        with open(file, 'wb') as f:
-            address = eve.RAM_G+(1024-128)*1024
-            for i in range(0,total):
-                #print("snapshotOne" ,i,block*i ,block_size)
-                eve.cmd_snapshot2(eve.RGB565, address, 0, block*i, 800, block)  #RGB565
-                eve.finish()
-                readAdd=0
-                while readAdd<block_size:
-                    leftSize=block_size-readAdd
-                    if (leftSize)>chunk_size:
-                        buf=eve.read_mem(address+readAdd,chunk_size)
-                    else:
-                        buf=eve.read_mem(address+readAdd,leftSize)
-                    readAdd+=chunk_size
-                    if not buf:
-                        print("error snapshotOne" ,i,address)
-                        return -1
-                    f.write(buf)
-        print("snapshot2 finish",total*block_size)
-
   
     def get_event(self):
         eve = self.eve
         touch=self.gesture.renew(eve)
         if touch.isTouch:
             ms = time.monotonic_ns() / 1000_000
-            #print("ms " ,ms,(ms - self.lastTouch),self.touchCounter)
             if  (ms - self.lastTouch)>0 and ( ms - self.lastTouch < 250):
                 self.touchCounter+=1
                 if self.touchCounter>5:
                     self.touchCounter=0
                     self.longTouch=1
-                    print("longTouch " ,self.longTouch)
-                    #self.snapshot2(self.ui_active.title)
+                    #print("longTouch " ,self.longTouch)
+                    # from  main_menu.eve_snapshot import snapshot2
+                    # snapshot2(eve,self.ui_active.title,60)
             else:
                 self.touchCounter=0
                 self.longTouch=0
@@ -307,8 +261,6 @@ class ui_main():
  
         return tag
 
- 
-
     def loop(self):
         self.eve.cmd_dlstart() #   
         self.eve.ClearColorRGB(0, 0, 0) 
@@ -316,17 +268,8 @@ class ui_main():
         self.eve.BlendFunc(self.eve.SRC_ALPHA, self.eve.ONE_MINUS_SRC_ALPHA) #reset to  default
         self.eve.ColorRGB(0, 0, 0)  
         self.eve.VertexFormat(2)
-
-        interrupt = 0
-        for i in [self.ui_4in1_sensor,self.ui_lds_scan ,self.ui_lds_Details]:
-            if i.interrupt():
-                interrupt = 1
-                break
-        if not interrupt:
-            self.ui_active.draw()
-
+        self.ui_active.draw()
         ev = self.get_event()
-
         try:
             self.eve.Display()
             self.eve.cmd_swap()  #Co-processor faulty

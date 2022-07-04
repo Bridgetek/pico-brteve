@@ -1,23 +1,14 @@
 import time
-import math
-from random import randint
 import json
 from .helper import helper
 from .gesture import gesture
-from .datetime import hh_mm, hh_mm_ss_ms, milis, now, print_weekday, random
 from .layout import layout
 from .LDSBus_Sensor import LDSBus_Sensor
 from .ui_common import ui_common
 from .ui_co2_sensor import ui_co2_sensor
 from .tags import *
-from . import datetime
 from .widgets import widgets_box, widgets_point
-
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_bt817_8 import BrtEve
 
 class ui_co2_sensor_co2(ui_co2_sensor):
     data_gui=1

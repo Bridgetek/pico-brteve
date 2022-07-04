@@ -1,12 +1,7 @@
 import time
 from .tags import *
 from .helper_gesture import helper_gesture
-
-import sys
-if sys.implementation.name == "circuitpython":
-    from brteve.brt_eve_bt817_8 import BrtEve
-else:
-    from ....lib.brteve.brt_eve_bt817_8 import BrtEve
+from brteve.brt_eve_rp2040 import BrtEveRP2040
 
 _state_play = 0
 _state_stop = 1
@@ -25,16 +20,7 @@ class audio_eve():
         self.eof = 0
         self.count=0
         self.start_ptr=0
-
         self.eve.storage.flash_state(eve.FLASH_STATUS_FULL)
-
-        # self.eve.cmd_flashdetach()
-        # self.wait_flush()
-        # self.eve.cmd_flashattach()
-        # self.wait_flush()
-        # self.eve.cmd_flashfast()
-        # self.wait_flush()
-
         self.fifo_wp = 0    
 
     def cmd_rp(self):
@@ -70,12 +56,10 @@ class audio_eve():
         # wait ulti fifo free
         while free_fifo < chunk_size:
             free_fifo = self.fifo_free()
-            #print('free_fifo=', free_fifo, 'ptr=', eve.rd32(eve.REG_PLAYBACK_READPTR) )
             time.sleep(0.01)
 
         # Flush new data, from address self.fifo_wp
         count = 0
-        #print('flush ', free_fifo, ' bytes to ', self.fifo_wp, '---------------------------')
         remain = free_fifo
         while(count < free_fifo):
             read_num = chunk_size if chunk_size < remain else remain
@@ -85,8 +69,6 @@ class audio_eve():
             buffer = file_handler.read(read_num)
             give_num = len(buffer)
             eve.write_mem(self.mediafifo_start + self.fifo_wp, buffer)
-            #print('flush ', give_num, ' bytes to ', self.fifo_wp)
-
             count += give_num
             remain -= give_num
             self.fifo_wp += give_num
@@ -112,11 +94,6 @@ class audio_eve():
 
             eve.cmd_flashread(self.mediafifo_start + self.fifo_wp,addr+self.count,read_num)
             give_num=read_num
-            #buffer = file_handler.read(read_num)
-            # give_num = len(buffer)
-            # eve.write_mem(self.mediafifo_start + self.fifo_wp, buffer)
-            #print('flush ', give_num, ' bytes to ', self.fifo_wp)
-
             self.count += give_num
             remain -= give_num
             self.fifo_wp += give_num
