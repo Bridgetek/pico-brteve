@@ -80,17 +80,12 @@ class ui_lds_scan(ui_config):
         for index, lds in self.LDSBus_Sensor.lds_list.items():
             if (i %2)==0: eve.ColorRGB(170, 85, 0)
             esle:eve.ColorRGB(85, 85, 0)
-            eve.ColorRGB(255, 255, 255)
-            enableBut=True
-            if (lds is  None):
-                lds=lds_a
-                enableBut=False
-                eve.ColorRGB(100,100, 100)                             
+            eve.ColorRGB(255, 255, 255)                           
             eve.cmd_text(x, y, 28, 0, lds['NAME'])
             eve.cmd_text(x+310, y, 28, 0, lds['DID'])
-            if (enableBut): eve.Tag(tag_ui_lds_data_0+i) # start from 1
+            eve.Tag(tag_ui_lds_data_0+i) 
             eve.cmd_button(x+370, y, 250,30,28, 0, lds['UID'])
-            eve.Tag(0) # start from 1
+            eve.Tag(0) 
             eve.cmd_text(x+640, y, 28, 0, lds['MFG'])
             y+=distance
             i=i+1

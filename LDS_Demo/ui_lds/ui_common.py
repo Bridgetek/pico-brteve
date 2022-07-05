@@ -21,21 +21,17 @@ class ui_common(ui_config):
         self.LDSBus_Sensor = LDSBus_Sensor
         self.title=""
         self._clearData=True
-
         self.start_time_ns = 0
         self.hh=0
         self.mm=0
-
         self.temp_value=0        
         self.hr_value=0
         self.last_hr=0
-        self.useGradient=0
         self._COLOR_GREEN=[0x90, 0xC8, 0x3A]
         self._COLOR_GRAY=[0x33, 0x33, 0x33]
         self._COLOR_WARNING=[0xD4, 0x21, 0x33]
         self._COLOR_YELLOW=[0xFF, 0xFF, 0x00]
         self.hData=2
-        self.hBk=3
         self.hBk512=4
         self.boxW=272
         self.boxH=180
@@ -447,38 +443,19 @@ class ui_common(ui_config):
         eve.SaveContext()
         eve.StencilFunc(eve.NEVER, 0x00, 0x00)
         eve.StencilOp(eve.INCR, eve.INCR)
-
-
         eve.ColorRGB(0x80, 0xFF, 0x40)
         eve.Begin(eve.RECTS)
-
         eve.LineWidth(rounded)
         eve.Vertex2f(x , y )
-        eve.Vertex2f(x + w , y-h )
-
-        
+        eve.Vertex2f(x + w , y-h )      
         eve.StencilFunc(eve.EQUAL, 0x01, 0x01)
         eve.StencilOp(eve.KEEP, eve.KEEP)
         eve.ScissorXY((int)(x), (int)(y-h))
-
         eve.ScissorSize(w, h)
-
-
-        #eve.cmd_gradient(x, y, 0xaef078, x+w, y-h, 0xa83e32) #good
-        eve.cmd_gradient(x, y, 0x100994, x+w, y-h, 0x6e3642)
-        
+        eve.cmd_gradient(x, y, 0x100994, x+w, y-h, 0x6e3642)       
         eve.RestoreContext()
 
-        ''' 
-        self.gradients = [
-                    [0xa83e32, 0xaef078],
-                    [0x09ad2f, 0x10170b],
-                    [0x100994, 0x6e3642],
-                    [0x6e0eeb, 0xfa6182],
-                    [0xcc06c9, 0xcfde5f],
-                    [0x3b8201, 0x27751b],
-                ]
-        '''
+
     def coordinateMarker(self,x,y,w,h,border,scale=1,blend=0,tvalue=0,MaxMin=2):
         eve = self.eve
 
@@ -489,16 +466,9 @@ class ui_common(ui_config):
         PADDING_Y = PADDING_X = 30
         ANGLE = 35
         FONTSIZE = 16
-
-        #num_mins, now_hh, now_mm = self.last_min(MEASURE_MINUTE_MAX)
         num_mins, now_hh, now_mm = MEASURE_MINUTE_MAX,0,0
 
         _second_gap=0
-        '''
-        _second_gap = self.second_gaps() # no needed to be updated
-        if _second_gap >= 0:
-            num_mins +=1
-        '''
 
         if border==1:
             # big border
@@ -523,22 +493,15 @@ class ui_common(ui_config):
             eve.cmd_text(x + 3, y + 3, 21, 0, "Temperature(")
             eve.Vertex2ii(x + 90, y + 3,17,248) #dot
             eve.cmd_text(x + 95, y + 3, 21, 0, "C)")
-#             eve.cmd_setfont2(1,0,32)
-#             eve.cmd_text(x + 185, y + 3, 1, 0, "\x20")
-#             eve.cmd_text(x + 200, y + 3, 21, 0, "()")
-#             eve.Begin(eve.BITMAPS)
-
         else:
             eve.cmd_text(x + 3, y + 3, 28, 0, "Temperature(")
             eve.Begin(eve.BITMAPS)
             eve.Vertex2ii(x + 130, y + 3,17,248) #dot
             eve.cmd_text(x + 135, y + 3, 28, 0, "C)")
-
         # Rows
         #row_offsetx = x + PADDING_X
         if scale==1:row_offsetx = x + PADDING_X+5 
         else:row_offsetx = x + PADDING_X+37  
-
         row_offsety = y + PADDING_Y
         ROW_HEIGHT = (h-PADDING_Y*2) / ROW_NUM
         eve.LineWidth(1)
@@ -573,13 +536,6 @@ class ui_common(ui_config):
             eve.Vertex2f(_x, row_offsety)
             #eve.Vertex2f(_x, row_offsety + ROW_LINE * ROW_HEIGHT - ROW_HEIGHT/2)
             eve.Vertex2f(_x, row_offsety + (ROW_LINE -1)* ROW_HEIGHT )
-
-            # _time_str = "19:20 am"
-            ''' 
-            tm = self._time_str(hh, mm, 0)
-            if i != 0: hh, mm, tm = self._time_str(hh, mm, 1)
-            #self.rotate_str_up(tm, ANGLE, FONTSIZE, 0, _x - 50, row_offsety + (ROW_LINE-1) * ROW_HEIGHT + ROW_HEIGHT)
-            '''
             tm="00:%02d"%(MEASURE_MINUTE_MAX-i) 
             if scale==1: eve.cmd_text(_x - 20, row_offsety + (ROW_LINE) * ROW_HEIGHT-ROW_HEIGHT/4 ,FONTSIZE,0,tm)
             else: eve.cmd_text(_x - 20, row_offsety + (ROW_LINE-1) * ROW_HEIGHT+ROW_HEIGHT/2 ,21,0,tm)
@@ -617,8 +573,6 @@ class ui_common(ui_config):
         numchunks=1
         bmWidth=96
         bmAdd=eve.RAM_G+256
-
- 
         PADDING_Y = PADDING_X = 30
         MAX_VALUE=80  #40-80
        
@@ -638,10 +592,7 @@ class ui_common(ui_config):
         else:
             eve.cmd_setbitmap(bmAdd, eve.BARGRAPH, SAMAPP_BARGRAPH_ARRAY_SIZE, bmWidth)
             eve.BitmapTransformA(0,128)  #double
-            #eve.BitmapTransformE(0,128)
             eve.BitmapTransformE(0,int(self.bb ))
-#             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
-#             eve.BitmapSizeH(1,0)
             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE*2,int(self.aa*bmWidth))
             eve.BitmapSizeH(0,0)
  
@@ -693,10 +644,6 @@ class ui_common(ui_config):
             eve.BitmapSizeH(0,0)
         elif scale==2:
             eve.BitmapHandle(self.hBk512)
-            #eve.BitmapTransformA(0,128)  #double
-            #eve.BitmapTransformE(0,int(self.bb ))
-#             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,0,int(self.aa*bmWidth))
-#             eve.BitmapSizeH(1,0)
             eve.BitmapSize(eve.NEAREST,eve.BORDER,eve.BORDER,SAMAPP_BARGRAPH_ARRAY_SIZE*2,int(self.aa*bmWidth))
             eve.BitmapSizeH(0,0)
 
@@ -705,7 +652,3 @@ class ui_common(ui_config):
         if scale==1: eve.Vertex2f(x+PADDING_X+5, y+PADDING_X) 
         else:        eve.Vertex2f(x+PADDING_X+37, y+PADDING_X) 
         eve.End() 
-
-  
-
-    

@@ -272,15 +272,13 @@ class ui_main():
         ev = self.get_event()
         try:
             self.eve.Display()
-            self.eve.cmd_swap()  #Co-processor faulty
+            self.eve.cmd_swap()  
             self.eve.flush() 
             self.eve.cmd_loadidentity() 
         except  Exception as e:
             print("exceprion:",e)
-        time.sleep(0.02)
+        time.sleep(0.005)
         return ev
-
-
 
 
 

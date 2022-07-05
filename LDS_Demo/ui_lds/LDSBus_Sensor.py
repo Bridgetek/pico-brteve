@@ -20,20 +20,13 @@ class LDSBus_Sensor(ui_config):
         self.lds=None
         self.lds_bus=None
         self.json_path="json"
-
         self.sensorType=""
         self.dataIndex=-1
-
         #self.skipSensor=False # AttributeError: 'LDSBus_Sensor' object has no attribute 'skipSensor'
         self.relayStatus={'Relay - CH 1':1,'Relay - CH 2':0}
         self.relayCurrents={'Current - CH 1':0.000,'Current - CH 2':0.051}
-
         self.relayStatus['Relay - CH 1']=0
-        self.relayStatus['Relay - CH 2']=1
-   
-        print('Relay - CH 1',self.relayStatus['Relay - CH 1'])
-        print('Relay - CH 2',self.relayStatus['Relay - CH 2'])
-
+        self.relayStatus['Relay - CH 2']=1 
         self.turnOnLDS()
 
     def turnOnLDS(self):
@@ -96,7 +89,6 @@ class LDSBus_Sensor(ui_config):
         sns='{"VALUE": "1"}'
         if  sensor['NAME'][0:1]=='T': sns='{"VALUE":"'+str(randint(20,27))+ '"}'
         if  sensor['NAME'][0:1]=='A': sns='{"VALUE":"'+str(randint(190,220))+ '"}'
-        #if  sensor['NAME'][0:1]=='H': sns='{"VALUE":"'+str(randint(80,95))+ '"}'
         if  sensor['NAME'][0:1]=='H': sns='{"VALUE":"'+str(randint(55,70))+ '"}'
         if  sensor['NAME'][0:1]=='M': sns='{"VALUE":"'+str(randint(0,1))+ '"}'
         if  sensor['NAME']=='CO2': sns='{"VALUE":"'+str(randint(700,780))+ '"}'
@@ -119,6 +111,5 @@ class LDSBus_Sensor(ui_config):
         if ui_config.skipSensor:return 1
         else: return self.lds_bus.LDSBus_SDK_Process_LDSUID(ldsuid)        
     def  LDSBus_SDK_WriteValue(self,ldsuid,sensor,data):
-        #if ui_config.skipSensor:return self.simulator(sensor)
         if ui_config.skipSensor:return self.simulatorWrite(sensor)
         else: return self.lds_bus.LDSBus_SDK_WriteValue(ldsuid, int(sensor['SAID']), int(sensor['CLS']), data, len(data))
