@@ -93,6 +93,8 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
 
         if resolution == "800x480":
             self.setup_800x480()
+        if resolution == "800x480_NoSquare":
+            self.setup_800x480_NoSquare()
         if resolution == "1280x720":
             self.setup_1280x720()
         if resolution == "1280x800":
@@ -507,6 +509,38 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
             (self.eve.REG_VSYNC1, 3),
             (self.eve.REG_VSYNC0, 0),
             (self.eve.REG_PCLK, 2),
+        ]
+        for (adress, value) in setup:
+            self.cmd_regwrite(adress, value)
+    def setup_800x480_NoSquare(self):
+        """Default setting for LCD WVGA 800x480"""
+        print("setup_800x480_NoSquare ")
+        self.Clear()
+        self.swap()
+        setup = [
+            # (self.eve.REG_OUTBITS, 0),
+            (self.eve.REG_DITHER, 1),
+            (self.eve.REG_CSPREAD, 0),
+            (self.eve.REG_PCLK_POL, 1),
+#            (self.eve.REG_ADAPTIVE_FRAMERATE, 0),
+
+            (self.eve.REG_HCYCLE, 928),
+            (self.eve.REG_HOFFSET, 88),
+            (self.eve.REG_HSIZE, 861),
+            (self.eve.REG_HSYNC1, 48),
+            (self.eve.REG_HSYNC0, 0),
+
+            (self.eve.REG_VCYCLE, 525),
+            (self.eve.REG_VOFFSET, 32),
+            (self.eve.REG_VSIZE, 480),
+
+            (self.eve.REG_VSYNC1, 3),
+            (self.eve.REG_VSYNC0, 0),
+            #(self.eve.REG_PCLK, 2),
+            (self.eve.REG_PCLK, 1), #When REG_PCLK is set to 1, the display output will be in EXTSYNC mode
+            (self.eve.REG_PCLK_FREQ, 0x8A1), #60M
+            #(self.eve.REG_PCLK_FREQ, 0x8B2), #33M
+            #(self.eve.REG_PCLK_FREQ, 443),  #8M blink
         ]
         for (adress, value) in setup:
             self.cmd_regwrite(adress, value)
