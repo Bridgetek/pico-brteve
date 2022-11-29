@@ -16,7 +16,7 @@ from sensors.sparkfun_max30101_max32664 import SparkFun_MAX30101_And_MAX32664
 
 from brteve.brt_eve_bt817_8 import BrtEve
 
-_BUFFER_DOWNLOADED_IMG = 0
+_BUFFER_DOWNLOADED_IMG = 1
 class internet_display:
     def __init__(self, eve: BrtEve, spi) -> None:
         self.eve=eve
@@ -26,6 +26,10 @@ class internet_display:
         TOTAL_STEPS = 7
         step = 0
         self._ast_img_id = 0
+
+        self._skip_sensor_bio = 0
+        self._skip_sensor_air = 0
+        self._skip_sensor_wifi = 0
 
         print("Start UI...")
         self.page1 = Page1_UI(eve)
@@ -37,6 +41,9 @@ class internet_display:
         self.i2c = busio.I2C(board.GP19, board.GP18)  # uses board.SCL and board.SDA
         self.air = 0
         self.init_air_sensor(self.i2c)
+        if self._skip_sensor_air:
+            self.init_screen("Air sensor is skipped", step, TOTAL_STEPS)
+            time.sleep(2)
 
         # init SparkFun Pulse Oximeter and Heart Rate Monitor
         self.init_screen("Initializing Pulse Oximeter and Heart Rate Monitor sensor ...",
@@ -45,6 +52,9 @@ class internet_display:
         self.i2c2 = busio.I2C(board.GP21, board.GP20)  # uses board.SCL and board.SDA
         self.bio=0
         self.init_bio_sensor(self.i2c2)
+        if self._skip_sensor_bio:
+            self.init_screen("Biometric sensor is skipped", step, TOTAL_STEPS)
+            time.sleep(2)
 
         #init wifi
         self.init_screen("Initializing Wifi module ...", step, TOTAL_STEPS)
@@ -53,30 +63,38 @@ class internet_display:
         self.spi = spi
         self.wifi_secrets = wifi_secrets
         self.ini_wifi(self.spi, self.wifi_secrets)
+        if self._skip_sensor_wifi:
+            self.init_screen("Wifi module is skipped", step, TOTAL_STEPS)
+            time.sleep(2)
 
-        self.init_screen("Connecting to wifi ...", step, TOTAL_STEPS)
-        step += 1
-        self.esp32_cs    = DigitalInOut(board.GP22)
-        self.esp32_ready = DigitalInOut(board.GP0)
-        self.esp32_reset = DigitalInOut(board.GP1)
-        self.connect_wifi(self.esp32_cs, self.esp32_ready, self.esp32_reset)
+        if not self._skip_sensor_wifi:
+            self.init_screen("Connecting to wifi ...", step, TOTAL_STEPS)
+            step += 1
+            self.esp32_cs    = DigitalInOut(board.GP22)
+            self.esp32_ready = DigitalInOut(board.GP0)
+            self.esp32_reset = DigitalInOut(board.GP1)
+            self.connect_wifi(self.esp32_cs, self.esp32_ready, self.esp32_reset)
+            if self._skip_sensor_wifi:
+                self.init_screen("Wifi module is skipped", step, TOTAL_STEPS)
+                time.sleep(2)
 
-        #init aio
-        print("Connecting to Adafruit IO ...")
-        self.init_screen("Connecting to Adafruit IO ...", step, TOTAL_STEPS)
-        step += 1
-        soc=self.wifi.socket
-        esp=self.wifi.esp
-        print(aio_secrets)
-        self.aio=aio(soc, esp, aio_secrets, "temp")
+        if not self._skip_sensor_wifi:
+            #init aio
+            print("Connecting to Adafruit IO ...")
+            self.init_screen("Connecting to Adafruit IO ...", step, TOTAL_STEPS, False)
+            step += 1
+            soc=self.wifi.socket
+            esp=self.wifi.esp
+            print(aio_secrets)
+            self.aio=aio(soc, esp, aio_secrets, "temp")
 
-        print("Fetching realtime clock...")
-        self.init_screen("Fetching realtime clock...", step, TOTAL_STEPS)
-        step += 1
-        self.get_time()
+            print("Fetching realtime clock...")
+            self.init_screen("Fetching realtime clock...", step, TOTAL_STEPS, False)
+            step += 1
+            self.get_time()
 
         print("Starting page 1...")
-        self.init_screen("Starting page 1...", step, TOTAL_STEPS)
+        self.init_screen("Starting page 1...", step, TOTAL_STEPS, False)
         step += 1
         self.page1.start()
 
@@ -85,8 +103,16 @@ class internet_display:
 
     def init_air_sensor(self, i2c):
         print("Initializing Air sensor ...")
+        time.sleep(0.5)
+        _try=0
         while 1:
             try:
+                tag = self.eve.rd32(self.eve.REG_TOUCH_TAG) & 0xFF
+                if (tag == 1 or _try == 10):
+                    print("Sensor is skipped")
+                    self._skip_sensor_air = 1
+                    return
+                _try += 1
                 self.air = CCS811_and_BME280_SparkFun(i2c)
             except Exception as e:
                 print(e)
@@ -96,8 +122,16 @@ class internet_display:
 
     def init_bio_sensor(self, i2c):
         print("Initializing Pulse Oximeter and Heart Rate Monitor sensor ...")
+        time.sleep(0.5)
+        _try=0
         while 1:
             try:
+                tag = self.eve.rd32(self.eve.REG_TOUCH_TAG) & 0xFF
+                if (tag == 1 or _try == 10):
+                    print("Sensor is skipped")
+                    self._skip_sensor_bio = 1
+                    return
+                _try += 1
                 self.bio = SparkFun_MAX30101_And_MAX32664(i2c)
                 self.bio.configBpm(self.bio.MODE_ONE)
             except Exception as e:
@@ -108,8 +142,16 @@ class internet_display:
 
     def ini_wifi(self, spi, secret):
         print("Initializing Wifi module ...")
+        time.sleep(0.5)
+        _try=0
         while 1:
             try:
+                tag = self.eve.rd32(self.eve.REG_TOUCH_TAG) & 0xFF
+                if (tag == 1 or _try == 10):
+                    print("Sensor is skipped")
+                    self._skip_sensor_wifi = 1
+                    return
+                _try += 1
                 self.wifi = wifi(spi, secret)
             except Exception as e:
                 print(e)
@@ -118,8 +160,17 @@ class internet_display:
             break
 
     def connect_wifi(self, esp32_cs, esp32_ready, esp32_reset):
-        while 1:
+        if self._skip_sensor_wifi: return
+
+        _try=0
+        while 1 and self._skip_sensor_wifi == 0:
             try:
+                tag = self.eve.rd32(self.eve.REG_TOUCH_TAG) & 0xFF
+                if (tag == 1 or _try == 10):
+                    print("Sensor is skipped")
+                    self._skip_sensor_wifi = 1
+                    return
+                _try += 1
                 self.wifi.connect(esp32_cs, esp32_ready, esp32_reset)
             except Exception as e:
                 print(e)
@@ -128,18 +179,20 @@ class internet_display:
             break
 
     def loop(self):
-        _page_active = 1
+        _page_active = 2
         while 1:
             if _page_active == 1:
                 self.page_1_update()
             else:
                 self.page_2_update()
 
-            if self.isTouch() != 0:
-                self._last_touch = 0
-                _page_active = (_page_active+1) % 2
+            for i in range(30):
+                if self.isTouch() != 0:
+                    self._last_touch = 0
+                    _page_active = (_page_active+1) % 2
+                    break
 
-    def init_screen(self, message, step, totalstep):
+    def init_screen(self, message, step, totalstep, skip_button = True):
         eve=self.eve
         eve.swap()
         eve.ClearColorRGB(255, 255, 255)
@@ -153,6 +206,12 @@ class internet_display:
         eve.ColorRGB(0x90, 0xC8, 0x3A)
         eve.cmd_text(tx, ty, 30, 0, message)
 
+        if skip_button ==  True:
+            w=100
+            h=50
+            eve.Tag(1)
+            eve.cmd_button(2, 2, w, h, 20, 0, "Skip this sensor")
+
         eve.ColorRGB(0, 0, 0)
         eve.cmd_text(eve.lcd_width/2 - 130, ty + 200 , 30, 0,
             "Initializing... (" + str((int)(step / totalstep * 100)) + "%)" )
@@ -161,6 +220,8 @@ class internet_display:
 
     def page_2_update(self):
         page2=self.page2
+        if self._skip_sensor_wifi:
+            return
 
         img_array = [
             'image0001.jpg',
@@ -173,13 +234,13 @@ class internet_display:
 
         imagepath='/sd/image_downloaded.jpg'
         while 1:
-            img = 'https://github.com/BRTSG-FOSS/pico-brteve/tree/main/circuitPython/examples/internet-data-display/images/' + img_array[self._ast_img_id]
+            img = 'https://raw.githubusercontent.com/BRTSG-FOSS/pico-brteve/main/circuitPython/examples/internet-data-display/images/' + img_array[self._ast_img_id]
             page2.message('Downloading ' + img, ' ')
-
             try:
                 r=self.wifi.get(img)
-            except Exception:
-                continue
+            except Exception as e:
+                print(e, img)
+                return
             t=r.iter_content(chunk_size=(64 * 4))
             num=0
 
@@ -187,10 +248,18 @@ class internet_display:
                 with open(imagepath, "wb") as file2:
                     for buff in t:
                         file2.write(buff)
-                        num +=len(buff)
+                        chunksize=len(buff)
+                        if chunksize < 0:
+                            print("Image cannot be downloaded")
+                            self._ast_img_id +=1
+                            self._ast_img_id %= 6
+                            return
+
+                        num += chunksize
                         page2.message('Downloading ' + img, str(num) + " bytes")
                         if self.isTouch():
                             return # cancel downloading
+                print("Displaying image: ", imagepath)
                 page2.draw_image(imagepath, img)
             else:
                 page2.start_load_image()
@@ -229,33 +298,40 @@ class internet_display:
 
     def page_1_update(self):
         while 1:
-            try:
-                self.aio.get_oi().loop()
-            except Exception as e:
+            if not self._skip_sensor_wifi:
+                try:
+                    self.aio.get_oi().loop()
+                except Exception as e:
+                    self.page1.message = "Disconnected to AIO, trying to reconnect..."
+                    self.page1.start()
 
-                self.page1.message = "Disconnected to AIO, trying to reconnect..."
-                self.page1.start()
+                    self.ini_wifi(self.spi, self.wifi_secrets)
+                    self.connect_wifi(self.esp32_cs, self.esp32_ready, self.esp32_reset)
+                    aio(self.wifi.socket, self.wifi.esp, aio_secrets, "temp")
 
-                self.ini_wifi(self.spi, self.wifi_secrets)
-                self.connect_wifi(self.esp32_cs, self.esp32_ready, self.esp32_reset)
-                aio(self.wifi.socket, self.wifi.esp, aio_secrets, "temp")
+            is_finger = 0
+            hr = 0
+            ox = 0
+            if not self._skip_sensor_bio:
+                try:
+                    is_finger, hr, ox = self.get_bio()
+                except Exception as e:
+                    self.page1.message = "Lost connection to BIO sensor, retrying ..."
+                    self.page1.start()
+                    self.init_bio_sensor(self.i2c2)
 
-            try:
-                is_finger, hr, ox = self.get_bio()
-            except Exception as e:
-                self.page1.message = "Lost connection to BIO sensor, retrying ..."
-                self.page1.start()
-                self.init_bio_sensor(self.i2c2)
-
-            try:
-                temperature, co2, tvoc, press, humidity = self.get_air()
-
-            except Exception as e:
-
-                self.page1.message = "Lost connection to AIR sensor, retrying ..."
-                self.page1.start()
-
-                self.init_air_sensor(self.i2c)
+            temperature = 0
+            co2 = 0
+            tvoc = 0
+            press = 0
+            humidity = 0
+            if not self._skip_sensor_air:
+                try:
+                    temperature, co2, tvoc, press, humidity = self.get_air()
+                except Exception as e:
+                    self.page1.message = "Lost connection to AIR sensor, retrying ..."
+                    self.page1.start()
+                    self.init_air_sensor(self.i2c)
 
             co2 = round(co2, 1)
             tvoc = round(tvoc, 1)
@@ -268,23 +344,22 @@ class internet_display:
                 self.update_local(temperature, co2, tvoc, press, hr, ox, humidity)
                 if self.isTouch():
                     return
-
                 self.update_aio(is_finger, temperature, co2, tvoc, press, hr, ox, humidity)
                 print(".", end='')
-
                 time.sleep(0.1)
             except Exception as e:
                 print(e)
                 print("page_1_update Error...")
 
-                self.page1.message = "Disconnected to AIO, trying to reconnect..."
-                self.page1.start()
+                if not self._skip_sensor_wifi:
+                    self.page1.message = "Disconnected to AIO, trying to reconnect..."
+                    self.page1.start()
 
-                self.ini_wifi(self.spi, self.wifi_secrets)
-                self.connect_wifi(self.esp32_cs, self.esp32_ready, self.esp32_reset)
-                aio(self.wifi.socket, self.wifi.esp, aio_secrets, "temp")
+                    self.ini_wifi(self.spi, self.wifi_secrets)
+                    self.connect_wifi(self.esp32_cs, self.esp32_ready, self.esp32_reset)
+                    aio(self.wifi.socket, self.wifi.esp, aio_secrets, "temp")
 
-                time.sleep(0.1)
+                    time.sleep(0.1)
                 continue
     def get_air(self):
         temperature = co2 = tvoc = press = humidity = 0
@@ -363,6 +438,8 @@ class internet_display:
     queue_push = 0
     turn_bio_count  = 0
     def update_aio(self, is_finger, temperature, co2, tvoc, press, hr, oxy, humidity):
+        if self._skip_sensor_wifi:
+            return
         try:
             push_per_min=30 # limitation (30 push per min)
             second_per_push = 60 / push_per_min
