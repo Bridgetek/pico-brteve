@@ -77,9 +77,14 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
         self.eve.register(self)
         self.coldstart()
 
+        # Programming Guide 2.4: Initialization Sequence during Boot Up
         time_start = time.monotonic()
         while self.rd32(self.eve.REG_ID) != 0x7c:
             assert (time.monotonic() - time_start) < 1.0, "No response - is device attached?"
+
+        time_start = time.monotonic()
+        while self.rd16(self.eve.REG_CPURESET) != 0x0:
+            assert(time.monotonic() - time_start) < 1.0, "EVE engines failed to reset"
 
         self.getspace()
 
