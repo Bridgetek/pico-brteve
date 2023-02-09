@@ -516,38 +516,75 @@ class BrtEveStorage(): # pylint: disable=too-many-public-methods
             :return: Number of bytes transfered on successful
         """
         eve=self.eve
-        file_size = 0
-        blocklen = 0
+        buffer_size = 512
+        sent = 0
+
+        if addr % 256 != 0:
+            print("EVE error: flash address invalid (not 256 bytes alignment)")
+            return 0
+            
+        # update blob from file first
+        if addr < BLOBSIZE:
+            self.flash_write_blob_file(file)
+        else :
+            #/ check and write blob
+            ret = self.flash_state(eve.FLASH_STATUS_FULL) # full mode
+            if ret != 0:
+                self.flash_write_blob_default()
+
+                ret = self.flash_state(eve.FLASH_STATUS_FULL) # full mode
+                if ret != 0:
+                    print("Cannot switch flash to fullmode\n")
+                    return 0 # Error
 
         #Erase Flash
         if is_erase and FLASH_CMD_UNSUCCESS == self.flash_erase():
+            print("EVE error: Cannot erase flash")
             return 0 # Error
 
         # Check flash status
         self.flash_state(eve.FLASH_STATUS_FULL)
         if eve.FLASH_STATUS_FULL != eve.rd8(eve.REG_FLASH_STATUS):
-            print("Switch flash to fullmode failed")
+            print("EVE error: Switch flash to fullmode failed")
             return 0 # Error
 
         try:
             with open(file, "rb") as file_handler:
-                eve.wr32(0x45) # send CMD_FLASHWRITE
-                eve.wr32(addr)
-                eve.wr32(align_to(file_size, FLASH_WRITE_ALIGN_BYTE))
+                file_handler.seek(0, SEEK_END)
+                file_size = file_handler.tell()
+                file_handler.seek(0, SEEK_SET)
 
-                #/ Download data to Coprocessor
-                data = file_handler.read(EVE_CMD_FIFO_SIZE)
+                # Ignore Blob data part of file
+                if addr < BLOBSIZE:
+                    sent = addr = BLOBSIZE
+                    file_handler.seek(addr)
+
+                eve_cmd_len = align_to(file_size, FLASH_WRITE_ALIGN_BYTE)
+                eve.cmd_flashwrite(addr, eve_cmd_len)
+
+                #/ Transfer rest of file to EVE (in fast mode)
+                while sent < file_size:
+                    data = file_handler.read(buffer_size)
                 blocklen = len(data)
-                while blocklen > 0:
-                    byte_num = align_to(blocklen, FLASH_WRITE_ALIGN_BYTE)
-                    eve.write_mem(data, byte_num)
-                    data = file_handler.read(EVE_CMD_FIFO_SIZE)
-                    blocklen = len(data)
+                    if blocklen == 0:
+                        print("Error on reading file:", file)
+                        return 0 # Error
+                    print("sending ", len(data), ", total =", sent)
+                    eve.cc(data)
+                    sent += blocklen
+
+                num_padding =  eve_cmd_len - sent
+                print("Adding padding", num_padding, "bytes")
+                if num_padding > 0:
+                    data = bytearray(num_padding)
+                    eve.cc(data)
+
         except OSError as exception:
             print("Unable to open file: ", file)
             print(exception)
             return 0 # Error
 
+        eve.finish()
         return file_size # File size
 
     def write_flash_via_ramg(self, file, addr):
