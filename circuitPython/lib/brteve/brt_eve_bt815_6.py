@@ -387,8 +387,7 @@ class BrtEve(BrtEveBT81xFT81xCommon): # pylint: disable=too-many-public-methods
         :param num: Number of bytes to write, must be multiple of 256
         :return: none
         """
-        self.cmd(0x45, "II", (ptr, len(num)))
-        self.cc(num)
+        self.cmd(0x45, "II", (ptr, num))
 
     @args_to_integer
     def cmd_gradienta(self, x0, y0, argb0, x1, y1, argb1):  # pylint: disable=invalid-name, too-many-arguments
