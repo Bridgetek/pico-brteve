@@ -704,8 +704,10 @@ class BrtEveModule(BrtEveCommon, BrtEveMoviePlayer): # pylint: disable=too-many-
 
     def load(self, file_handler):
         """Load a file to command fifo"""
+        size=0
         while True:
             chunk = file_handler.read(512)
+            size = size + len(chunk)
             if not chunk:
-                return
+                return size
             self.cc(align4(chunk))
