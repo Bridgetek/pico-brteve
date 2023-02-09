@@ -229,7 +229,7 @@ class BrtEveCommon(_EVE): # pylint: disable=too-many-public-methods
     CORERST                = const(0x68)  # Reset core - all registers default and processors reset
 
     def cstring(self, s_value):
-        """ Send a string TODO XXX, the string will be alligned to 4
+        """ Send a string, the string will be alligned to 4
         :param s_value: Input value
         :return: none
         """
@@ -238,7 +238,7 @@ class BrtEveCommon(_EVE): # pylint: disable=too-many-public-methods
         self.cc(align4(s_value + _B0))
 
     def fstring(self, s_value):
-        """ Send a string and its format params TODO XXX, the string will be alligned to 4
+        """ Send a string and its format params, the string will be alligned to 4
         :param s_value: Input value
         :return: none
         """
