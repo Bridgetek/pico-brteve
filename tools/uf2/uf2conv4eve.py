@@ -82,7 +82,7 @@ def convert_to_uf2(eve3_firmware, eve4_firmware, file_content):
     numblocks_eve3 = (len(eve3_firmware) + 255) // 256
     numblocks_eve4 = (len(eve4_firmware) + 255) // 256
     numblocks_fw = max(numblocks_eve3, numblocks_eve4)
-    numblocks_file = (len(file_content) - EVE_FLASH_FIRMWARE_SIZE + 255) // 256
+    numblocks_file = (((len(file_content)|4095)+1) - EVE_FLASH_FIRMWARE_SIZE + 255) // 256
     if numblocks_file < (EVE_FLASH_FIRMWARE_SIZE // 256):
         numblocks_file = 0
     numblocks = numblocks_fw + numblocks_file
@@ -122,7 +122,7 @@ def convert_to_uf2(eve3_firmware, eve4_firmware, file_content):
             UF2_MAGIC_START0, UF2_MAGIC_START1,
             flags, ptr, 256, numblocks_fw + blockno, numblocks, 0)
         while len(chunk) < 256:
-            chunk += b"\x00"
+            chunk += b"\xff"
         block = hd + chunk + datapadding + struct.pack(b"<I", UF2_MAGIC_END)
         assert len(block) == 512
         outp.append(block)
