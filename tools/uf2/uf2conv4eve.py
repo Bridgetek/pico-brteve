@@ -82,7 +82,7 @@ def convert_to_uf2(eve3_firmware, eve4_firmware, file_content):
     numblocks_eve3 = (len(eve3_firmware) + 255) // 256
     numblocks_eve4 = (len(eve4_firmware) + 255) // 256
     numblocks_fw = max(numblocks_eve3, numblocks_eve4)
-    numblocks_file = (((len(file_content)|4095)+1) - EVE_FLASH_FIRMWARE_SIZE + 255) // 256
+    numblocks_file = (((len(file_content)|4095)+1) - EVE_FLASH_FIRMWARE_SIZE) // 256
     if numblocks_file < (EVE_FLASH_FIRMWARE_SIZE // 256):
         numblocks_file = 0
     numblocks = numblocks_fw + numblocks_file
