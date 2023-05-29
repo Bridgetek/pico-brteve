@@ -17,10 +17,12 @@ Build release:
 ```
 cd pico-brteve\tools\uf2\source
 git clone https://github.com/BRTSG-FOSS/EveApps
-cd EveApps && git checkout 5c6975de0709826cab0286ec52c06ef76f56faf7 && cd ../
+cd EveApps && git checkout -b 5c6975de0709826cab0286ec52c06ef76f56faf7 && cd ../
 mkdir build
 cd build
-cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA  ../
+set PICO_SDK_PATH=path-to--pico-sdk
+set PICO_TOOLCHAIN_PATH=path-to--GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
+"C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA  ../
 nmake eve_flash_pico
 ```
 

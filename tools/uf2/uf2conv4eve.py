@@ -248,7 +248,10 @@ def write_file(name, buf):
     #     f.write(buf)
     print("Wrote %d bytes to %s" % (len(buf), name))
 
-def pin_select(args):
+"""
+Pin setting for EVE-flash, stored in SPI_PIN.CNF
+"""
+def pin_select(name, args):
     pins=[
         ["MISO", 4 ],
         ["CS"  , 5 ],
@@ -260,18 +263,18 @@ def pin_select(args):
         ["IO3" , 15],
     ]
     spliter='-'
-    for arg in args[0]:
+    for arg in args[0]: # each arg is an pin setting, ex: -p int-7
         pin_nth = 0 
         for i, pin in enumerate(pins):
-            print(pin)
             pin_name_pos=arg.find(spliter)
             if arg[0:pin_name_pos].upper() ==  pin[0]:
                 pins[i][1] = arg[pin_name_pos+1::]
             
     print("Setting SPI pin:", pins)
-    
-    with open(name, "wb") as f:
-        f.write(buf[s:s + 8192])
+    spin = ""
+    for s in pins:
+        spin += str(s) + "\n"
+    write_file(name, bytes(spin, 'ascii'))
     
 def main():
     def error(msg):
@@ -311,8 +314,6 @@ def main():
                 inpbuf = f.read()
         eve3blob = []
         eve4blob = []
-        if args.pin:
-            pin_select(args.pin)
             
         if args.firmware:
             for fw in args.firmware:
@@ -390,7 +391,12 @@ def main():
             if len(rpi_drives) == 0 and len(eve_drives) == 0:
                 error("No drive to deploy.")
         
-        if len(rpi_drives) != 0 or len(rpi_drives) != 0:
+        if args.pin:
+            for d in rpi_drives:
+                print("Launching %s (%s)" % (d, board_id(d)))
+                pin_select(d + "/SPI_PIN.CNF", args.pin)
+
+        if len(rpi_drives) != 0:
             if len(eve_drives) == 0:
                 with open(os.path.dirname(os.path.realpath(__file__)) + "/eve_flash_pico.uf2", mode='rb') as f:
                     picofw = f.read()
