@@ -272,8 +272,9 @@ def pin_select(name, args):
             
     print("Setting SPI pin:", pins)
     spin = ""
-    for s in pins:
-        spin += str(s) + "\n"
+    for i, pin in pins:
+        spin += str(i) + ": " + str(pin) + "\r\n"
+    print("spin=", spin)
     write_file(name, bytes(spin, 'ascii'))
     
 def main():
@@ -304,7 +305,11 @@ def main():
     parser.add_argument('-p' , '--pin', dest='pin', type=str, action='append', nargs='*',
                         help='Set the pin assignment of Eve SPI interface')
     args = parser.parse_args()
-
+    
+    if len(sys.argv) < 2:
+        parser.print_help()
+        exit(0)
+        
     if args.list:
         list_drives()
     else:
@@ -354,8 +359,17 @@ def main():
                                 eve4blob = f.read()
                     else:
                         error("Invalid EVE generation for firmware")
+                                
+        if args.pin:
+            for d in get_rpi_drives():
+                print("Launching %s (%s)" % (d, board_id(d)))
+                pin_select(d + "/SPI_PIN.CNF", args.pin)
+
         if len(inpbuf) == 0 and len(eve3blob) == 0 and len(eve4blob) == 0:
-            error("Need input file")
+            if args.pin:
+                sys.exit(0)
+            else:
+                error("Need input file")
         
         from_uf2 = is_uf2(inpbuf)
         ext = "uf2"
@@ -390,11 +404,6 @@ def main():
         else:
             if len(rpi_drives) == 0 and len(eve_drives) == 0:
                 error("No drive to deploy.")
-        
-        if args.pin:
-            for d in rpi_drives:
-                print("Launching %s (%s)" % (d, board_id(d)))
-                pin_select(d + "/SPI_PIN.CNF", args.pin)
 
         if len(rpi_drives) != 0:
             if len(eve_drives) == 0:
