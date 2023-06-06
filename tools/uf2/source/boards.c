@@ -133,7 +133,6 @@ static void eve_eflash_init(){
   // detecting SD card
   EVE_Util_loadSdCard(phost);
 	if (sdhost_card_detect() != SDHOST_CARD_INSERTED) {
-    printf("No SD card detected\r\n");
 		return;
 	}
   printf("SD card detected\r\n");

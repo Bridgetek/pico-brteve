@@ -48,6 +48,7 @@ IF(EVE_APPS_PLATFORM STREQUAL "RP2040")
   ADD_DEFINITIONS("-D${EVE_APPS_PLATFORM}")
   ADD_DEFINITIONS("-D${EVE_APPS_DISPLAY}")
   add_definitions(-DNDEBUG) # Assert fail in time.c : repeating_timer_callback()
+  add_definitions(-D_DEBUG) # eve debug flag
 
   TARGET_INCLUDE_DIRECTORIES(eve_flash_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR})
   
