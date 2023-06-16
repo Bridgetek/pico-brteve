@@ -8,28 +8,24 @@ It is based on https://github.com/adafruit/tinyuf2.
 
 Need prepare pico-SDK from https://github.com/raspberrypi/pico-sdk version 1.3.0
 
-EveApps from this version: https://github.com/BRTSG-FOSS/EveApps/commit/5c6975de0709826cab0286ec52c06ef76f56faf7
-
 Open Developer command promt for VS2019
 
 Build release:
 
 ```
-cd pico-brteve\tools\uf2\source
-git clone https://github.com/BRTSG-FOSS/EveApps
-cd EveApps && git checkout -b 5c6975de0709826cab0286ec52c06ef76f56faf7 && cd ../
-mkdir build
-cd build
-set PICO_SDK_PATH=path-to--pico-sdk
-set PICO_TOOLCHAIN_PATH=path-to--GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
-"C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WVGA  ../
-nmake eve_flash_pico
+$ cd pico-brteve\tools\uf2
+$ mkdir build
+$ cd build
+$ set PICO_SDK_PATH=path-to--pico-sdk
+$ set PICO_TOOLCHAIN_PATH=path-to--GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
+$ "C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles"  -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WVGA  ../source
+$ nmake eve_flash_pico
 ```
 
 Build with debug flag:
 
 ```
-cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=DEBUG ../
+$ cmake -G "NMake Makefiles" -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=DEBUG ../
 ```
 
 ## Debugging

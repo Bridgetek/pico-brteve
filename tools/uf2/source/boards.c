@@ -227,7 +227,7 @@ bool board_dfu_init(void)
 
   bootup_starting = 1;
   count_bootup_attempt = 0;
-  if (!EVE_Hal_open(phost, &params))// co goi ham nay thi sau khi return se panic 
+  if (!EVE_Hal_open(phost, &params))
   {
     eve_printf_debug("Failed to open device!\n");
     return false;
