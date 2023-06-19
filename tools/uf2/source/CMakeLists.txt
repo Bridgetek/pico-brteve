@@ -66,7 +66,7 @@ IF(EVE_APPS_PLATFORM STREQUAL "RP2040_PLATFORM")
   set_target_properties(eve_flash_pico PROPERTIES OUTPUT_NAME eve_flash_pico)
   pico_set_program_name(eve_flash_pico "eve_flash_pico")
   pico_add_extra_outputs(eve_flash_pico)
-  #pico_set_binary_type(eve_flash_pico no_flash) # no_flash = program lost when reboot 
+  pico_set_binary_type(eve_flash_pico no_flash) # no_flash = program lost when reboot
     
   TARGET_INCLUDE_DIRECTORIES(eve_flash_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR})
   
