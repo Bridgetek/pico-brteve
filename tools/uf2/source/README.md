@@ -12,6 +12,7 @@ It is based on https://github.com/adafruit/tinyuf2.
   3. Clone pico-sdk:
      ```
       $ git clone --branch 1.3.0 https://github.com/raspberrypi/pico-sdk.git
+      $ cd pico-sdk
       $ git submodule update --init
      ```
      
