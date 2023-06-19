@@ -1,3 +1,4 @@
+
 # eve_flash_pico
 
 ## Introduction
@@ -17,20 +18,20 @@ It is based on https://github.com/adafruit/tinyuf2.
 
   5. Open developer command promt for Visual Studio and run:
 
-```
-$ cd pico-brteve\tools\uf2
-$ mkdir build
-$ cd build
-$ set PICO_SDK_PATH=path-to--pico-sdk
-$ set PICO_TOOLCHAIN_PATH=path-to--GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
-$ "C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles"  -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WVGA  ../source
-$ nmake eve_flash_pico
-```
+   ```
+   $ cd pico-brteve\tools\uf2
+   $ mkdir build
+   $ cd build
+   $ set PICO_SDK_PATH=path-to--pico-sdk
+   $ set PICO_TOOLCHAIN_PATH=path-to--GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
+   $ "C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles"  -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WVGA  ../source
+   $ nmake eve_flash_pico
+   ```
 
-```
-Debug mode:
-$ cmake -G "NMake Makefiles" -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=DEBUG ../
-```
+   ```
+   Debug mode:
+   $ cmake -G "NMake Makefiles" -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=DEBUG ../
+   ```
 
 ## Debugging
 
