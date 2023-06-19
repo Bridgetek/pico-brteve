@@ -346,6 +346,7 @@ def write_eve_flash_pico():
         return False
     else:
         print("BTEVE USB drive detected at", eve_drives)
+        return True
 
 def detect_pico_drive(args):
     if write_eve_flash_pico() == True:
