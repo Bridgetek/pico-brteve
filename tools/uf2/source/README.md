@@ -10,13 +10,18 @@ It is based on https://github.com/adafruit/tinyuf2.
   1. Use Window 10 OS.
   2. Install cmake 3.19.x, python, Visual Studio 2022 community (must select C++), GNU Arm Embedded Toolchain for window.
   3. Clone pico-sdk:
-      $git clone --branch 1.3.0 https://github.com/raspberrypi/pico-sdk.git 
-      $git submodule update --init
-  4. Set environment variable:
-      set PICO_SDK_PATH=[PATH-TO pico-sdk]
-      set PICO_TOOLCHAIN_PATH=C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
-
-  5. Open developer command promt for Visual Studio and run:
+     ```
+      $ git clone --branch 1.3.0 https://github.com/raspberrypi/pico-sdk.git
+      $ git submodule update --init
+     ```
+     
+  5. Set environment variable:
+      ```
+      $ set PICO_SDK_PATH=[PATH-TO pico-sdk]
+      $ set PICO_TOOLCHAIN_PATH=C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
+      ```
+      
+  7. Open developer command promt for Visual Studio and run:
 
    ```
    $ cd pico-brteve\tools\uf2
