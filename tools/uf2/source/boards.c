@@ -133,7 +133,6 @@ static void eve_eflash_init(){
   // detecting SD card
   EVE_Util_loadSdCard(phost);
 	if (sdhost_card_detect() != SDHOST_CARD_INSERTED) {
-    printf("No SD card detected\r\n");
 		return;
 	}
   printf("SD card detected\r\n");
@@ -228,7 +227,7 @@ bool board_dfu_init(void)
 
   bootup_starting = 1;
   count_bootup_attempt = 0;
-  if (!EVE_Hal_open(phost, &params))// co goi ham nay thi sau khi return se panic 
+  if (!EVE_Hal_open(phost, &params))
   {
     eve_printf_debug("Failed to open device!\n");
     return false;

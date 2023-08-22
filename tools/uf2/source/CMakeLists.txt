@@ -1,54 +1,73 @@
 # Build command:
-#   git clone https://github.com/BRTSG-FOSS/EveApps
-#   git clone https://github.com/hathach/tinyusb
-#   mkdir build
-#   cd build
-#   cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040  ../
-#   nmake
-# 
+#   $ cd pico-brteve\tools\uf2
+#   $ mkdir build
+#   $ cd build
+#   $ set PICO_SDK_PATH=path-to--pico-sdk
+#   $ set PICO_TOOLCHAIN_PATH=path-to--GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
+#   $ "C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles" -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WVGA  ../
+#   $ nmake eve_flash_pico
 
 cmake_minimum_required(VERSION 3.13)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(PATH_EVEAPPS "./EveApps/common" CACHE PATH "Location of EveApps/common folder") 
+set(EVE_APPS_PLATFORM "RP2040_PLATFORM")
 
-FILE(GLOB SRCS *.c EveApps/common/application/*.c)
-FILE(GLOB HDRS *.h EveApps/common/application/*.h)
-SOURCE_GROUP("" FILES ${SRCS} ${HDRS})
-SOURCE_GROUP("tinyuf2" FILES usb_descriptors.c uf2.h screen.c msc.c images.c ghostfat.c compile_date.h board_api.h main.c)
+MACRO(HELPER_SUBDIRLIST result curdir)
+  FILE(GLOB children "${curdir}/*")
+  LIST(APPEND ${result} ${curdir})
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${child})
+      LIST(APPEND ${result} ${child})
+      HELPER_SUBDIRLIST(${result} ${child})
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
 
-ADD_EXECUTABLE(eve_flash_pico ${SRCS} ${HDRS})
-ADD_DEFINITIONS(-DNDEBUG=1) # Prevent asserts fail in the TinyUSB
-#ADD_DEFINITIONS(-DTINYUF2_DISPLAY=0)
+# Include eve_hal framework folders
+HELPER_SUBDIRLIST(SUBDIRS_EVEAPPS "${PATH_EVEAPPS}/")
+list(FILTER SUBDIRS_EVEAPPS EXCLUDE REGEX ".*\\Arduino")
+list(FILTER SUBDIRS_EVEAPPS EXCLUDE REGEX ".*\\esd_core")
+include_directories(${SUBDIRS_EVEAPPS})
 
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  ADD_DEFINITIONS(-D_DEBUG=1)
-  target_compile_definitions(eve_flash_pico PUBLIC _DEBUG=1)
-  add_compile_definitions(_DEBUG)
-ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+# A eve_hal framwwork source files
+file(GLOB_RECURSE EVEAPPS_C "${PATH_EVEAPPS}/*.c" )
+file(GLOB_RECURSE EVEAPPS_H "${PATH_EVEAPPS}/*.h" )
 
-IF(EVE_APPS_PLATFORM STREQUAL "RP2040")
+FILE(GLOB SRCS *.c ${EVEAPPS_C})
+FILE(GLOB HDRS *.h ${EVEAPPS_H})
+
+# exlude modified file
+list(FILTER SRCS EXCLUDE REGEX ".*\\EVE_Util.c")
+list(FILTER SRCS EXCLUDE REGEX ".*\\arduino\\.*")
+list(FILTER SRCS EXCLUDE REGEX ".*\\esd_core\\.*")
+MESSAGE(STATUS "SRCS = ${SRCS}")
+MESSAGE(STATUS "SUBDIRS_EVEAPPS = ${SUBDIRS_EVEAPPS}")
+
+ADD_DEFINITIONS(-DNDEBUG=1) # Prevent asserts fail in the TinyUSB in time.c : repeating_timer_callback()
+ADD_DEFINITIONS(-DTINYUF2_DISPLAY=0)
+
+# Add EveApps configuration
+ADD_DEFINITIONS("-D${EVE_APPS_GRAPHICS}")
+ADD_DEFINITIONS("-D${EVE_APPS_PLATFORM}")
+ADD_DEFINITIONS("-D${EVE_APPS_DISPLAY}")
+ADD_DEFINITIONS(-D_DEBUG=1) # eve debug flag
+
+IF(EVE_APPS_PLATFORM STREQUAL "RP2040_PLATFORM")
   # Pull in Pico SDK (must be before project)
-  INCLUDE("EveApps/pico_sdk_import.cmake")
+  INCLUDE("pico_sdk_import.cmake")
   PROJECT("eve_flash_pico" C CXX ASM)
   
   # Initialise the Pico SDK
   pico_sdk_init()
 
   # Set output
+  ADD_EXECUTABLE(eve_flash_pico ${SRCS} ${HDRS})
+  set_target_properties(eve_flash_pico PROPERTIES OUTPUT_NAME eve_flash_pico)
+  pico_set_program_name(eve_flash_pico "eve_flash_pico")
   pico_add_extra_outputs(eve_flash_pico)
-  pico_set_binary_type(eve_flash_pico no_flash)
+  pico_set_binary_type(eve_flash_pico no_flash) # no_flash = program lost when reboot
     
-  # Add EveApps configuration
-  ADD_SUBDIRECTORY("EveApps")
-  INCLUDE_DIRECTORIES("EveApps/common")
-  INCLUDE_DIRECTORIES("EveApps/common/eve_hal")
-  INCLUDE_DIRECTORIES("EveApps/common/eve_hal/Hdr")
-  INCLUDE_DIRECTORIES("EveApps/common/application/fatfs/source")
-  INCLUDE_DIRECTORIES("EveApps/common/application")
-
-  ADD_DEFINITIONS("-D${EVE_APPS_GRAPHICS}")
-  ADD_DEFINITIONS("-D${EVE_APPS_PLATFORM}")
-  ADD_DEFINITIONS("-D${EVE_APPS_DISPLAY}")
-  add_definitions(-DNDEBUG) # Assert fail in time.c : repeating_timer_callback()
-
   TARGET_INCLUDE_DIRECTORIES(eve_flash_pico PRIVATE ${CMAKE_CURRENT_LIST_DIR})
   
   TARGET_LINK_LIBRARIES(eve_flash_pico PRIVATE
@@ -57,8 +76,9 @@ IF(EVE_APPS_PLATFORM STREQUAL "RP2040")
     tinyusb_device
     tinyusb_board
     pico_stdlib
-    eve_hal
-    fatfs
+    
+    hardware_spi
+    hardware_uart
   )
   
 ENDIF()

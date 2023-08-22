@@ -8,6 +8,8 @@ import time
 import os.path
 import argparse
 from tqdm import tqdm
+import configparser # to read SPI_PIN.CNF file from USB drive
+from itertools import chain # to read SPI_PIN.CNF file from USB drive
 
 # Derived from https://raw.githubusercontent.com/microsoft/uf2/master/utils/uf2conv.py under MIT license
 # Modifications:
@@ -24,6 +26,18 @@ UF2_FAMILY_ID_EVE3 = 0x1594d309 # BT815, BT816
 UF2_FAMILY_ID_EVE4 = 0x9c217c82 # BT817, BT818
 
 EVE_FLASH_FIRMWARE_SIZE = 4096
+
+blob_bt815 = os.path.dirname(os.path.realpath(__file__)) + "/BT815-unified.blob"
+blob_bt817 = os.path.dirname(os.path.realpath(__file__)) + "/BT817-unified.blob"
+eve_flash_pico = os.path.dirname(os.path.realpath(__file__)) + "/eve_flash_pico.uf2"
+
+def file_2_buf(file):
+    try:
+        with open(file, "rb") as f:
+            return f.read()
+    except:
+        return []
+    return []
 
 def is_uf2(buf):
     if len(buf) < 512:
@@ -205,9 +219,18 @@ def get_drives():
 
 
 def board_id(path):
-    with open(path + INFO_FILE, mode='r') as file:
-        file_content = file.read()
-    return re.search("Board-ID: ([^\r\n]*)", file_content).group(1)
+    if os.path.isfile(path):
+        return " "
+
+    try: # add try - catch here beacuse of file may not able to read right after board reboot
+        with open(path + INFO_FILE, mode='r') as file:
+            file_content = file.read()
+        id = re.search("Board-ID: ([^\r\n]*)", file_content).group(1)
+        return id
+    except:
+        return " "
+
+    return " "
 
 def eve_flash_status(path):
     with open(path + INFO_FILE, mode='r') as file:
@@ -223,7 +246,13 @@ def get_rpi_drives():
 
 def is_eve_drive(d):
     id = board_id(d)
-    return id.startswith("BT815-") or id.startswith("BT816-") or id.startswith("BT817-") or id.startswith("BT818-")
+    return id.startswith("BT815-") or \
+           id.startswith("BT816-") or \
+           id.startswith("BT817-") or \
+           id.startswith("BT818-") or \
+           id.startswith("BT8XX-") or \
+           id.startswith("BT40817-") or \
+           id.startswith("BT")
 
 def get_eve_drives():
     drives = get_drives()
@@ -252,31 +281,90 @@ def write_file(name, buf):
 Pin setting for EVE-flash, stored in SPI_PIN.CNF
 """
 def pin_select(name, args):
-    pins=[
-        ["MISO", 4 ],
-        ["CS"  , 5 ],
-        ["SCK" , 2 ],
-        ["MOSI", 3 ],
-        ["INT" , 6 ],
-        ["PWD" , 7 ],
-        ["IO2" , 14],
-        ["IO3" , 15],
-    ]
+    # Read EVE configuration file
+    spi_parser = configparser.ConfigParser()
+    with open(name) as lines:
+        lines = chain(("[top]",), lines)  # This line does the trick.
+        spi_parser.read_file(lines)
+
+    pins = spi_parser.items('top')
+    print("Existing EVE-SPI pin config: ", pins);
+
+    # Read user SPI configuration input and update existing pins
     spliter='-'
     for arg in args[0]: # each arg is an pin setting, ex: -p int-7
-        pin_nth = 0 
-        for i, pin in enumerate(pins):
+        pin_nth = 0
+        for i, pin in enumerate(pins): # i = nth, pin = list('key', 'value')
             pin_name_pos=arg.find(spliter)
-            if arg[0:pin_name_pos].upper() ==  pin[0]:
-                pins[i][1] = arg[pin_name_pos+1::]
-            
-    print("Setting SPI pin:", pins)
-    spin = ""
+            pin_name=arg[0:pin_name_pos]
+            pin_value=arg[pin_name_pos+1::]
+
+            if arg[0:pin_name_pos].lower() == pin[0].lower():
+                pins[i] = (pin_name, pin_value)
+
+    print("Updating a new EVE-SPI pin config: ", pins);
+    spi_pin_stream = ""
     for i, pin in pins:
-        spin += str(i) + ": " + str(pin) + "\r\n"
-    print("spin=", spin)
-    write_file(name, bytes(spin, 'ascii'))
+        spi_pin_stream += str(i) + ": " + str(pin) + "\r\n"
+    write_file(name, bytes(spi_pin_stream, 'ascii'))
     
+def write_eve_flash_pico():
+    rpi_drives = get_rpi_drives()
+    eve_drives = get_eve_drives()
+
+    if len(eve_drives) != 0:
+        # Ok, PICO-EVE drive is already exist
+        print("BTEVE USB drive detected at", eve_drives)
+        return True
+
+    if len(rpi_drives) == 0:
+        # not ok, drive "RPI-RP2" is not exist
+        return False
+
+    print("PI-PICO USB drive detected at", rpi_drives)
+    # Now "RPI-RP2" is exist and BTEVE USB drive is not exist, flash the uf2 program
+
+    # Drive "RPI-RP2" is exist, start writing .uf2 program into it
+    with open(eve_flash_pico, mode='rb') as f:
+        picofw = f.read()
+
+        for d in rpi_drives:
+            print("Writing PI-PICO BTEVE program into %s (%s)" % (d, board_id(d)))
+            # The pi-pico board will reset and open an USB drive after this
+            write_file(d + "/pi-pico-eve-programmer.uf2", picofw) # any file name is ok
+
+
+    # loop and detect the EVE-usb drive
+    tries = 0
+    while len(eve_drives) < 1 and tries < 100:
+        time.sleep(0.05)
+        eve_drives = get_eve_drives()
+        tries += 1
+
+    if tries == 100:
+        print("Timeout! UF2 is just written but EVE usb drive is not detected")
+        return False
+    else:
+        print("BTEVE USB drive detected at", eve_drives)
+        return True
+
+def detect_pico_drive(args):
+    if write_eve_flash_pico() == True:
+        return True
+
+    if not args.wait:
+        return False
+    
+    print("No \"RPI-RP2\" USB drive is detected ")
+    print("Please hold \"SEL\" button and reset your PI-PICO board")
+    print("Waiting PI-PICO to come up...")
+
+    while write_eve_flash_pico() == False:
+        print(".", end='')
+        time.sleep(1)
+        
+    return True
+        
 def main():
     def error(msg):
         print(msg)
@@ -312,134 +400,131 @@ def main():
         
     if args.list:
         list_drives()
-    else:
-        inpbuf = []
-        if args.input:
-            with open(args.input, mode='rb') as f:
-                inpbuf = f.read()
-        eve3blob = []
-        eve4blob = []
-            
-        if args.firmware:
-            for fw in args.firmware:
-                if len(fw) == 0:
-                    if len(eve3blob) == 0:
-                        print("Including default EVE3 firmware blob")
-                        with open(os.path.dirname(os.path.realpath(__file__)) + "/BT815-unified.blob", mode='rb') as f:
-                            eve3blob = f.read()
-                    if len(eve4blob) == 0:
-                        print("Including default EVE4 firmware blob")
-                        with open(os.path.dirname(os.path.realpath(__file__)) + "/BT817-unified.blob", mode='rb') as f:
-                            eve4blob = f.read()
-                else:
-                    evegen = fw[0].upper()
-                    if evegen == "EVE3" or evegen == "BT815" or evegen == "BT816":
-                        if len(fw) >= 2:
-                            print("Including EVE3 firmware blob %s" % fw[1])
-                            blobfile = fw[1]
-                        else:
-                            print("Including default EVE3 firmware blob")
-                            blobfile = os.path.dirname(os.path.realpath(__file__)) + "/BT815-unified.blob"
-                        if blobfile == "input":
-                            eve3blob = inpbuf
-                        else:
-                            with open(blobfile, mode='rb') as f:
-                                eve3blob = f.read()
-                    elif evegen == "EVE4" or evegen == "BT817" or evegen == "BT818":
-                        if len(fw) >= 2:
-                            print("Including EVE4 firmware blob %s" % fw[1])
-                            blobfile = fw[1]
-                        else:
-                            print("Including default EVE3 firmware blob")
-                            blobfile = os.path.dirname(os.path.realpath(__file__)) + "/BT817-unified.blob"
-                        if blobfile == "input":
-                            eve4blob = inpbuf
-                        else:
-                            with open(blobfile, mode='rb') as f:
-                                eve4blob = f.read()
-                    else:
-                        error("Invalid EVE generation for firmware")
-                                
-        if args.pin:
-            for d in get_rpi_drives():
-                print("Launching %s (%s)" % (d, board_id(d)))
-                pin_select(d + "/SPI_PIN.CNF", args.pin)
+        return
+    
+    if not detect_pico_drive(args):
+        print("No BTEVE drive is detected, existing...")
+        return
 
-        if len(inpbuf) == 0 and len(eve3blob) == 0 and len(eve4blob) == 0:
-            if args.pin:
-                sys.exit(0)
-            else:
-                error("Need input file")
+    inpbuf = file_2_buf(args.input)
+    eve3blob = []
+    eve4blob = []
         
-        from_uf2 = is_uf2(inpbuf)
-        ext = "uf2"
-        if args.deploy:
-            outbuf = inpbuf
-            if args.keep:
-                outbuf_nofw = []
-        elif from_uf2:
-            outbuf = convert_from_uf2(inpbuf)
-            ext = "bin"
-        elif args.carray:
-            outbuf = convert_to_carray(inpbuf)
-            ext = "h"
-        else:
-            outbuf = convert_to_uf2(eve3blob[0:EVE_FLASH_FIRMWARE_SIZE], eve4blob[0:EVE_FLASH_FIRMWARE_SIZE], inpbuf)
-            if args.keep:
-                outbuf_nofw = convert_to_uf2([], [], inpbuf)
-        print("Converting to %s, output size: %d" %
-              (ext, len(outbuf)))
-        if args.convert or ext != "uf2":
-            eve_drives = []
-            rpi_drives = []
-            if args.output == None:
-                args.output = "flash." + ext
-        else:
-            rpi_drives = get_rpi_drives()
-            eve_drives = get_eve_drives()
-
-        if args.output:
-            print("Save as %s" % args.output)
-            write_file(args.output, outbuf)
-        else:
-            if len(rpi_drives) == 0 and len(eve_drives) == 0:
-                error("No drive to deploy.")
-
-        if len(rpi_drives) != 0:
-            if len(eve_drives) == 0:
-                with open(os.path.dirname(os.path.realpath(__file__)) + "/eve_flash_pico.uf2", mode='rb') as f:
-                    picofw = f.read()
-                for d in rpi_drives:
-                    print("Launching %s (%s)" % (d, board_id(d)))
-                    write_file(d + "/NEW.UF2", picofw)
-            
-            tries = 0
-            while len(eve_drives) < len(rpi_drives) and tries < 100:
-                time.sleep(0.05)
-                eve_drives = get_eve_drives()
-                tries += 1
-                
-            if tries == 100:
-                error("Timeout")
-            
-            for d in eve_drives:
-                if args.keep and eve_flash_status(d) == "FULL":
-                    print("Flashing %s (%s), firmware will be skipped" % (d, board_id(d)))
-                    if len(outbuf_nofw):
-                        write_file(d + "/NEW.UF2", outbuf_nofw)
+    if args.firmware:
+        for fw in args.firmware:
+            if len(fw) == 0:
+                print("Including default EVE3 firmware blob")
+                eve3blob = file_2_buf(blob_bt815)
+                print("Including default EVE4 firmware blob")
+                eve4blob = file_2_buf(blob_bt817)
+                    
+            else:
+                evegen = fw[0].upper()
+                if evegen == "EVE3" or evegen == "BT815" or evegen == "BT816":
+                    if len(fw) >= 2:
+                        print("Including EVE3 firmware blob %s" % fw[1])
+                        blobfile = fw[1]
                     else:
-                        print("Nothing happens")
+                        print("Including default EVE3 firmware blob")
+                        blobfile = blob_bt815
+                    if blobfile == "input":
+                        eve3blob = inpbuf
+                    else:
+                        eve3blob = file_2_buf(blobfile)
+                elif evegen == "EVE4" or evegen == "BT817" or evegen == "BT818":
+                    if len(fw) >= 2:
+                        print("Including EVE4 firmware blob %s" % fw[1])
+                        blobfile = fw[1]
+                    else:
+                        print("Including default EVE3 firmware blob")
+                        blobfile = blob_bt817
+                    if blobfile == "input":
+                        eve4blob = inpbuf
+                    else:
+                        eve4blob = file_2_buf(blobfile)
                 else:
-                    print("Flashing %s (%s)" % (d, board_id(d)))
-                    write_file(d + "/NEW.UF2", outbuf)
+                    error("Invalid EVE generation for firmware")
+                            
+    if args.pin:
+        for d in get_rpi_drives():
+            print("Pin setting to %s (%s)" % (d, board_id(d)))
+            pin_select(d + "/SPI_PIN.CNF", args.pin)
+
+    if len(inpbuf) == 0 and len(eve3blob) == 0 and len(eve4blob) == 0:
+        if args.pin:
+            sys.exit(0)
+        else:
+            error("Need input file")
+    
+    from_uf2 = is_uf2(inpbuf)
+    ext = "uf2"
+    if args.deploy:
+        outbuf = inpbuf
+        if args.keep:
+            outbuf_nofw = []
+    elif from_uf2:
+        outbuf = convert_from_uf2(inpbuf)
+        ext = "bin"
+    elif args.carray:
+        outbuf = convert_to_carray(inpbuf)
+        ext = "h"
+    else:
+        outbuf = convert_to_uf2(eve3blob[0:EVE_FLASH_FIRMWARE_SIZE], eve4blob[0:EVE_FLASH_FIRMWARE_SIZE], inpbuf)
+        if args.keep:
+            outbuf_nofw = convert_to_uf2([], [], inpbuf)
+    print("Converting to %s, output size: %d" %
+          (ext, len(outbuf)))
+    if args.convert or ext != "uf2":
+        eve_drives = []
+        rpi_drives = []
+        if args.output == None:
+            args.output = "flash." + ext
+    else:
+        rpi_drives = get_rpi_drives()
+        eve_drives = get_eve_drives()
+
+    if args.output:
+        print("Save as %s" % args.output)
+        write_file(args.output, outbuf)
+    else:
+        if len(rpi_drives) == 0 and len(eve_drives) == 0:
+            error("No drive to deploy.")
+
+    if len(rpi_drives) != 0:
+        if len(eve_drives) == 0:
+            with open(os.path.dirname(os.path.realpath(__file__)) + "/eve_flash_pico.uf2", mode='rb') as f:
+                picofw = f.read()
+            for d in rpi_drives:
+                print("Launching %s (%s)" % (d, board_id(d)))
+                write_file(d + "/NEW.UF2", picofw)
+        
+        tries = 0
+        while len(eve_drives) < len(rpi_drives) and tries < 100:
+            time.sleep(0.05)
+            eve_drives = get_eve_drives()
+            tries += 1
             
-            if args.wait:
+        if tries == 100:
+            error("Timeout")
+        
+        for d in eve_drives:
+            if args.keep and eve_flash_status(d) == "FULL":
+                print("Flashing %s (%s), firmware will be skipped" % (d, board_id(d)))
+                if len(outbuf_nofw):
+                    write_file(d + "/NEW.UF2", outbuf_nofw)
+                else:
+                    print("Nothing happens")
+            else:
+                print("Flashing %s (%s)" % (d, board_id(d)))
+                write_file(d + "/NEW.UF2", outbuf)
+        
+        if args.wait:
+            rpi_drives = get_rpi_drives()
+            tries = 0
+            while len(rpi_drives) < len(eve_drives) and tries < 100:
+                time.sleep(0.05)
                 rpi_drives = get_rpi_drives()
-                tries = 0
-                while len(rpi_drives) < len(eve_drives) and tries < 100:
-                    time.sleep(0.05)
-                    rpi_drives = get_rpi_drives()
-                    tries += 1
+                tries += 1
 
 
 if __name__ == "__main__":

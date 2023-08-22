@@ -133,13 +133,13 @@ char infoUf2File[512] =
 
 char infoSPIConfFile[128] =
     "MISO" ": 4  \r\n"
-    "CS"   ": 14  \r\n"
+    "CS"   ": 5  \r\n" // PD100 use pin 14
     "SCK"  ": 2  \r\n"
     "MOSI" ": 3  \r\n"
     "INT"  ": 6  \r\n"
     "PWD"  ": 7  \r\n"
-    "IO2"  ": 5 \r\n"
-    "IO3"  ": 15 \r\n";
+    "IO2"  ": 14 \r\n" // PD100 use pin 5
+    "IO3"  ": 15 \r\n";    
 
 const char indexFile[] =
     "<!doctype html>\n"

@@ -148,6 +148,7 @@ int main(void)
     tud_task();
     if (_dfu_complete)
     {
+      // Deinit EVE and return to RP2040 boot loader
       board_dfu_complete();
 	  
       // _dfu_complete = false;

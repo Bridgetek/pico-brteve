@@ -1,3 +1,4 @@
+
 # eve_flash_pico
 
 ## Introduction
@@ -6,31 +7,35 @@ It is based on https://github.com/adafruit/tinyuf2.
 
 ## Build 
 
-Need prepare pico-SDK from https://github.com/raspberrypi/pico-sdk version 1.3.0
+  1. Use Window 10 OS.
+  2. Install cmake 3.19.x, python, Visual Studio 2022 community (must select C++), GNU Arm Embedded Toolchain for window.
+  3. Clone pico-sdk:
+     ```
+      $ git clone --branch 1.3.0 https://github.com/raspberrypi/pico-sdk.git
+      $ cd pico-sdk
+      $ git submodule update --init
+     ```
+     
+  5. Set environment variable:
+      ```
+      $ set PICO_SDK_PATH=[PATH-TO pico-sdk]
+      $ set PICO_TOOLCHAIN_PATH=C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
+      ```
+      
+  7. Open developer command promt for Visual Studio and run:
 
-EveApps from this version: https://github.com/BRTSG-FOSS/EveApps/commit/5c6975de0709826cab0286ec52c06ef76f56faf7
+   ```
+   $ cd pico-brteve\tools\uf2
+   $ mkdir build
+   $ cd build
+   $ "C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles"  -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WVGA  ../source
+   $ nmake eve_flash_pico
+   ```
 
-Open Developer command promt for VS2019
-
-Build release:
-
-```
-cd pico-brteve\tools\uf2\source
-git clone https://github.com/BRTSG-FOSS/EveApps
-cd EveApps && git checkout -b 5c6975de0709826cab0286ec52c06ef76f56faf7 && cd ../
-mkdir build
-cd build
-set PICO_SDK_PATH=path-to--pico-sdk
-set PICO_TOOLCHAIN_PATH=path-to--GNU Arm Embedded Toolchain\\10 2020-q4-major\\bin
-"C:\Program Files\CMake\bin\cmake.exe" -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA  ../
-nmake eve_flash_pico
-```
-
-Build with debug flag:
-
-```
-cmake -G "NMake Makefiles" -DEVE_APPS_PLATFORM=RP2040 -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=DEBUG ../
-```
+   ```
+   Debug mode:
+   $ cmake -G "NMake Makefiles" -DEVE_APPS_GRAPHICS=BT817 -DEVE_APPS_DISPLAY=WXGA -DCMAKE_BUILD_TYPE=DEBUG ../source
+   ```
 
 ## Debugging
 
