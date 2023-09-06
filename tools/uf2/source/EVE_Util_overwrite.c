@@ -268,7 +268,7 @@ uint32_t readChipID(EVE_HalContext *phost)
 	
 	if (chipId == 0x00017A81)
 	{
-		chipId = EVE_BT817;
+		chipId = 0x00011708;
 	}
 	
 	return chipId;
