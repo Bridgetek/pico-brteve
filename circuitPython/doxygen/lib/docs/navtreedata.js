@@ -26,7 +26,7 @@ var NAVTREE =
 [
   [ "Brteve Project", "index.html", [
     [ "Namespaces", "namespaces.html", [
-      [ "Namespace List", "namespaces.html", "namespaces_dup" ],
+      [ "Namespace List", "namespaces.html", null ],
       [ "Namespace Members", "namespacemembers.html", [
         [ "All", "namespacemembers.html", null ],
         [ "Functions", "namespacemembers_func.html", null ]
@@ -46,8 +46,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"annotated.html",
-"classbrteve_1_1brt__eve__module_1_1_brt_eve_module.html#a52777e73cdb450c16aecd4be80fdaca6"
+"annotated.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
