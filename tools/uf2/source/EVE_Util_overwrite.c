@@ -109,7 +109,7 @@ static const char *s_HostDisplayNames[EVE_HOST_NB] = {
 	"Embedded",
 };
 
-#define EVE_SELECT_CHIP_NB 14
+#define EVE_SELECT_CHIP_NB 15
 
 #if defined(EVE_MULTI_GRAPHICS_TARGET)
 
@@ -128,6 +128,7 @@ static const char *s_SelectChipName[EVE_SELECT_CHIP_NB] = {
 	"BT815",
 	"BT816",
 	"BT817",
+	"BT817A",
 	"BT818",
 };
 
@@ -145,6 +146,7 @@ static EVE_CHIPID_T s_SelectChipId[EVE_SELECT_CHIP_NB] = {
 	EVE_BT815,
 	EVE_BT816,
 	EVE_BT817,
+	EVE_BT817A,
 	EVE_BT818,
 };
 
@@ -288,7 +290,7 @@ EVE_HAL_EXPORT void EVE_Util_bootupDefaults(EVE_HalContext *phost, EVE_BootupPar
 #ifdef EVE_SYSTEM_CLOCK
 	bootup->SystemClock = EVE_SYSTEM_CLOCK;
 #else
-	if (chipId >= EVE_FT800 && chipId <= EVE_BT818)
+	if ((chipId >= EVE_FT800 && chipId <= EVE_BT818) || chipId == EVE_BT817A )
 	{
 #if (EVE_SUPPORT_CHIPID >= EVE_BT815)
 		if (chipId >= EVE_BT815)
@@ -1103,8 +1105,7 @@ EVE_HAL_EXPORT bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters 
 		EVE_Host_coreReset(phost);
 		/* Wait for valid chip ID */
 		chipId = EVE_Hal_rd32(phost, ROM_CHIPID);
-		while (EXTRACT_CHIPID(chipId) < EVE_FT800
-		    || EXTRACT_CHIPID(chipId) > EVE_BT818)
+		while ((EXTRACT_CHIPID(chipId) < EVE_FT800 || EXTRACT_CHIPID(chipId) > EVE_BT818) && (EXTRACT_CHIPID(chipId) != EVE_BT817A))
 		{
 			eve_printf_debug("EVE ROM_CHIPID after wake up %lx\n", (unsigned long)chipId);
 
@@ -1270,7 +1271,7 @@ EVE_HAL_EXPORT bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters 
 #pragma warning(push)
 #pragma warning(disable : 6285)
 #endif
-	if ((EVE_CHIPID == EVE_BT815 || EVE_CHIPID == EVE_BT817) && (EVE_HOST != EVE_HOST_BT8XXEMU))
+	if ((EVE_CHIPID == EVE_BT815 || EVE_CHIPID == EVE_BT817 || EVE_CHIPID == EVE_BT817A) && (EVE_HOST != EVE_HOST_BT8XXEMU))
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -1898,7 +1899,7 @@ SelectChipId:
 			goto SelectChipId;
 		if (selectedChipId >= 0 && selectedChipId < EVE_SELECT_CHIP_NB)
 			*chipId = s_SelectChipId[selectedChipId];
-		else if (selectedChipId >= EVE_FT800 && selectedChipId <= EVE_BT818)
+		else if ((selectedChipId >= EVE_FT800 && selectedChipId <= EVE_BT818) || selectedChipId == EVE_BT817A)
 			*chipId = selectedChipId;
 		else
 			goto SelectChipId;

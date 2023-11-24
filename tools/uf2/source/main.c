@@ -128,7 +128,7 @@ int main(void)
     board_app_jump();
     while(1) {}
   }
-  
+
   if(board_dfu_init()){
     board_flash_init();
     uf2_init();

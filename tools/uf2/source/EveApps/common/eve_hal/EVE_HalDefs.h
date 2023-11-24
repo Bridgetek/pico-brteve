@@ -83,6 +83,7 @@ typedef enum EVE_CHIPID_T
 	EVE_CHIPID_BT815 = EVE_BT815,
 	EVE_CHIPID_BT816 = EVE_BT816,
 	EVE_CHIPID_BT817 = EVE_BT817,
+	EVE_CHIPID_BT817A = EVE_BT817A,
 	EVE_CHIPID_BT818 = EVE_BT818,
 } EVE_CHIPID_T;
 
@@ -529,6 +530,7 @@ static inline EVE_CHIPID_T EVE_extendedChipId(int chipId)
 	case EVE_BT816 & 0xFFFF:
 		return (EVE_CHIPID_T)((chipId & 0xFFFF) | 0x30000);
 	case EVE_BT817 & 0xFFFF:
+	case EVE_BT817A & 0xFFFF:
 	case EVE_BT818 & 0xFFFF:
 		return (EVE_CHIPID_T)((chipId & 0xFFFF) | 0x40000);
 	default:
@@ -563,6 +565,7 @@ static inline int EVE_gen(EVE_CHIPID_T chipId)
 	case EVE_BT816:
 		return EVE3;
 	case EVE_BT817:
+	case EVE_BT817A:
 	case EVE_BT818:
 		return EVE4;
 	default:

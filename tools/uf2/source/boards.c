@@ -33,7 +33,7 @@
 #include "pico/unique_id.h"
 
 #define UF2_FAMILY_ID_EVE3 0x1594d309 // BT815, BT816
-#define UF2_FAMILY_ID_EVE4 0x9c217c82 // BT817, BT818
+#define UF2_FAMILY_ID_EVE4 0x9c217c82 // BT817, BT817A, BT818
 
 #define BTFLASH_CMD_RUID (0x4B) /* Read Unique ID */
 #define BTFLASH_RUID_DUMMY_BYTES (4)

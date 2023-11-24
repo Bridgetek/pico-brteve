@@ -25,7 +25,7 @@ INFO_FILE = "/INFO_UF2.TXT"
 UF2_VERSION_FILE = "source/board.h"
 
 UF2_FAMILY_ID_EVE3 = 0x1594d309 # BT815, BT816
-UF2_FAMILY_ID_EVE4 = 0x9c217c82 # BT817, BT818
+UF2_FAMILY_ID_EVE4 = 0x9c217c82 # BT817, BT817A, BT818
 
 EVE_FLASH_FIRMWARE_SIZE = 4096
 
@@ -251,6 +251,7 @@ def is_eve_drive(d):
     return id.startswith("BT815-") or \
            id.startswith("BT816-") or \
            id.startswith("BT817-") or \
+           id.startswith("BT817A-") or \
            id.startswith("BT818-") or \
            id.startswith("BT8XX-") or \
            id.startswith("BT40817-") or \
@@ -475,12 +476,12 @@ def main():
                         eve3blob = inpbuf
                     else:
                         eve3blob = file_2_buf(blobfile)
-                elif evegen == "EVE4" or evegen == "BT817" or evegen == "BT818":
+                elif evegen == "EVE4" or evegen == "BT817" or evegen == "BT817A" or evegen == "BT818":
                     if len(fw) >= 2:
                         print("Including EVE4 firmware blob %s" % fw[1])
                         blobfile = fw[1]
                     else:
-                        print("Including default EVE3 firmware blob")
+                        print("Including default EVE4 firmware blob")
                         blobfile = blob_bt817
                     if blobfile == "input":
                         eve4blob = inpbuf
