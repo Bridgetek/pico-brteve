@@ -264,6 +264,18 @@ static inline void uploadTouchFirmware(EVE_HalContext *phost)
 }
 #endif
 
+uint32_t readChipID(EVE_HalContext *phost)
+{
+	uint32_t chipId = EVE_Hal_rd32(phost, ROM_CHIPID);
+	
+	if (chipId == 0x00017A81)
+	{
+		chipId = 0x00011708;
+	}
+	
+	return chipId;
+}
+
 /**
  * @brief Clear the screen
  * 
@@ -1104,7 +1116,7 @@ EVE_HAL_EXPORT bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters 
 
 		EVE_Host_coreReset(phost);
 		/* Wait for valid chip ID */
-		chipId = EVE_Hal_rd32(phost, ROM_CHIPID);
+		chipId = readChipID(phost, ROM_CHIPID);
 		while ((EXTRACT_CHIPID(chipId) < EVE_FT800 || EXTRACT_CHIPID(chipId) > EVE_BT818) && (EXTRACT_CHIPID(chipId) != EVE_BT817A))
 		{
 			eve_printf_debug("EVE ROM_CHIPID after wake up %lx\n", (unsigned long)chipId);
@@ -1114,7 +1126,7 @@ EVE_HAL_EXPORT bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters 
 			if (phost->CbCmdWait && !phost->CbCmdWait(phost))
 				return false;
 
-			chipId = EVE_Hal_rd32(phost, ROM_CHIPID);
+			chipId = readChipID(phost);
 
 #ifdef EVE_MULTI_TARGET
 			/* Turn off external clock if chipId reads incorrectly for 4 times */
@@ -1193,7 +1205,7 @@ EVE_HAL_EXPORT bool EVE_Util_bootup(EVE_HalContext *phost, EVE_BootupParameters 
 			return false;
 	}
 	eve_printf_debug("EVE register ID after wake up %x\n", (unsigned int)id);
-	eve_assert(chipId == EVE_Hal_rd32(phost, ROM_CHIPID));
+	eve_assert(chipId == readChipID(phost));
 
 	/* Update REG_FREQUENCY as per user selected */
 	if (bootup->SystemClock != EVE_SYSCLK_DEFAULT)
