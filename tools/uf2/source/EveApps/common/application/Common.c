@@ -286,14 +286,14 @@ void Gpu_Init(EVE_HalContext* phost) {
 	EVE_sleep(300);
 #endif
 
-#if defined(BT817_ENABLE) || defined(BT818_ENABLE)
+#if defined(BT817_ENABLE) || defined(BT817A_ENABLE) || defined(BT818_ENABLE)
 	/// Enable capacity touch
 	Init_CapacitiveTouch(phost);
 
 	/// set API level to BT817
 	EVE_CoCmd_apiLevel(phost, 2);
 	EVE_Cmd_waitFlush(phost);
-	printf("Set APILEVEL to BT817/8 (2)\n");
+	printf("Set APILEVEL to BT817/7A/8 (2)\n");
 #else
 	printf("Set APILEVEL to default (1)\n");
 #endif
@@ -352,7 +352,7 @@ uint32_t Draw_Point(EVE_HalContext* phost, uint32_t Rx, uint32_t Ry, uint32_t R)
 
 uint32_t Draw_Image(EVE_HalContext* phost, const char* filePath,
 		uint32_t format) {
-#if defined(BT817_ENABLE) || defined(BT818_ENABLE)
+#if defined(BT817_ENABLE) || defined(BT817A_ENABLE) || defined(BT818_ENABLE)
 	Gpu_Hal_LoadImageToMemory(phost, filePath, RAM_G, LOADIMAGE);
 	uint32_t ptr = 0;
 	uint32_t w;

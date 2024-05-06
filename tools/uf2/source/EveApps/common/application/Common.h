@@ -125,7 +125,7 @@ void Gpu_Init(EVE_HalContext *phost);
 void Gpu_Release(EVE_HalContext *phost);
 uint32_t Get_SystemClock(EVE_HalContext *phost);
 uint32_t Draw_Point(EVE_HalContext *phost, uint32_t Rx, uint32_t Ry, uint32_t R);
-#if defined(BT817_ENABLE) || defined(BT818_ENABLE)
+#if defined(BT817_ENABLE) || defined(BT817A_ENABLE)|| defined(BT818_ENABLE)
 uint32_t Draw_Image(EVE_HalContext *phost, const char *filePath, uint32_t format);
 #endif
 
